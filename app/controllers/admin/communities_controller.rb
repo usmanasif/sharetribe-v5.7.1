@@ -29,6 +29,43 @@ class Admin::CommunitiesController < ApplicationController
     render "edit_look_and_feel", locals: onboarding_popup_locals
   end
 
+  def edit_featured_slider
+    @selected_left_navi_link = "tribe_featured_slider"
+    @community = @current_community
+    @slider_images = get_slider_images
+    @states = [["Slider 1",1],["Slider 2", 2] ,["Inactive",0],["Delete", -1]]
+    render 'edit_featured_slider'
+  end
+
+  def edit_featured_products
+    @selected_left_navi_link = "tribe_featured_slider"
+    @community = @current_community
+    render 'edit_featured_products'
+  end
+
+  def update_featured_slider
+    @selected_left_navi_link = "tribe_featured_slider"
+    @community = @current_community
+    slider_image_params = params.require(:community).permit(:image)
+    slider_image = FeaturedSlider.new(slider_image_params)
+    slider_image.image_for = 0
+    slider_image.save
+    edit_featured_slider
+  end
+
+  def modify_slider
+    img_id = params[:img_id].split('_')[1]
+    featured_slider = FeaturedSlider.find(img_id)
+    if params[:option_selected] == -1
+      featured_slider.destroy
+      render json:{deleted: false},status:200
+    else
+      featured_slider.image_for = params[:option_selected]
+      featured_slider.save!
+      render json:{deleted: true},status:200
+    end
+  end
+
   def edit_text_instructions
     @selected_left_navi_link = "text_instructions"
     @community = @current_community
@@ -41,7 +78,7 @@ class Admin::CommunitiesController < ApplicationController
     @url_params = {
       :host => @current_community.full_domain,
       :ref => "welcome_email",
-      :locale => @current_user.locale
+      :locale => @current_user.locales
     }
 
     sender_address = EmailService::API::Api.addresses.get_sender(community_id: @current_community.id).data
@@ -153,20 +190,28 @@ class Admin::CommunitiesController < ApplicationController
   # This is currently only for superadmins, quick and hack solution
   def payment_gateways
     # Redirect if payment gateway in use but it's not braintree
-    redirect_to admin_details_edit_path if @current_community.payment_gateway && !@current_community.braintree_in_use?
-
-    @selected_left_navi_link = "payment_gateways"
-    @community = @current_community
-    @payment_gateway = Maybe(@current_community).payment_gateway.or_else { BraintreePaymentGateway.new }
-
-    render :braintree_payment_gateway
+    if((@current_community.payment_gateway) && (!@current_community.braintree_in_use?))
+      redirect_to admin_details_edit_path
+    else
+      @selected_left_navi_link = "payment_gateways"
+      @community = @current_community
+      @payment_gateway = Maybe(@current_community).payment_gateway.or_else { BraintreePaymentGateway.new }
+      render :braintree_payment_gateway
+    end
   end
 
   def update_payment_gateway
     # Redirect if payment gateway in use but it's not braintree
     redirect_to admin_details_edit_path if @current_community.payment_gateway && !@current_community.braintree_in_use?
 
-    braintree_params = params[:payment_gateway]
+    braintree_params = params.require(:payment_gateway).permit(
+                                                                :braintree_environment,
+                                                                :braintree_public_key,
+                                                                :braintree_private_key,
+                                                                :braintree_merchant_id,
+                                                                :braintree_master_merchant_id,
+                                                                :braintree_client_side_encryption_key
+                                                              )
     community_params = params.require(:community).permit(:commission_from_seller)
 
     unless @current_community.update_attributes(community_params)
@@ -344,6 +389,10 @@ class Admin::CommunitiesController < ApplicationController
   end
 
   private
+
+  def get_slider_images
+    FeaturedSlider.all
+  end
 
   def enqueue_status_sync!(address)
     Maybe(address)

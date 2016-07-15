@@ -1,0 +1,118 @@
+%script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"}
+- content_for :title_header do
+  %h1
+    = t("layouts.admin.admin")
+    = "-"
+    = "Featured Slider"
+
+= render :partial => "admin/left_hand_navigation", :locals => { :links => admin_links_for(@current_community) }
+
+
+#new_news_item_form.left-navi-section
+  %h2 Edit marketplace "#{@community.name(I18n.locale)}" landing page slider
+  = form_for @community, :url => admin_edit_featured_slider_path, :method => :put, multipart: true do |form|
+    .row
+      .col-12
+        = form.label :Upload_image_for_slider, :class => "input"
+        = form.file_field(:image, :class => "file_field" ,:required => true )
+
+    .row
+      .col-12
+        = form.button "Upload Image", :id => "edit_community_button",:class => "send_button"
+
+  / -if @slider_images.present?
+  /   -@slider_images.each do |image|
+  /     - s_i = show_slider_image(image.listing_id)
+  /     %img{:alt => "Slider_image", :height => "150", :src => s_i.image.url(:original), :width => "250"}
+  - if @slider_images.any?
+    - @slider_images.each do |image|
+      - if image.image_for == 1
+        .slider-holder.slider1
+          = select_tag(:slider[image.id], options_for_select(@states , image.image_status) ,class: 'slider_menu form-select', id: "id_#{image.id}", style: " width: 100%")
+          .br
+          %img{:alt => "Slider_image", :height => "150", :src => image.image.url(:medium), :width => "100%"}/
+
+      - if image.image_for == 2
+        .slider-holder.slider2
+          = select_tag(:slider[image.id], options_for_select(@states , image.image_status) ,class: 'slider_menu form-select', id: "id_#{image.id}", style: " width: 100%") 
+          .br
+          %img{:alt => "Slider_image", :height => "150",src: image.image.url(:medium), :width => "100%"}/
+
+      - if image.image_for == 0
+        .slider-holder
+          = select_tag(:slider[image.id], options_for_select(@states , image.image_status) ,class: 'slider_menu form-select', id: "id_#{image.id}", style: " width: 100%") 
+          .br
+          %img{:alt => "Slider_image", :height => "150",src: image.image.url(:medium), :width => "100%"}/
+
+:javascript
+  function changeColor(obj_id,option_selected){
+    if(option_selected == '1'){
+      $("#"+obj_id).parent().removeClass('slider2');
+      $("#"+obj_id).parent().addClass('slider1');
+    }
+    if(option_selected == '2'){
+      $("#"+obj_id).parent().removeClass('slider1');
+      $("#"+obj_id).parent().addClass('slider2');
+    }
+    if(option_selected == '0'){
+      $("#"+obj_id).parent().removeClass('slider1');
+      $("#"+obj_id).parent().removeClass('slider2');
+    }
+  };
+  $(".slider_menu").change(function(e){
+    obj_id = e.target.id;
+    var option_selected = $("#"+obj_id).val();
+    console.log(e.parent);
+    $.ajax({
+            url: "#{admin_modify_slider_url}",
+            data: {img_id: obj_id, option_selected: option_selected},
+            method: 'PUT',
+            type: 'json',
+            success: function(result){
+            	if(result["deleted"] == 'true'){
+            		$("#"+obj_id).parent().hide();
+            	}
+            	else{
+                changeColor(obj_id, option_selected)
+            	}
+            },
+            error: function(error){
+            }
+          });
+  });
+
+
+:css
+  .slider-holder{
+    float: left;
+    width: 48%;
+    margin: 0 2% 8px 0;
+    border-left: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;
+    border-top: 1px solid #000;
+    padding: 5px;
+  }
+  .form-select {
+    width: 200px;  
+  }
+  select {
+    width: 100%;
+    height: 45px;
+    border: 0;
+
+    border-bottom: 1px solid black;
+    background: #fff url('https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_down_48px-128.png') no-repeat;
+    background-size: 20px;
+    background-position:  right 10px center;
+    font-family: 'Arial';
+    padding-left: 24px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  .slider1{
+    background: darkgray;
+  }
+  .slider2{
+    background: #954453;
+  }

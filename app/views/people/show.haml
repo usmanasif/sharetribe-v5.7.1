@@ -5,73 +5,349 @@
   %h1
     %span.profile-title= @person.name(@current_community) + (@community_customization && @community_customization.storefront_label ? @community_customization.storefront_label : "")
 
-.row
-  .col-8
-
-    .row.relative
-      .people-image-mobile
-        = huge_avatar_thumb(@person)
-      .profile-action-buttons-mobile
-        = render :partial => "profile_action_buttons"
-
+.rating-details
+  .col-md-12.col-sm-12.col-xs-12
     .row
-      - if @person.description && !@person.description.blank?
-        - text_with_line_breaks do
-          = @person.description
-      - elsif current_user?(@person)
-        %a{href: person_settings_path(@person)}
-          .icon-with-text-container
-            .ss-chat.icon-part
-            .ss.text-part= t(".add_description")
-
+      .col-md-2.col-sm-2.col-xs-2
+        .people-image-mobile
+          = huge_avatar_thumb(@person)
+        .profile-action-buttons-mobile
+          -if current_user?(@person)
+            %a.profile-edit-link{href: person_settings_path(@person)}
+              .content
+                = t("people.show.edit_profile_info")
+      .col-md-10.col-sm-10.col-xs-10.padding-left-0
+        .follow-taxtarea
+          .follow-head.row
+            .col-md-9.col-sm-9.col-xs-9
+              %a.title{:href => "#"} #{@person.full_name}
+              ( #{listings.count} )
+              %span.feed-back-text
+                
+            .col-md-3.col-sm-3.col-xs-3.pull-right.text-right
+              -if !current_user?(@person)
+                %a.fa.fa-envelope-o{:href => new_person_person_message_path(@person)}
+                %a{:href => new_person_person_message_path(@person)}
+                  %span Contact me
+          .row
+            .col-md-4.col-sm-4.col-xs-4      
+              - if @current_community.follow_in_use? && @current_user && !current_user?(@person)
+                - if @current_user.follows?(@person)
+                  = link_to person_follower_path(@person, @current_user), :method => "delete", :remote => true, :id => "followButton" , :class => "following_button" do
+                    %button.btn-follow{:type => "button"} 
+                      Following
+                - else
+                  = link_to [ @person, :followers ], :method => "post", :remote => true, :id => "followButton" , :class => "follow_button" do
+                    %button.btn-follow{:type => "button"} 
+                      %i.fa.fa-plus
+                        Follow
+            .col-md-8.col-sm-8.col-xs-8.follow_caption
+              - if @person.description && !@person.description.blank?
+                - text_with_line_breaks do
+                  = @person.description
+              - elsif current_user?(@person)
+                %a{href: person_settings_path(@person)}
+                  .icon-with-text-container
+                    .ss-chat.icon-part
+                    .ss.text-part= t(".add_description")
+                          
+  .col-md-12.col-sm-12.col-xs-12.see-all-feeback-block
     .row
-      %h2.people-header
-        - if listings.total_entries > 0
-          - if current_user?(@person) && params[:show_closed]
-            = pluralize(listings.total_entries, t(".listing"), t(".listings"))
-          - else
-            = pluralize(listings.total_entries, t(".open_listing"), t(".open_listings"))
-        - else
-          - if current_user?(@person) && params[:show_closed]
-            = t(".no_listings")
-          - else
-            = t(".no_open_listings")
-        %span.people-show-closed-link
-          - if current_user?(@person)
-            - if params[:show_closed]
-              = link_to t("people.profile_listings.show_only_open"), person_path(@person)
-            - else
-              = link_to t("people.profile_listings.show_also_closed"), person_path(@person, :show_closed => true)
-
-    #profile-listings-list
-      - limit = 6
-      = render :partial => 'listings/profile_listings', :locals => {person: @person, limit: limit, listings: listings}
-
-    - if @current_community.follow_in_use?
-      = render :partial => "followed_people", :locals => { person: @person, followed_people: followed_people, limit: 6 }
-
-    - if @current_community.testimonials_in_use
-      #people-testimonials.listing-main
-        .row
-          %h2.people-header
-            - if received_testimonials.size > 0
-              = pluralize(received_testimonials.size, t(".review"), t(".reviews"))
-              = "(#{feedback_positive_percentage.to_s}% #{t("people.show.positive")}, #{received_positive_testimonials.size}/#{received_testimonials.size})"
-            - else
-              = t(".no_reviews")
-          - if received_testimonials.size > 0
-            #profile-testimonials-list
-              = render :partial => "testimonials", :locals => {:received_testimonials => received_testimonials, :limit => 3}
-
-  .col-4
+      .col-md-6.col-sm-6.col-xs-6
+        %h3
+          Feedback ratings
+      .col-md-6.col-sm-6.col-xs-6.pull-right.text-right
+        %h3
+          %a{:href => "#"} see all feeback
     .row
-      .people-image
-        = huge_avatar_thumb(@person)
+      .col-md-4.col-sm-4.col-xs-4.feedback-border-right
+       
+        %ul.ratinglist-detail.row
+          %li
+            .col-md-4.col-sm-4.col-xs-4
+              %span#rateYo
+            .col-md-3.col-sm-3.col-xs-3
+              %strong
+                #{received_testimonials.size}
+            .col-md-5.col-sm-5.col-xs-5
+              %span
+                Item as described
+      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right                                                 
+        .col-md-4.col-sm-4.col-xs-4
+          %p
+            %span
+              %i.fa.fa-plus-circle
+            %strong
+              #{received_positive_testimonials.size}
+          %p
+            Positive
+        .col-md-4.col-sm-4.col-xs-4
+          %p
+            %span
+              %i.icon-circle-blank{:style => "font-size:18px"}
+            %strong
+              #{received_neutral_testimonials.size}
+          %p
+            Neutral
+        .col-md-4.col-sm-4.col-xs-4
+          %p
+            %span
+              %i.fa.fa-minus-circle
+            %strong
+              #{received_negative_testimonials.size}
+          %p
+            Negative
+      .col-md-4.col-sm-4.col-xs-4
+        #rating-carousel
+          -received_testimonials.each do |testimonial| 
+            - listing = testimonial.tx.listing
+            .item
+              .row
+                .col-md-4.col-sm-4.col-xs-4
+                  = small_avatar_thumb(testimonial.author)
+                  -if testimonial.grade <= 0.25
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                  -elsif testimonial.grade == 0.5
+                    %i.fa.fa-star{"aria-hidden" => "true"}
+                    %i.fa.fa-star-half-o{"aria-hidden" => "true"}
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                  -elsif testimonial.grade >= 0.5
+                    %i.fa.fa-star{"aria-hidden" => "true"} 
+                    %i.fa.fa-star{"aria-hidden" => "true"} 
+                    %i.fa.fa-star{"aria-hidden" => "true"}
+                .col-md-8.col-sm-8.col-xs-8
+                  .item-caption
+                    - text_with_line_breaks do
+                      #{testimonial.text} 
+                  %span        
+                    .testimonial-author
+                      = link_to_unless testimonial.author.deleted?, PersonViewUtils.person_display_name(testimonial.author, @current_community), testimonial.author
+                      = t("testimonials.testimonial.about_listing")
+                      = link_to listing.title, listing
+                  %span    
+                    = time_ago(testimonial.created_at) + "."
+                / .testimonial-icon{:class => testimonial.grade > 0.25 ? 'positive' : 'negative'}
+                /   - if testimonial.grade > 0.25
+                /     = icon_tag("like", ["positive"])
+                /   - else
+                /     = icon_tag("dislike", ["negative"])
+              
 
-    .row
-      .profile-action-buttons-desktop
-        = render :partial => "profile_action_buttons"
+ 
+.container.collections-slider
+  %h1
+    Collections by #{@person.username} (#{listings.count})
+  #collections-carousel
+    -if listings.count > 0
+      -listings.each do |listing|
+        .item 
+          .collections-items
+            .collections-items-head
+              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}          
+            .colletions-img-slider
+              %a.items-title{:href => listing_path(set_path(listing.id))}
+                = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
+            %ul.collections-img-list 
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,2), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,3), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+            %p USD$ #{listing.price}
+
+.container.following-collections
+  %h2
+    Following
+  %label.following-members Members
+  %ul.following-members-list
+    %li.row
+      .col-md-3.col-sm-3.col-xs-3
+        
+      .col-md-9.col-sm-9.col-xs-9
+        %a.following-members{:href => "#"} Members
+        %span #{listings.count} collections.
+        %span #{@person.followers.count} followers
+
+  %ul.following-images-list
+    -@person.followers.each do |person|
+      %li.padding-0.col-md-1.col-sm-1.col-xs-1
+        = link_to person  do
+          = large_avatar_thumb(person, :class => "img-responsive")
+          = person.full_name
+        .following-user-details
+          %p #{person.listings.count} &nbsp&nbspListings
+          %p #{person.followers.count} Followers
+
+  %ul.following-images-list
+    - grade = 0 
+    -if received_testimonials.size > 0
+      -received_testimonials.each do |r_t|
+        -grade = grade + r_t.grade
+      - grade = ( grade / received_testimonials.size ) * 5 
+
 
 - content_for :extra_javascript do
   :javascript
     window.ST.initializeFollowButtons();
+
+
+%link{:href => "https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.1.1/jquery.rateyo.min.css", :rel => "stylesheet"}
+%script{:src => "https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.1.1/jquery.rateyo.min.js"}
+:javascript
+  $(function () {
+    $("#rateYo").rateYo({
+      rating: #{grade},
+      readOnly: true,
+      starWidth: "20px",
+      multiColor: {
+      "startColor": "#ffffe6", //RED
+      "endColor"  : "#ffff00"  //GREEN
+    }
+
+    });
+  });
+  $(document).ready(function () {
+    $("#rating-carousel").owlCarousel({
+
+      autoPlay: 3000, //Set AutoPlay to 3 seconds
+      dots: true,
+      items: 1,
+      itemsDesktop: [1199, 3],
+      itemsDesktopSmall: [979, 3]
+    });
+     $("#collections-carousel").owlCarousel({
+
+      autoPlay: 3000, //Set AutoPlay to 3 seconds
+      dots: true,
+      items: 4                                                                                          ,
+      itemsDesktop: [1199, 3],
+      itemsDesktopSmall: [979, 3]
+    });
+  });
+  $(document).ready(function(){
+   var a = parseInt( #{received_positive_testimonials.size} )
+   var b = parseInt( #{received_testimonials.size} )
+   if( a == 0 ){
+      $(".feed-back-text").text("0.0% positive feedback")
+   }else{
+      var c = parseFloat(( a / b ) * 100).toFixed(2)
+      $(".feed-back-text").text(c+"% positive feedback")
+   }
+   $(function() { 
+      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); }); 
+      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); }); 
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ - content_for :javascript do
+/   initialize_profile_view("#{@person.username}");
+
+/ - content_for :title_header do
+/   %h1
+/     %span.profile-title= @person.name(@current_community) + (@community_customization && @community_customization.storefront_label ? @community_customization.storefront_label : "")
+
+/ .row
+/   .col-8
+
+/     .row.relative
+/       .people-image-mobile
+/         = huge_avatar_thumb(@person)
+/       .profile-action-buttons-mobile
+/         = render :partial => "profile_action_buttons"
+
+/     .row
+/       - if @person.description && !@person.description.blank?
+/         - text_with_line_breaks do
+/           = @person.description
+/       - elsif current_user?(@person)
+/         %a{href: person_settings_path(@person)}
+/           .icon-with-text-container
+/             .ss-chat.icon-part
+/             .ss.text-part= t(".add_description")
+
+/     .row
+/       %h2.people-header
+/         - if listings.total_entries > 0
+/           - if current_user?(@person) && params[:show_closed]
+/             = pluralize(listings.total_entries, t(".listing"), t(".listings"))
+/           - else
+/             = pluralize(listings.total_entries, t(".open_listing"), t(".open_listings"))
+/         - else
+/           - if current_user?(@person) && params[:show_closed]
+/             = t(".no_listings")
+/           - else
+/             = t(".no_open_listings")
+/         %span.people-show-closed-link
+/           - if current_user?(@person)
+/             - if params[:show_closed]
+/               = link_to t("people.profile_listings.show_only_open"), person_path(@person)
+/             - else
+/               = link_to t("people.profile_listings.show_also_closed"), person_path(@person, :show_closed => true)
+
+/     #profile-listings-list
+/       - limit = 6
+/       = render :partial => 'listings/profile_listings', :locals => {person: @person, limit: limit, listings: listings}
+
+/     - if @current_community.follow_in_use?
+/       = render :partial => "followed_people", :locals => { person: @person, followed_people: followed_people, limit: 6 }
+
+/     - if @current_community.testimonials_in_use
+/       #people-testimonials.listing-main
+/         .row
+/           %h2.people-header
+/             - if received_testimonials.size > 0
+/               = pluralize(received_testimonials.size, t(".review"), t(".reviews"))
+/               = "(#{feedback_positive_percentage.to_s}% #{t("people.show.positive")}, #{received_positive_testimonials.size}/#{received_testimonials.size})"
+/             - else
+/               = t(".no_reviews")
+/           - if received_testimonials.size > 0
+/             #profile-testimonials-list
+/               = render :partial => "testimonials", :locals => {:received_testimonials => received_testimonials, :limit => 3}
+
+/   .col-4
+/     .row
+/       .people-image
+/         = huge_avatar_thumb(@person)
+
+/     .row
+/       .profile-action-buttons-desktop
+/         = render :partial => "profile_action_buttons"
+
+/ - content_for :extra_javascript do
+/   :javascript
+/     window.ST.initializeFollowButtons();

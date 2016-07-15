@@ -1,0 +1,10 @@
+%script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"}
+- content_for :title_header do
+  %h1
+    = t("layouts.admin.admin")
+    = "-"
+    = t("admin.communities.edit_details.community_featured_slider")
+
+= render :partial => "admin/left_hand_navigation", :locals => { :links => admin_links_for(@current_community) }
+#new_news_item_form.left-navi-section
+  %h2 Edit marketplace "#{@community.name(I18n.locale)}" featured products

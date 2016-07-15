@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160627063918) do
+ActiveRecord::Schema.define(version: 20160711101804) do
 
   create_table "auth_tokens", force: :cascade do |t|
     t.string   "token",            limit: 255
@@ -415,6 +415,18 @@ ActiveRecord::Schema.define(version: 20160627063918) do
 
   add_index "feature_flags", ["community_id"], name: "index_feature_flags_on_community_id", using: :btree
 
+  create_table "featured_sliders", force: :cascade do |t|
+    t.integer  "listing_id",         limit: 4
+    t.boolean  "is_active"
+    t.integer  "image_for",          limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "image_file_name",    limit: 255
+    t.string   "image_content_type", limit: 255
+    t.integer  "image_file_size",    limit: 4
+    t.datetime "image_updated_at"
+  end
+
   create_table "feedbacks", force: :cascade do |t|
     t.text     "content",      limit: 65535
     t.string   "author_id",    limit: 255
@@ -573,6 +585,7 @@ ActiveRecord::Schema.define(version: 20160627063918) do
     t.boolean  "pickup_enabled",                                default: false
     t.integer  "shipping_price_cents",            limit: 4
     t.integer  "shipping_price_additional_cents", limit: 4
+    t.boolean  "featured",                                      default: false
   end
 
   add_index "listings", ["category_id"], name: "index_listings_on_new_category_id", using: :btree

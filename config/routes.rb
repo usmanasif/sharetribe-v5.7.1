@@ -71,10 +71,15 @@ Kassi::Application.routes.draw do
     CustomLandingPage::LandingPageStore.enabled?(request.env[:current_marketplace]&.id)
   }
 
+
   # Default routes for homepage, these are matched if custom landing page is not in use
   # Inside this constraits are the routes that are used when request has subdomain other than www
-  get '/:locale/' => 'homepage#index', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
-  get '/' => 'homepage#index', as: :homepage_without_locale
+
+  #get '/:locale/' => 'homepage#index', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
+  get '/:locale/' => 'homepage#home', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
+  get '/' => 'homepage#home', as: :homepage_without_locale
+  root :to => 'homepage#home'
+
   get '/:locale/s', to: redirect('/%{locale}', status: 307), constraints: { locale: locale_matcher }
   get '/s', to: redirect('/', status: 307)
 
@@ -171,6 +176,11 @@ Kassi::Application.routes.draw do
       patch "/look_and_feel"      => "communities#update_look_and_feel",        as: :look_and_feel
       get   "/details/edit"       => "community_customizations#edit_details",   as: :details_edit
       patch "/details"            => "community_customizations#update_details", as: :details
+ 
+      # featured slider
+      get :edit_featured_slider , to: 'communities#edit_featured_slider'
+      put :edit_featured_slider, to: 'communities#update_featured_slider'
+      put :modify_slider , to: 'communities#modify_slider'
 
       resources :communities do
         member do
@@ -191,7 +201,6 @@ Kassi::Application.routes.draw do
           get :menu_links
           put :menu_links, to: 'communities#update_menu_links'
           delete :delete_marketplace
-
           # DEPRECATED (2016-03-22)
           # These routes are not in use anymore, don't use them
           # See new routes above, outside of communities resource
@@ -363,6 +372,8 @@ Kassi::Application.routes.draw do
             put :close
             put :move_to_top
             put :show_in_updates_email
+            post :change_featured_status
+
           end
         end
         resources :person_messages

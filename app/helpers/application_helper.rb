@@ -368,7 +368,7 @@ module ApplicationHelper
       {
         :topic => :manage,
         :text => t("admin.communities.edit_details.invite_people"),
-        :icon_class => "ss-adduser",
+        :icon_class => icon_class("fa fa-user-plus"),
         :path => new_invitation_path,
         :name => "invite_people"
       },
@@ -382,16 +382,23 @@ module ApplicationHelper
       {
         :topic => :configure,
         :text => t("admin.communities.edit_details.community_details"),
-        :icon_class => "ss-page",
+        :icon_class => icon_class("coins"),
         :path => admin_details_edit_path,
         :name => "tribe_details"
       },
       {
         :topic => :configure,
         :text => t("admin.communities.edit_details.community_look_and_feel"),
-        :icon_class => "ss-paintroller",
+        :icon_class => icon_class("coins"),
         :path => admin_look_and_feel_edit_path,
         :name => "tribe_look_and_feel"
+      },
+      {
+        :topic => :configure,
+        :text => "Featured Slider",
+        :icon_class => icon_class("coins"),
+        :path => admin_edit_featured_slider_path,
+        :name => "tribe_featured_slider"
       },
       {
         :topic => :configure,
@@ -708,4 +715,40 @@ module ApplicationHelper
       content_for :extra_javascript do js end
     end
   end
+
+  def count_active_listings_for author_id
+    Listing.where(:author_id => author_id , :deleted => false ).count
+  end
+
+  def item_condition
+    condition = ""
+    self.custom_field_values.where(:type => 'CheckboxFieldValue').all.each do |c_f_v|
+      if c_f_v.question.name == "Item Condition"
+        s_id = c_f_v.selected_options.first.id
+        condition = c_f_v.question.options.find(s_id).title
+      end
+    end
+    return condition
+  end
+
+  def min_order
+    quantity = ""
+    self.custom_field_values.where(:type => 'NumericFieldValue').all.each do |c_f_v|
+      if c_f_v.question.name == 'Min Order'
+        quantity = c_f_v.display_value
+      end
+    end
+    return quantity
+  end
+  
+  def available
+    quantity = ""
+    self.custom_field_values.where(:type => 'NumericFieldValue').all.each do |c_f_v|
+      if c_f_v.question.name == 'Items available'
+        quantity = quantity + c_f_v.display_value.to_s
+      end
+    end
+    return quantity
+  end
+
 end

@@ -75,7 +75,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    sign_out
+    sign_out 
     session[:person_id] = nil
     flash[:notice] = t("layouts.notifications.logout_successful")
     redirect_to landing_page_path

@@ -32,10 +32,10 @@ default: &default_settings
   # NOTE: in Heroku you can't store files in local system, so S3 should be used
 
   # Default bucket
-  s3_bucket_name:
+  s3_bucket_name: devsinc-bucket
 
   # Bucket for files users upload directly to S3. You can add an expiration policy to these files.
-  s3_upload_bucket_name:
+  s3_upload_bucket_name: devsinc-bucket-2
 
   # Server assets directly from the Rails application, defaults to true
   #
@@ -60,8 +60,8 @@ default: &default_settings
   asset_host:
 
   # AWS keys
-  aws_access_key_id:
-  aws_secret_access_key:
+  aws_access_key_id: AKIAID4OD4SWXJNSH54Q
+  aws_secret_access_key: 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
 
   # This is used with AWS SNS notifications. You need to create "email bounces and complaints" topic to SNS
   # and subscribe an url (https://yourdomain.com/bounces?sns_notification_token=[this_token])

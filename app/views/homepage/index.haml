@@ -156,3 +156,54 @@
             = t(".no_listings_notification",
                   add_listing_link: link_to(t(".add_listing_link_text"),
                   new_listing_path(ref: "add_listing_link"))).html_safe
+
+
+:css
+  .btn-un {
+      background: red;
+      color: white;
+      border-radius: 26px;
+      position: absolute;
+      right: 7px;
+      top: 0px;
+      padding: 1px 16px;
+  }
+  .f_b{
+    background:green;
+    color:white;
+    border-radius: 26px;
+  }
+  .un_f_b{
+    background:red;
+    color:white;
+    border-radius: 26px;
+  }
+
+%script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
+:javascript
+  $(document).ready(function(){
+    $(document).on('ajax:before', '.ujs', function(e, xhr, settings){
+      var btn = $(this).find('button');
+      // console.log(this.data);
+
+      if(btn.hasClass('un_f_b')){
+        btn.removeClass('un_f_b').addClass('f_b');
+        btn.text('Featured')
+      }
+
+      else if(btn.hasClass('f_b')){
+        btn.removeClass('f_b').addClass('un_f_b');
+        btn.text('Un Featured');
+      }
+      
+      var params = 'act=on';
+
+      if(btn.hasClass('f_b')){
+        params = 'act=off';
+      }
+
+      var a = $(this);
+      a.removeData('params');
+      a.attr('data-params', params);
+    });
+  });
