@@ -18,3 +18,4 @@ Rails.application.config.assets.paths << Rails.root.join("app", "assets", "webpa
 Rails.application.config.assets.precompile << "server-bundle.js"
 
 Rails.application.config.assets.precompile += ["application.js", "application.css" , "index/app-index.css" , "index/app-index.js"]
+Rails.application.config.assets.precompile += %w( *.js ^[^_]*.css *.css.erb )
