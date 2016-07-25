@@ -4,6 +4,10 @@ ruby '2.3.1'
 
 gem 'rails', '4.2.5.2'
 
+gem 'geocoder'
+gem 'httparty'
+gem 'hipchat'
+
 gem 'coffee-rails', "~> 4.0.1"
 gem 'uglifier', "~> 2.7.2"
 
@@ -12,7 +16,7 @@ gem 'compass-rails', '~> 2.0'
 
 # Requiring 'compass' gem directly is not normally needed,
 # 'compass-rails' already does that.
-#
+
 # However, we want to have compass version which is at least 0.13,
 # because it fixes a bug that caused compass helpers to override
 # important Rails asset helpers

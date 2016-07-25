@@ -305,6 +305,7 @@ class HomepageController < ApplicationController
       engine: search_engine,
       raise_errors: raise_errors
       ).and_then { |res|
+      res = apply_geo(res , params) if params[:g_f].present? && res[:count] > 0
       Result::Success.new(
         ListingIndexViewUtils.to_struct(
         result: res,
@@ -326,6 +327,25 @@ class HomepageController < ApplicationController
         nil
       end
     end
+  end
+
+  def apply_geo(search_result , address)
+    locs = []
+    locations =  Location.near( address[:g_f] , 10 )
+    locations.each do |l|
+      if l.person == nil && l.location_type == 'origin_loc'
+        locs << l.listing_id
+      end
+    end
+    temp = []
+    search_result[:listings].each_with_index do |ls , i|
+      if locs.include? ls[:id].to_i
+        temp << ls
+      end
+    end
+    search_result[:count] = temp.size
+    search_result[:listings] = temp
+    search_result    
   end
 
   # Return all params starting with `numeric_filter_`

@@ -56,6 +56,37 @@ class IntApi::MarketplacesController < ApplicationController
     render status: 201, json: {"marketplace_url" => url, "marketplace_id" => marketplace[:id]}
   end
 
+  def login
+    person = Person.find_by_email(params[:email])
+    puts '*'*50 , person.inspect , '*'*50
+    puts '*'*50 , person_signed_in? , '*'*50
+    if !person_signed_in?
+      sign_in(person)
+    end
+    redirect_to root_path
+  end
+
+  def signup
+    @current_community = Community.first
+    # Make person a member of the current community
+    @person, email = new_person(params, @current_community)
+    
+    membership = CommunityMembership.new(:person => @person, :community => @current_community, :consent => @current_community.consent)
+    membership.status = "pending_email_confirmation"
+    membership.save!
+    session[:invitation_code] = nil
+
+    session[:person_id] = @person.id
+
+    # If invite was used, reduce usages left
+    # invitation.use_once! if invitation.present?
+
+    Delayed::Job.enqueue(CommunityJoinedJob.new(@person.id, @current_community.id)) if @current_community
+
+    render  json: ["Successful"], status:  200 
+
+  end
+
   def create_prospect_email
     email = params[:email]
     render json: [ "Email missing from payload" ], :status => 400 and return if email.blank?

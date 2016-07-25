@@ -27,6 +27,9 @@ class Location < ActiveRecord::Base
   belongs_to :listing
   belongs_to :community
 
+  geocoded_by :address 
+  after_validation :geocode
+
   def search_and_fill_latlng(address=nil, locale=APP_CONFIG.default_locale)
     okresponse = false
     geocoder = "http://maps.googleapis.com/maps/api/geocode/json?address="

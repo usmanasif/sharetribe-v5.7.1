@@ -5,5 +5,12 @@
   - if show_custom_fields
     = render :partial => "custom_filters", locals: { filters: filters }
 
+  .row
+    .col-12
+      .custom-filter-title
+        Location(City/State)
+      .custom-filter-options
+        %input{:id => "g_f", name: "g_f", style: "width: 100%"}
+
   %button{type: 'submit'}
     = t("homepage.custom_filters.update_view")
