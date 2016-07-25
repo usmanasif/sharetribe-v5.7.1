@@ -7,7 +7,8 @@ gem 'rails', '4.2.5.2'
 gem 'geocoder'
 gem 'httparty'
 gem 'hipchat'
-
+gem 'puma'
+ 
 gem 'coffee-rails', "~> 4.0.1"
 gem 'uglifier', "~> 2.7.2"
 
