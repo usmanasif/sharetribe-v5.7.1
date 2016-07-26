@@ -69,6 +69,7 @@ class IntApi::MarketplacesController < ApplicationController
   def signup
     if params.present?
       @current_community = Community.first
+      puts "*"*500 , params , "*"*500
       # Make person a member of the current community
       @person = UserService::API::Users.create_user({
           given_name: params[:first_name],
@@ -76,16 +77,10 @@ class IntApi::MarketplacesController < ApplicationController
           email: params[:email],
           password: params[:password],
           locale: params[:marketplace_language]},
-          Community.first.id).data
-
+          1 )
       session[:invitation_code] = nil
 
       session[:person_id] = @person.id
-
-      # If invite was used, reduce usages left
-      # invitation.use_once! if invitation.present?
-
-      Delayed::Job.enqueue(CommunityJoinedJob.new(@person.id, @current_community.id)) if @current_community
       render  json: ["Successful"], status:  200 
     else
       render json: ["Unsuccessful"] , status: 400
