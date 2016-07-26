@@ -76,7 +76,7 @@ class IntApi::MarketplacesController < ApplicationController
           email: params[:email],
           password: params[:password],
           locale: params[:marketplace_language]},
-          marketplace[:id]).data
+          Community.first.id).data
 
       session[:invitation_code] = nil
 
