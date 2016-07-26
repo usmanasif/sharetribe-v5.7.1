@@ -11,11 +11,10 @@ Rails.application.config.assets.version = "1.0"
 # Rails.application.config.assets.precompile += %w( search.js )
 
 # Add folder with webpack generated assets to assets.paths
-Rails.application.config.assets.paths << Rails.root.join("app", "assets", "webpack")
+Rails.application.config.assets.paths << Rails.root.join("app", "assets", "webpack" )
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
 Rails.application.config.assets.precompile << "server-bundle.js"
 
-Rails.application.config.assets.precompile += ["application.js", "application.css" , "index/app-index.css" , "index/app-index.js"]
-Rails.application.config.assets.precompile += %w( *.js ^[^_]*.css *.css.erb )
+Rails.application.config.assets.precompile += ["application.js", "application.css" , "index/app-index.css" , "index/app-index.js" ]
