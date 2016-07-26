@@ -70,11 +70,14 @@ class IntApi::MarketplacesController < ApplicationController
     if params.present?
       @current_community = Community.first
       # Make person a member of the current community
-      @person, email = new_person_p(params, @current_community)
-      
-      membership = CommunityMembership.new(:person => @person, :community => @current_community, :consent => @current_community.consent)
-      membership.status = "pending_email_confirmation"
-      membership.save!
+      @person = UserService::API::Users.create_user({
+          given_name: params[:first_name],
+          family_name: params[:last_name],
+          email: params[:email],
+          password: params[:password],
+          locale: params[:marketplace_language]},
+          marketplace[:id]).data
+
       session[:invitation_code] = nil
 
       session[:person_id] = @person.id
