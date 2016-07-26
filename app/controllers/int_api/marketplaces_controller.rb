@@ -78,9 +78,6 @@ class IntApi::MarketplacesController < ApplicationController
           password: params[:password],
           locale: params[:marketplace_language]},
           1 )
-      session[:invitation_code] = nil
-
-      session[:person_id] = @person.id
       render  json: ["Successful"], status:  200 
     else
       render json: ["Unsuccessful"] , status: 400
