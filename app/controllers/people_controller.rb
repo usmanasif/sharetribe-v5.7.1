@@ -104,7 +104,6 @@ class PeopleController < Devise::RegistrationsController
     end
 
     if @current_community && @current_community.join_with_invite_only? || params[:invitation_code]
-
       unless Invitation.code_usable?(params[:invitation_code], @current_community)
         # abort user creation if invitation is not usable.
         # (This actually should not happen since the code is checked with javascript)
@@ -350,6 +349,10 @@ class PeopleController < Devise::RegistrationsController
 
   def show_closed?
     params[:closed] && params[:closed].eql?("true")
+  end
+
+  def new_person_p(params , current_community)
+    new_person( params , current_community )
   end
 
   private

@@ -67,23 +67,26 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def signup
-    @current_community = Community.first
-    # Make person a member of the current community
-    @person, email = new_person(params, @current_community)
-    
-    membership = CommunityMembership.new(:person => @person, :community => @current_community, :consent => @current_community.consent)
-    membership.status = "pending_email_confirmation"
-    membership.save!
-    session[:invitation_code] = nil
+    if params.present?
+      @current_community = Community.first
+      # Make person a member of the current community
+      @person, email = new_person_p(params, @current_community)
+      
+      membership = CommunityMembership.new(:person => @person, :community => @current_community, :consent => @current_community.consent)
+      membership.status = "pending_email_confirmation"
+      membership.save!
+      session[:invitation_code] = nil
 
-    session[:person_id] = @person.id
+      session[:person_id] = @person.id
 
-    # If invite was used, reduce usages left
-    # invitation.use_once! if invitation.present?
+      # If invite was used, reduce usages left
+      # invitation.use_once! if invitation.present?
 
-    Delayed::Job.enqueue(CommunityJoinedJob.new(@person.id, @current_community.id)) if @current_community
-
-    render  json: ["Successful"], status:  200 
+      Delayed::Job.enqueue(CommunityJoinedJob.new(@person.id, @current_community.id)) if @current_community
+      render  json: ["Successful"], status:  200 
+    else
+      render json: ["Unsuccessful"] , status: 400
+    end
 
   end
 
