@@ -45,7 +45,7 @@ Kassi::Application.routes.draw do
   namespace :int_api do
     post "/create_trial_marketplace" => "marketplaces#create"
     post "/prospect_emails" => "marketplaces#create_prospect_email"
-    get "/login_with_API" => "marketplaces#login"
+    post "/login_with_API" => "marketplaces#login"
     post "/signup_with_API" => "marketplaces#signup"
   end
 

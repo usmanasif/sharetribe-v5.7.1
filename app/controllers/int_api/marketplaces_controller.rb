@@ -64,8 +64,11 @@ class IntApi::MarketplacesController < ApplicationController
         sign_in(person)
       end      
     end
-    redirect_to root_path
-  end
+    render json: {
+      status: 200,
+      message: "Successfully created Login.",
+      person_id: person.id
+    }.to_json
 
   def signup
     if params.present?
