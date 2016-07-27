@@ -67,7 +67,7 @@ class IntApi::MarketplacesController < ApplicationController
     render json: {
       status: 200,
       message: "Successfully created Login.",
-      person_id: person.id
+      person_id: person_id.person_id
     }.to_json
   end 
   
