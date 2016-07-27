@@ -57,6 +57,7 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def login
+    puts '*'*500 , params , '*'*500
     if params[:email].present?
       person_id = Email.select('person_id').find_by_address params[:email].to_s
       person = Person.find person_id.person_id 
@@ -70,7 +71,7 @@ class IntApi::MarketplacesController < ApplicationController
       person_id: person_id.person_id
     }.to_json
   end 
-  
+
   def signup
     if params.present?
       @current_community = Community.first
