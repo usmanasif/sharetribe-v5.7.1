@@ -69,7 +69,8 @@ class IntApi::MarketplacesController < ApplicationController
       message: "Successfully created Login.",
       person_id: person.id
     }.to_json
-
+  end 
+  
   def signup
     if params.present?
       @current_community = Community.first
