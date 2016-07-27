@@ -171,6 +171,16 @@ class PeopleController < Devise::RegistrationsController
     )
   end
 
+  def json_for_vendor_advisor params , email 
+    return {
+      :username => params["person"]["username"] ,
+      :email => email ,
+      :encrypted_password => params["person"]["password"] ,
+      :first_name => params["person"]["given_name"] ,
+      :last_name => params["person"]["family_name"] ,
+    }
+  end
+
   def build_devise_resource_from_person(person_params)
     person_params.delete(:terms) #remove terms part which confuses Devise
 
