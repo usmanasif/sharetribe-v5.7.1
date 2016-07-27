@@ -57,11 +57,14 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def login
-    person = Person.find_by_email(params[:email])
-    puts '*'*50 , person.inspect , '*'*50
-    puts '*'*50 , person_signed_in? , '*'*50
-    if !person_signed_in?
-      sign_in(person)
+    if params[:email].present?
+      person_id = Email.select('person_id').find_by_address params[:email].to_s
+      person = Person.find person_id 
+      puts '*'*50 , person.inspect , '*'*50
+      puts '*'*50 , person_signed_in? , '*'*50
+      if !person_signed_in?
+        sign_in(person)
+      end      
     end
     redirect_to root_path
   end
