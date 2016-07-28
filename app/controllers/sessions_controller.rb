@@ -13,7 +13,9 @@ class SessionsController < ApplicationController
   before_filter :allow_params_authentication!, :only => :create
 
   def new
-    puts '*'*500 , 'session#new' , params , '*'*500
+    res = HTTParty.get('http://still-ridge-7153.herokuapp.com/api/v1/user_services/get_current_user_email')
+    puts '*'*500 , 'session#new' ,res.inspect , '*'*500
+
     @selected_tribe_navi_tab = "members"
     @facebook_merge = session["devise.facebook_data"].present?
     if @facebook_merge
