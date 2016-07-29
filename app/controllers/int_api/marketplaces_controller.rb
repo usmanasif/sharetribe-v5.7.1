@@ -58,7 +58,7 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def login
-    puts '*'*500 , params , '*'*500
+    puts '*'*500 , 'marketplaces#login' , params , '*'*500
     if params[:email].present?
       person_id = Email.select('person_id').find_by_address params[:email].to_s
       person = Person.find person_id.person_id 
@@ -66,11 +66,7 @@ class IntApi::MarketplacesController < ApplicationController
         sign_in(person)
       end      
     end
-    render json: {
-      status: 200,
-      message: "Successfully created Login.",
-      person_id: person_id.person_id
-    }.to_json
+    redirect_to landing_page_without_locale_path
   end 
 
   def signup
