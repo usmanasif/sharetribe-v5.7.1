@@ -60,7 +60,7 @@ class IntApi::MarketplacesController < ApplicationController
   def login
     puts '*'*500 , 'params' , params , '*'*500
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
-    puts '*'*500 , 'uri decode' , p=hash.URI.decode(params) , '*'*500 
+    puts '*'*500 , 'uri decode' , p=URI.decode(params) , '*'*500 
     puts '*'*500 , 'hash decrypt' , hash.decrypt(p)
     if params[:email].present?
       person_id = Email.select('person_id').find_by_address params[:email].to_s
