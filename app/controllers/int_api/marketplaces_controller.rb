@@ -64,11 +64,13 @@ class IntApi::MarketplacesController < ApplicationController
     if email.present?
       obj = Email.select('person_id').find_by_address email.to_s
       puts '*'*500 ,  obj.inspect
-      person = Person.find obj.person_id
-      puts '*'*500 ,  person 
-      if !person_signed_in?
-        sign_in(person)
-      end      
+      if obj.person_id.present? 
+        person = Person.find obj.person_id
+        puts '*'*500 ,  person 
+        if !person_signed_in?
+          sign_in(person)
+        end
+      end     
     end
     redirect_to landing_page_without_locale_path
   end 
