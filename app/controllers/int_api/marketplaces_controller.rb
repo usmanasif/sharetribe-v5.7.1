@@ -62,8 +62,10 @@ class IntApi::MarketplacesController < ApplicationController
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
     puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
     if email.present?
-      puts '*'*500 ,  obj = Email.select('person_id').find_by_address email.to_s
-      puts '*'*500 ,  person = Person.find obj.person_id 
+      obj = Email.select('person_id').find_by_address email.to_s
+      puts '*'*500 ,  obj.inspect
+      person = Person.find obj.person_id
+      puts '*'*500 ,  person 
       if !person_signed_in?
         sign_in(person)
       end      
