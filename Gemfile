@@ -8,7 +8,7 @@ gem 'geocoder'
 gem 'httparty'
 gem 'hipchat'
 gem 'puma'
-gem 'gibberish'
+#gem 'gibberish'
 
  
 gem 'coffee-rails', "~> 4.0.1"

@@ -17,6 +17,8 @@ Kassi::Application.routes.draw do
 
   get "/design" => "design#design"
 
+  get '/zillow' => "zillows#image_uploading"
+
   # config/routes.rb
   if Rails.env.development?
     mount MailPreview => 'mail_view'
