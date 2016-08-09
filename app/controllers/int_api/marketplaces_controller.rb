@@ -62,15 +62,14 @@ class IntApi::MarketplacesController < ApplicationController
     puts '*'*500 , 'current user' , @current_user.inspect 
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
     puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
-    sign_out 
-    session[:person_id] = nil
     if email.present?
-      obj = Email.select('person_id').find_by_address email.to_s
-      puts '*'*500 ,  obj.inspect
+      obj = Email.select('person_id').find_by address: email.to_s
+      puts '*'*500 ,'obj',  obj.inspect
       if obj.person_id.present? 
         person = Person.find obj.person_id
-        puts '*'*500 ,  person 
-        if !person_signed_in?
+        puts '*'*500 ,  person.inspect  
+        puts '*'*500 , logged_in?
+        if !logged_in?
           sign_in(person)
         end
       end     
@@ -95,7 +94,10 @@ class IntApi::MarketplacesController < ApplicationController
     else
       render json: ["Unsuccessful"] , status: 400
     end
+  end
 
+  def get_current_user
+    render status: 200 , json: { "session" => session }
   end
 
   def create_prospect_email

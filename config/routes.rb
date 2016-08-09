@@ -49,6 +49,7 @@ Kassi::Application.routes.draw do
     post "/prospect_emails" => "marketplaces#create_prospect_email"
     get "/login_with_API" => "marketplaces#login"
     post "/signup_with_API" => "marketplaces#signup"
+    get "/current/user" => "marketplaces#get_current_user"
   end
 
   # Keep before /:locale/ routes, because there is locale 'vi', which matches '_lp_preview'
