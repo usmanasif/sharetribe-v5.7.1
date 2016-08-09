@@ -58,14 +58,16 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def login
-    p = params["check"].gsub('__p__' , '+')
+    puts '*'*500 , 'params' , p = params["check"].gsub('__p__' , '+') , '*'*500
+    puts '*'*500 , 'current user' , @current_user.inspect 
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
-    puts '*'*50 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
+    puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
     if email.present?
       obj = Email.select('person_id').find_by_address email.to_s
+      puts '*'*500 ,  obj.inspect
       if obj.person_id.present? 
         person = Person.find obj.person_id
-        puts '*'*50 ,  person 
+        puts '*'*500 ,  person 
         if !person_signed_in?
           sign_in(person)
         end
