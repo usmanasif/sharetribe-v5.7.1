@@ -62,6 +62,8 @@ class IntApi::MarketplacesController < ApplicationController
     puts '*'*500 , 'current user' , @current_user.inspect 
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
     puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
+    sign_out 
+    session[:person_id] = nil
     if email.present?
       obj = Email.select('person_id').find_by_address email.to_s
       puts '*'*500 ,  obj.inspect
