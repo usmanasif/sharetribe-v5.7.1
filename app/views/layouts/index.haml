@@ -13,7 +13,7 @@
       %nav.navbar.navbar-inverse.login{:role => "navigation"}
         .container
           .navbar-header
-            %a.navbar-brand{:href => "/"} Vendor Advisor
+            %a.navbar-brand{:href => "http://still-ridge-7153.herokuapp.com/"} Vendor Advisor
           - if @current_user.present?
             %ul.nav.navbar-nav.navbar-left.left-navarea
               %li.dropdown
@@ -22,19 +22,19 @@
                   %span.caret
                 %ul.dropdown-menu{:role => "menu"}
                   %li
-                    %a{:href => "#"} Add Property
+                    %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_business"} Add Property
                   - if true
                     %li.divider
                     %li
-                      %a{:href => "#"} My Properties
+                      %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} My Properties
                   - else
                     %li
-                      %a{:href => "#"} Properties
+                      %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} Properties
               - if true
                 %li
-                  %a{:href => "#"} Brands
+                  %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/brand_list"} Brands
                 %li
-                  %a{:href => "#"} Vendors
+                  %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/vendor_list"} Vendors
               - else
                 %li.dropdown
                   %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "businesses_path", :role => "button"}
@@ -42,16 +42,16 @@
                     %span.caret
                   %ul.dropdown-menu{:role => "menu"}
                     %li
-                      %a{:href => "#"} Add Vendor
+                      %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_vendor"} Add Vendor
                     %li.divider
                     %li
-                      %a{:href => "#"} My Vendors
+                      %a{:href => "http://still-ridge-7153.herokuapp.com/vendors"} My Vendors
               %li
-                %a{:href => "#", :target => "_blank"}MarketPlace
+                %a{:href => "/" }MarketPlace
               %li
-                %a{:href => "#", :target => "_blank"}Chat With Vendors
+                %a{:href => "#" }Chat With Vendors
               %li
-                %a{:href => "https://vd-rc-ua.herokuapp.com/validate/api?verify=#{}=#{}", :target => "_blank"} Chat
+                %a{:href => "https://vd-rc-ua.herokuapp.com/validate/api?verify=#{}=#{}"} Chat
           %ul.nav.navbar-nav.navbar-right.top-navarea
             %nav.top-header-list
               %ul
