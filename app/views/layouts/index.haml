@@ -10,6 +10,103 @@
 
   %body
     %header#header
+      %nav.navbar.navbar-inverse.login{:role => "navigation"}
+        .container
+          .navbar-header
+            %a.navbar-brand{:href => "/"} Vendor Advisor
+          - if @current_user.present?
+            %ul.nav.navbar-nav.navbar-left.left-navarea
+              %li.dropdown
+                %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
+                  Properties
+                  %span.caret
+                %ul.dropdown-menu{:role => "menu"}
+                  %li
+                    %a{:href => "#"} Add Property
+                  - if true
+                    %li.divider
+                    %li
+                      %a{:href => "#"} My Properties
+                  - else
+                    %li
+                      %a{:href => "#"} Properties
+              - if true
+                %li
+                  %a{:href => "#"} Brands
+                %li
+                  %a{:href => "#"} Vendors
+              - else
+                %li.dropdown
+                  %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "businesses_path", :role => "button"}
+                    Vendors
+                    %span.caret
+                  %ul.dropdown-menu{:role => "menu"}
+                    %li
+                      %a{:href => "#"} Add Vendor
+                    %li.divider
+                    %li
+                      %a{:href => "#"} My Vendors
+              %li
+                %a{:href => "#", :target => "_blank"}MarketPlace
+              %li
+                %a{:href => "#", :target => "_blank"}Chat With Vendors
+              %li
+                %a{:href => "https://vd-rc-ua.herokuapp.com/validate/api?verify=#{}=#{}", :target => "_blank"} Chat
+          %ul.nav.navbar-nav.navbar-right.top-navarea
+            %nav.top-header-list
+              %ul
+                %li
+                  .header-left.hidden-tablet
+                    .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
+                      #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
+                      = icon_tag("rows", ["header-menu-icon"])
+                      %span.visible-tablet-inline
+                        = t("header.menu")
+                  %li
+                    .dropdown.login-menu 
+                      %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                        Menu
+                        %span.caret
+                      %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                        %li
+                          = link_to "/" do
+                            = icon_tag("home", ["icon-with-text"])
+                            = t("header.home")
+                        %li
+                          = link_to new_listing_path, :class => "hidden-tablet" do
+                            = icon_tag("new_listing", ["icon-with-text"])
+                            = t("homepage.index.post_new_listing")
+                        %li
+                          = link_to about_infos_path do
+                            = icon_tag("information", ["icon-with-text"])
+                            = t("header.about")
+                        %li
+                          = link_to new_user_feedback_path do
+                            = icon_tag("feedback", ["icon-with-text"])
+                            = t("header.contact_us")
+                        %li
+                          - with_invite_link do
+                            = link_to new_invitation_path do
+                              = icon_tag("invite", ["icon-with-text"])
+                              = t("header.invite")
+                        %li
+                          - Maybe(@current_community).menu_links.each do |menu_links|
+                            - menu_links.each do |menu_link|
+                              = link_to menu_link.url(I18n.locale), :target => "_blank" do
+                                = icon_tag("redirect", ["icon-with-text"])
+                                = menu_link.title(I18n.locale)
+                        %li
+                          - if @current_user && @current_community && @current_user.has_admin_rights?
+                            = link_to edit_details_admin_community_path(@current_community) do
+                              = icon_tag("admin", ["icon-with-text"])
+                              = t("layouts.logged_in.admin")
+                        / %li
+                        /   .hidden-desktop
+                        /     - with_available_locales do |locales|
+                        /       .toggle-menu-title
+                        /         = t("layouts.global-header.select_language")
+                        /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
+
       .header-top
         .container
           .row
@@ -17,20 +114,14 @@
               %nav.top-header-list
                 %ul
                   %li
-                    Hi&nbsp
-                    - unless @current_user
-                      = link_to login_path, class: "header-text-link header-hover", id: "header-login-link" do
-                        = t("header.login")
-                      or
-                      = link_to sign_up_path, class: "header-text-link header-hover" do
-                        = t("header.signup")
-                    - else
+                    - if @current_user
                       - Maybe(@current_user).each do |user|
                         - conversations = @current_community.conversations.for_person(user)
                         - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
 
                         .dropdown.login-menu 
                           %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                            Hi&nbsp 
                             =@current_user.username
                             %span.caret
                           %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -73,112 +164,161 @@
                         %span.visible-tablet-inline
                           = t("header.menu")
                     %li
-                      .dropdown.login-menu 
-                        %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                          Menu
-                          %span.caret
-                        %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                          %li
-                            = link_to "/" do
-                              = icon_tag("home", ["icon-with-text"])
-                              = t("header.home")
-                          %li
-                            = link_to new_listing_path, :class => "hidden-tablet" do
-                              = icon_tag("new_listing", ["icon-with-text"])
-                              = t("homepage.index.post_new_listing")
-                          %li
-                            = link_to about_infos_path do
-                              = icon_tag("information", ["icon-with-text"])
-                              = t("header.about")
-                          %li
-                            = link_to new_user_feedback_path do
-                              = icon_tag("feedback", ["icon-with-text"])
-                              = t("header.contact_us")
-                          %li
-                            - with_invite_link do
-                              = link_to new_invitation_path do
-                                = icon_tag("invite", ["icon-with-text"])
-                                = t("header.invite")
-                          %li
-                            - Maybe(@current_community).menu_links.each do |menu_links|
-                              - menu_links.each do |menu_link|
-                                = link_to menu_link.url(I18n.locale), :target => "_blank" do
-                                  = icon_tag("redirect", ["icon-with-text"])
-                                  = menu_link.title(I18n.locale)
-                          %li
-                            - if @current_user && @current_community && @current_user.has_admin_rights?
-                              = link_to edit_details_admin_community_path(@current_community) do
-                                = icon_tag("admin", ["icon-with-text"])
-                                = t("layouts.logged_in.admin")
-                          / %li
-                          /   .hidden-desktop
-                          /     - with_available_locales do |locales|
-                          /       .toggle-menu-title
-                          /         = t("layouts.global-header.select_language")
-                          /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
-      .container
-        .header-content
-          .col-md-2.col-sm-2.col-xs-12.header-p-5
-            %a.logo{:href => root_path } VendorAdvisor
-          .col-md-1.col-sm-1.col-xs-1.header-p-5
-            .dropdown.dorpdown-shop
-              %button#dropdownMenu1.btn.btn-default.dropdown-toggle.btn-shop{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                Shop by category
-                %span.caret
-              %ul.dropdown-menu.row{"aria-labelledby" => "dropdownMenu1"}
-                -@main_categories.each do |category|
-                  %li.col-md-4.col-sm-4.col-xs-4
-                    %a{:href => "#"} #{category.display_name(I18n.locale)}
-                    -sub_categories = @categories.select { |c| c.parent_id == category.id }
-                    -if sub_categories
-                      %ul.dropdown-child
-                        -sub_categories.each do |sub_category|
-                          %li
-                            %a{:href => "#"} #{sub_category.display_name(I18n.locale)}
+                      / .dropdown.login-menu 
+                      /   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                      /     Menu
+                      /     %span.caret
+                      /   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                      /     %li
+                      /       = link_to "/" do
+                      /         = icon_tag("home", ["icon-with-text"])
+                      /         = t("header.home")
+                      /     %li
+                      /       = link_to new_listing_path, :class => "hidden-tablet" do
+                      /         = icon_tag("new_listing", ["icon-with-text"])
+                      /         = t("homepage.index.post_new_listing")
+                      /     %li
+                      /       = link_to about_infos_path do
+                      /         = icon_tag("information", ["icon-with-text"])
+                      /         = t("header.about")
+                      /     %li
+                      /       = link_to new_user_feedback_path do
+                      /         = icon_tag("feedback", ["icon-with-text"])
+                      /         = t("header.contact_us")
+                      /     %li
+                      /       - with_invite_link do
+                      /         = link_to new_invitation_path do
+                      /           = icon_tag("invite", ["icon-with-text"])
+                      /           = t("header.invite")
+                      /     %li
+                      /       - Maybe(@current_community).menu_links.each do |menu_links|
+                      /         - menu_links.each do |menu_link|
+                      /           = link_to menu_link.url(I18n.locale), :target => "_blank" do
+                      /             = icon_tag("redirect", ["icon-with-text"])
+                      /             = menu_link.title(I18n.locale)
+                      /     %li
+                      /       - if @current_user && @current_community && @current_user.has_admin_rights?
+                      /         = link_to edit_details_admin_community_path(@current_community) do
+                      /           = icon_tag("admin", ["icon-with-text"])
+                      /           = t("layouts.logged_in.admin")
+                      /     / %li
+                      /     /   .hidden-desktop
+                      /     /     - with_available_locales do |locales|
+                      /     /       .toggle-menu-title
+                      /     /         = t("layouts.global-header.select_language")
+                      /     /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
+    .container
+      .header-content
+        / .col-md-2.col-sm-2.col-xs-12.header-p-5
+        /   %a.logo{:href => root_path } VendorAdvisor
+        .col-md-1.col-sm-1.col-xs-1.header-p-5
+          .dropdown.dorpdown-shop
+            %button#dropdownMenu1.btn.btn-default.dropdown-toggle.btn-shop{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+              Shop by category
+              %span.caret
+            %ul.dropdown-menu.row{"aria-labelledby" => "dropdownMenu1"}
+              -@main_categories.each do |category|
+                %li.col-md-4.col-sm-4.col-xs-4
+                  %a{:href => "#"} #{category.display_name(I18n.locale)}
+                  -sub_categories = @categories.select { |c| c.parent_id == category.id }
+                  -if sub_categories
+                    %ul.dropdown-child
+                      -sub_categories.each do |sub_category|
+                        %li
+                          %a{:href => "#"} #{sub_category.display_name(I18n.locale)}
+        .col-md-10.col-sm-10.col-xs-10.header-p-5
+          %form.form-inline.search-form.search-result{:action => "#{homepage_index_path}" , :method => "get"}
+            .input-group.col-sm-10
+              %input.form-control{:name => "q", :placeholder => "Search", :type => "text", :value => ""}
+                .input-group-btn.select-drop-head
+                  .search-form-input.categorices-select.btn.btn-default.dropdown-toggle 
+                    %span.caret.caret-icon
+                    = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories") 
+                  / /btn-group
+            %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
+        .col-md-1.col-sm-1.col-xs-1.header-p-0
+          %a.advanced{:href => "#"} Advanced
+      .navarea
+        %nav.navbar.navbar-default.row
+          .container-fluid
+            / Brand and toggle get grouped for better mobile display
+            .navbar-header.row
+              %button.navbar-toggle.collapsed{"aria-expanded" => "false", "data-target" => "#bs-example-navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
+                %span.sr-only Toggle navigation
+                %span.icon-bar
+                %span.icon-bar
+                %span.icon-bar
+            / Collect the nav links, forms, and other content for toggling
+            #bs-example-navbar-collapse-1.collapse.navbar-collapse
+              %ul.nav.navbar-nav
+                %li
+                  %a{:href => "#"} Following
+                %li
+                  %a{:href => "#"} Today
+                %li
+                  %a{:href => "#"} Fashion
+                %li
+                  %a{:href => "#"} Expand Fashion
+                %li
+                  %a{:href => "#"} Electronics
+                %li
+                  %a{:href => "#"} Collectibles & Art
+                %li
+                  %a{:href => "#"} Home & Garden
+                %li
+                  %a{:href => "#"} Sporting Goods
 
-          .col-md-8.col-sm-8.col-xs-8.header-p-5
-            %form.form-inline.search-form.search-result{:action => "#{homepage_index_path}" , :method => "get"}
-              .input-group.col-sm-10
-                %input.form-control{:name => "q", :placeholder => "Search", :type => "text", :value => ""}
-                  .input-group-btn.select-drop-head
-                    .search-form-input.categorices-select.btn.btn-default.dropdown-toggle 
-                      %span.caret.caret-icon
-                      = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories") 
-                    / /btn-group
-              %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
-          .col-md-1.col-sm-1.col-xs-1.header-p-0
-            %a.advanced{:href => "#"} Advanced
-        .navarea
-          %nav.navbar.navbar-default.row
-            .container-fluid
-              / Brand and toggle get grouped for better mobile display
-              .navbar-header.row
-                %button.navbar-toggle.collapsed{"aria-expanded" => "false", "data-target" => "#bs-example-navbar-collapse-1", "data-toggle" => "collapse", :type => "button"}
-                  %span.sr-only Toggle navigation
-                  %span.icon-bar
-                  %span.icon-bar
-                  %span.icon-bar
-              / Collect the nav links, forms, and other content for toggling
-              #bs-example-navbar-collapse-1.collapse.navbar-collapse
-                %ul.nav.navbar-nav
-                  %li
-                    %a{:href => "#"} Following
-                  %li
-                    %a{:href => "#"} Today
-                  %li
-                    %a{:href => "#"} Fashion
-                  %li
-                    %a{:href => "#"} Expand Fashion
-                  %li
-                    %a{:href => "#"} Electronics
-                  %li
-                    %a{:href => "#"} Collectibles & Art
-                  %li
-                    %a{:href => "#"} Home & Garden
-                  %li
-                    %a{:href => "#"} Sporting Goods
-
-              / /.navbar-collapse
-            / /.container-fluid
-    / Banner
+            / /.navbar-collapse
+          / /.container-fluid
+        / Banner
   = yield
+
+
+:css
+  #header {
+    padding: 0 0 0;
+    margin: 0 0 50px;
+  }
+  #header .navbar {
+    margin: 0;
+  }
+  .header-top {
+    width: 100%;
+    float: left;
+    position: inherit;
+        overflow: inherit;
+   
+  }
+  #header .navbar-right {
+      margin-right: 31px;
+          margin-top: 19px;
+  }
+  .cart-area {
+      float: right;
+      font-family: 'Helvetica';
+      font-size: 12px;
+      padding: 0 0 0 0;
+      text-align: right;
+  }
+  .top-navarea .login-menu  .login-btn {
+    color: #fff !important;
+  }
+  .top-navarea .open>.dropdown-toggle.btn-default:focus, 
+  .top-navarea .open>.dropdown-toggle.btn-default:hover {
+    color: #fff !important;
+  }
+  .left-navarea .dropdown-menu{
+    top: 39px;
+  }
+  
+  .header-p-5 .form-control {
+    height: 38px;
+    border-right: 0;
+    box-shadow: none;
+  }
+      
+  @media (min-width: 768px){
+  .input-group-btn.select-drop-head {
+        width: 25% !important;
+  }
+}
