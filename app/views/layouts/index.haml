@@ -43,7 +43,6 @@
                   %ul.dropdown-menu{:role => "menu"}
                     %li
                       %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_vendor"} Add Vendor
-                    %li.divider
                     %li
                       %a{:href => "http://still-ridge-7153.herokuapp.com/vendors"} My Vendors
               %li
@@ -51,17 +50,37 @@
               %li
                 %a{:href => "#" }Chat With Vendors
               %li
-                %a{:href => "https://vd-rc-ua.herokuapp.com/validate/api?verify=#{}=#{}"} Chat
-          %ul.nav.navbar-nav.navbar-right.top-navarea
-            %nav.top-header-list
-              %ul
-                %li
-                  .header-left.hidden-tablet
-                    .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-                      #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
-                      = icon_tag("rows", ["header-menu-icon"])
-                      %span.visible-tablet-inline
-                        = t("header.menu")
+            
+            %ul.nav.navbar-nav.navbar-right.right-admin-dropdown
+              %li.dropdown
+                %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
+                  = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
+                  %span.caret
+                %ul.dropdown-menu{:role => "menu"}
+                  %li= link_to "My Profile", "http://still-ridge-7153.herokuapp.com/users/edit"
+                  %li= link_to "Logout", "http://still-ridge-7153.herokuapp.com/users/logout", :method => 'delete'
+
+      .header-top
+        .container
+          .row
+            .col-md-6.col-sm-6.col-xs-6
+              %nav.top-header-list
+                %ul
+                  %li
+                    - if @current_user
+                      Hi User
+                    -else
+                      Hi Guest 
+            .col-md-6.col-sm-6.col-xs-6
+              %nav.cart-area
+                %ul
+                  %li
+                    .header-left.hidden-tablet
+                      .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
+                        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
+                        = icon_tag("rows", ["header-menu-icon"])
+                        %span.visible-tablet-inline
+                          = t("header.menu")
                   %li
                     .dropdown.login-menu 
                       %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
@@ -76,6 +95,33 @@
                           = link_to new_listing_path, :class => "hidden-tablet" do
                             = icon_tag("new_listing", ["icon-with-text"])
                             = t("homepage.index.post_new_listing")
+                        - if @current_user
+                          - Maybe(@current_user).each do |user|
+                            - conversations = @current_community.conversations.for_person(user)
+                            - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+                            %li
+                              = link_to person_inbox_path(@current_user) do
+                                = icon_tag("mail", ["icon-with-text"])
+                                = t("layouts.conversations.messages")
+                                - if unread_count > 0
+                                  .mobile-badge{:class => get_badge_class(unread_count)}
+                                  = unread_count
+                            %li
+                              = link_to person_path(user) do
+                                = icon_tag("user", ["icon-with-text"])
+                                = t("header.profile")                        
+                            %li
+                              = link_to person_path(user, :show_closed => true) do
+                                = icon_tag("list", ["icon-with-text"])
+                                = t("header.manage_listings")                         
+                            %li
+                              = link_to person_settings_path(user) do
+                                = icon_tag("settings", ["icon-with-text"])
+                                = t("layouts.logged_in.settings")
+                            %li
+                              = link_to logout_path do
+                                = icon_tag("logout", ["icon-with-text"])
+                                = t("layouts.logged_in.logout")
                         %li
                           = link_to about_infos_path do
                             = icon_tag("information", ["icon-with-text"])
@@ -106,107 +152,6 @@
                         /       .toggle-menu-title
                         /         = t("layouts.global-header.select_language")
                         /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
-
-      .header-top
-        .container
-          .row
-            .col-md-6.col-sm-6.col-xs-6
-              %nav.top-header-list
-                %ul
-                  %li
-                    - if @current_user
-                      - Maybe(@current_user).each do |user|
-                        - conversations = @current_community.conversations.for_person(user)
-                        - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
-
-                        .dropdown.login-menu 
-                          %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                            Hi&nbsp 
-                            =@current_user.username
-                            %span.caret
-                          %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                            %li
-                              = link_to person_inbox_path(@current_user) do
-                                = icon_tag("mail", ["icon-with-text"])
-                                = t("layouts.conversations.messages")
-                                - if unread_count > 0
-                                  .mobile-badge{:class => get_badge_class(unread_count)}
-                                  = unread_count
-                            %li
-                              = link_to person_path(user) do
-                                = icon_tag("user", ["icon-with-text"])
-                                = t("header.profile")                        
-                            %li
-                              = link_to person_path(user, :show_closed => true) do
-                                = icon_tag("list", ["icon-with-text"])
-                                = t("header.manage_listings")                         
-                            %li
-                              = link_to person_settings_path(user) do
-                                = icon_tag("settings", ["icon-with-text"])
-                                = t("layouts.logged_in.settings")
-                            %li
-                              = link_to logout_path do
-                                = icon_tag("logout", ["icon-with-text"])
-                                = t("layouts.logged_in.logout")
-                        %li     
-                          .header-right
-                            = #render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, user: user}
-
-
-            .col-md-6.col-sm-6.col-xs-6
-              %nav.cart-area
-                %ul
-                  %li
-                    .header-left.hidden-tablet
-                      .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-                        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
-                        = icon_tag("rows", ["header-menu-icon"])
-                        %span.visible-tablet-inline
-                          = t("header.menu")
-                    %li
-                      / .dropdown.login-menu 
-                      /   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                      /     Menu
-                      /     %span.caret
-                      /   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                      /     %li
-                      /       = link_to "/" do
-                      /         = icon_tag("home", ["icon-with-text"])
-                      /         = t("header.home")
-                      /     %li
-                      /       = link_to new_listing_path, :class => "hidden-tablet" do
-                      /         = icon_tag("new_listing", ["icon-with-text"])
-                      /         = t("homepage.index.post_new_listing")
-                      /     %li
-                      /       = link_to about_infos_path do
-                      /         = icon_tag("information", ["icon-with-text"])
-                      /         = t("header.about")
-                      /     %li
-                      /       = link_to new_user_feedback_path do
-                      /         = icon_tag("feedback", ["icon-with-text"])
-                      /         = t("header.contact_us")
-                      /     %li
-                      /       - with_invite_link do
-                      /         = link_to new_invitation_path do
-                      /           = icon_tag("invite", ["icon-with-text"])
-                      /           = t("header.invite")
-                      /     %li
-                      /       - Maybe(@current_community).menu_links.each do |menu_links|
-                      /         - menu_links.each do |menu_link|
-                      /           = link_to menu_link.url(I18n.locale), :target => "_blank" do
-                      /             = icon_tag("redirect", ["icon-with-text"])
-                      /             = menu_link.title(I18n.locale)
-                      /     %li
-                      /       - if @current_user && @current_community && @current_user.has_admin_rights?
-                      /         = link_to edit_details_admin_community_path(@current_community) do
-                      /           = icon_tag("admin", ["icon-with-text"])
-                      /           = t("layouts.logged_in.admin")
-                      /     / %li
-                      /     /   .hidden-desktop
-                      /     /     - with_available_locales do |locales|
-                      /     /       .toggle-menu-title
-                      /     /         = t("layouts.global-header.select_language")
-                      /     /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
     .container
       .header-content
         / .col-md-2.col-sm-2.col-xs-12.header-p-5
