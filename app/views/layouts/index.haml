@@ -48,7 +48,7 @@
               %li
                 %a{:href => "/" }MarketPlace
               %li
-                %a{:href => "#" }Chat With Vendors
+                %a{:href => chatbox_url.to_s }Chat With Vendors
               %li
             
             %ul.nav.navbar-nav.navbar-right.right-admin-dropdown
@@ -146,12 +146,6 @@
                             = link_to edit_details_admin_community_path(@current_community) do
                               = icon_tag("admin", ["icon-with-text"])
                               = t("layouts.logged_in.admin")
-                        / %li
-                        /   .hidden-desktop
-                        /     - with_available_locales do |locales|
-                        /       .toggle-menu-title
-                        /         = t("layouts.global-header.select_language")
-                        /       = render :partial => "layouts/locale_select", :collection => locales, :as => :loc_array
     .container
       .header-content
         / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -212,7 +206,8 @@
                   %a{:href => "#"} Home & Garden
                 %li
                   %a{:href => "#"} Sporting Goods
-
+                %li
+                  %a{:href => "#"} Suiting
             / /.navbar-collapse
           / /.container-fluid
         / Banner

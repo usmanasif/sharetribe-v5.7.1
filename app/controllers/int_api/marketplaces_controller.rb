@@ -59,7 +59,10 @@ class IntApi::MarketplacesController < ApplicationController
 
   def login
     puts '*'*500 , 'params' , p = params["check"].gsub('__p__' , '+') , '*'*500
-    puts '*'*500 , 'current user' , @current_user.inspect 
+    puts '*'*500 , 'current user' , @current_user.inspect
+    puts '*'*500 , params.inspect
+    session['chatbox_verify'] = params['verify'] if params['verify']
+    session['chatbox_token'] = params['token'] if params['token']
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
     puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
     if email.present?
