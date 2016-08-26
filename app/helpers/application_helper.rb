@@ -60,14 +60,6 @@ module ApplicationHelper
     end
   end
 
-  def chatbox_url
-    if session['chatbox_verify'] && session['chatbox_token']
-      return "https://vd-rc-ua.herokuapp.com/validate/api?verify=" + session['chatbox_verify'] + "&token=" + session['chatbox_token'] 
-    else
-      return "https://vd-rc-ua.herokuapp.com/"
-    end
-  end
-
   # Changes line breaks to <br>-tags and transforms URLs to links
   def text_with_line_breaks_html_safe(&block)
     haml_concat add_p_tags(capture_haml(&block)).html_safe

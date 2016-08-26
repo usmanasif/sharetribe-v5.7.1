@@ -22,6 +22,7 @@
     = react_component("TopbarApp", props: props, prerender: true)
   - # this will be an alternative old header
   - # but for the sake of developing we include them both for a short while
+  = render partial: 'layouts/vA_Header'
   = render partial: 'layouts/global_header', locals: header_props()
 
   - if display_expiration_notice?
