@@ -1,8 +1,9 @@
 class IntApi::MarketplacesController < ApplicationController
 
   skip_filter :fetch_community, :check_http_auth, :only => [:login]
-
-
+  
+  skip_before_filter  :verify_authenticity_token, only: [:is_register]
+  
   before_filter :set_access_control_headers
 
   NewMarketplaceForm = Form::NewMarketplace
