@@ -61,8 +61,6 @@ class IntApi::MarketplacesController < ApplicationController
     puts '*'*500 , 'params' , p = params["check"].gsub('__p__' , '+') , '*'*500
     puts '*'*500 , 'current user' , @current_user.inspect
     puts '*'*500 , params.inspect
-    session['chatbox_verify'] = params['verify'] if params['verify']
-    session['chatbox_token'] = params['token'] if params['token']
     hash = Gibberish::AES.new('My_home_town_is_CA_USA')
     puts '*'*500 , 'hash decrypt' , email = hash.decrypt(p.gsub('\\', ''))
     if email.present?
@@ -89,18 +87,24 @@ class IntApi::MarketplacesController < ApplicationController
       @person = UserService::API::Users.create_user({
           given_name: params[:first_name],
           family_name: params[:last_name],
-          email: params[:email],
+          email: params[:email].downcase,
           password: params[:password],
           locale: params[:marketplace_language]},
           1 )
-      render  json: ["Successful"], status:  200 
+      render  json: [status: "Successful"], status:  200 
     else
-      render json: ["Unsuccessful"] , status: 400
+      render json: [status: "Unsuccessful"] , status: 400
     end
   end
 
-  def get_current_user
-    render status: 200 , json: { "session" => session }
+  def is_register
+    if Email.find_by email: params["email"]
+      render status: 200 , json: { "session" => true }
+    else
+      render status: 400 , json: { "status" => false }
+    end
+      
+    
   end
 
   def create_prospect_email

@@ -48,6 +48,7 @@ Kassi::Application.routes.draw do
     post "/create_trial_marketplace" => "marketplaces#create"
     post "/prospect_emails" => "marketplaces#create_prospect_email"
     get "/login_with_API" => "marketplaces#login"
+    post "/is_register" => "marketplaces#is_register"
     post "/signup_with_API" => "marketplaces#signup"
     get "/current/user" => "marketplaces#get_current_user"
   end
