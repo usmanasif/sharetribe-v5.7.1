@@ -98,8 +98,8 @@ class IntApi::MarketplacesController < ApplicationController
   end
 
   def is_register
-    if Email.find_by email: params["email"]
-      render status: 200 , json: { "session" => true }
+    if Email.find_by address: params["email"]
+      render status: 200 , json: { "status" => true }
     else
       render status: 400 , json: { "status" => false }
     end
