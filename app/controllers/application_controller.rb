@@ -212,7 +212,7 @@ class ApplicationController < ActionController::Base
   # sessions which potentially had a person_id pointing to another
   # community are all expired.
   def ensure_user_belongs_to_community
-    return unless @current_user
+    return unless @current_user && @current_community
 
     if !@current_user.is_admin? && @current_user.accepted_community != @current_community
 
