@@ -92,9 +92,12 @@ class IntApi::MarketplacesController < ApplicationController
           password: params[:password],
           locale: params[:marketplace_language]},
           1 )
+      puts '*'*50 , @person.inspect
+      puts '*'*50 , @person.data[:id]
+      puts '*'*50 , Person.find_by family_name: params[:last_name]
       puts '*'*50 , Person.find_by(username: @person.data[:id]).community_membership.update(status: 'accepted')
       
-      render  json: [status: "Successful"], status:  200 
+      render json: [status: "Successful"], status:  200 
     else
       render json: [status: "Unsuccessful"] , status: 400
     end
