@@ -380,9 +380,11 @@ class ApplicationController < ActionController::Base
       # having email confirmed but not the membership)
       #
       # TODO Remove this. Find the issue that causes this and fix it, don't fix the symptoms.
-      if @current_user.has_valid_email_for_community?(@current_community)
-        @current_community.approve_pending_membership(@current_user)
-        redirect_to search_path and return
+      if @current_user.present? && @current_community.present?
+        if @current_user.has_valid_email_for_community?(@current_community)
+          @current_community.approve_pending_membership(@current_user)
+          redirect_to search_path and return
+        end
       end
 
       redirect_to confirmation_pending_path
