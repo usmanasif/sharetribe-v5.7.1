@@ -62,7 +62,7 @@
             %ul.nav.navbar-nav.navbar-right.right-admin-dropdown
               %li.dropdown
                 %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
-                  = @current_user.given_name + @current_user.family_name
+                  = @current_user.given_name + ' ' + @current_user.family_name
                   //= @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
                   %span.caret
                 %ul.dropdown-menu{:role => "menu"}
