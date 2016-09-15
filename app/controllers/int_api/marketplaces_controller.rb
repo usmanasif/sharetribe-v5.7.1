@@ -94,8 +94,8 @@ class IntApi::MarketplacesController < ApplicationController
           1 )
       puts '*'*50 , @person.inspect
       puts '*'*50 , @person.data[:id]
-      puts '*'*50 , Person.find_by(family_name: params[:last_name])
-      puts '*'*50 , Person.find_by(username: @person.data[:id]).community_membership.update(status: 'accepted')
+      puts '*'*50 , Person.find_by(family_name: params[:last_name]).inspect
+      puts '*'*50 , Person.find_by(family_name: params[:last_name]).community_membership.update(status: 'accepted')
       
       render json: [status: "Successful"], status:  200 
     else
