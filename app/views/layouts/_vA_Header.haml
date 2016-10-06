@@ -1,55 +1,55 @@
-/ Latest compiled and minified CSS
+/ / Latest compiled and minified CSS
 
 
-%nav.navbar.navbar-inverse.login{:role => "navigation"}
-  .container
-    .navbar-header
-      %a.navbar-brand{:href => "http://still-ridge-7153.herokuapp.com/"} Vendor Advisor
-    - if @current_user.present?
-      %ul.nav.navbar-nav.navbar-left.left-navarea
-        %li.dropdown
-          %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
-            Properties
-            %span.caret
-          %ul.dropdown-menu{:role => "menu"}
-            %li
-              %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_business"} Add Property
-            - if true
-              %li.divider
-              %li
-                %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} My Properties
-            - else
-              %li
-                %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} Properties
-        - if true
-          %li
-            %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/brand_list"} Brands
-          %li
-            %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/vendor_list"} Vendors
-        - else
-          %li.dropdown
-            %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "businesses_path", :role => "button"}
-              Vendors
-              %span.caret
-            %ul.dropdown-menu{:role => "menu"}
-              %li
-                %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_vendor"} Add Vendor
-              %li
-                %a{:href => "http://still-ridge-7153.herokuapp.com/vendors"} My Vendors
-        %li
-          %a{:href => "/" }MarketPlace
-        %li
-          %a{:href => "http://still-ridge-7153.herokuapp.com/chatbox" }Chat With Vendors
-        %li
+/ %nav.navbar.navbar-inverse.login{:role => "navigation"}
+/   .container
+/     .navbar-header
+/       %a.navbar-brand{:href => "http://still-ridge-7153.herokuapp.com/"} Vendor Advisor
+/     - if @current_user.present?
+/       %ul.nav.navbar-nav.navbar-left.left-navarea
+/         %li.dropdown
+/           %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
+/             Properties
+/             %span.caret
+/           %ul.dropdown-menu{:role => "menu"}
+/             %li
+/               %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_business"} Add Property
+/             - if true
+/               %li.divider
+/               %li
+/                 %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} My Properties
+/             - else
+/               %li
+/                 %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} Properties
+/         - if true
+/           %li
+/             %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/brand_list"} Brands
+/           %li
+/             %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/vendor_list"} Vendors
+/         - else
+/           %li.dropdown
+/             %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "businesses_path", :role => "button"}
+/               Vendors
+/               %span.caret
+/             %ul.dropdown-menu{:role => "menu"}
+/               %li
+/                 %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_vendor"} Add Vendor
+/               %li
+/                 %a{:href => "http://still-ridge-7153.herokuapp.com/vendors"} My Vendors
+/         %li
+/           %a{:href => "/" }MarketPlace
+/         %li
+/           %a{:href => "http://still-ridge-7153.herokuapp.com/chatbox" }Chat With Vendors
+/         %li
       
-      %ul.nav.navbar-nav.navbar-right.right-admin-dropdown
-        %li.dropdown
-          %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
-            = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
-            %span.caret
-          %ul.dropdown-menu{:role => "menu"}
-            %li= link_to "My Profile", "http://still-ridge-7153.herokuapp.com/users/edit"
-            %li= link_to "Logout", "http://still-ridge-7153.herokuapp.com/users/logout", :method => 'delete'
+/       %ul.nav.navbar-nav.navbar-right.right-admin-dropdown
+/         %li.dropdown
+/           %a.dropdown-toggle{"aria-expanded" => "false", "data-toggle" => "dropdown", :href => "#", :role => "button"}
+/             = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
+/             %span.caret
+/           %ul.dropdown-menu{:role => "menu"}
+/             %li= link_to "My Profile", "http://still-ridge-7153.herokuapp.com/users/edit"
+/             %li= link_to "Logout", "http://still-ridge-7153.herokuapp.com/users/logout", :method => 'delete'
 
 
 
