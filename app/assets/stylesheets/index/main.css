@@ -5,7 +5,7 @@
        url('/assets/glyphicons-halflings-regular.woff') format('woff'),
        url('/assets/glyphicons-halflings-regular.ttf') format('truetype'), 
        url('/assets/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
-}
+}*/
 @font-face {
 	font-family: 'Helvetica';
 	src: url('/assets/index/Helvetica.eot?#iefix') format('embedded-opentype'),  
@@ -15,7 +15,7 @@
 	url('/assets/index/Helvetica.svg#Helvetica') format('svg');
 	font-weight: normal;
 	font-style: normal;
-}*/
+}
 body {/*
     font: 14px/17px'Helvetica, Arial, sans-serif';*/
     background: url('../index/bbg-body.jpg') !important;
