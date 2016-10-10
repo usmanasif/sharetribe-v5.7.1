@@ -3,7 +3,7 @@
   .header-holder 
     .logo 
       %a{:href => "http://still-ridge-7153.herokuapp.com/"} Vendor Advisor
-    - if  @current_user.present?
+    - if @current_user.present?
       %ul#myTopnav.topnav
         %li
           .dropdown
@@ -11,14 +11,14 @@
             %ul#myDropdown1.dropdown-content
               %li
                 %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/search_business"} Add Property
-              - unless true
+              - unless @current_user.is_admin?
                 %li.divider
                 %li
                   %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} My Properties
               - else
                 %li
                   %a{:href => "http://still-ridge-7153.herokuapp.com/businesses"} Properties
-        - if  @current_user.is_admin?
+        - if @current_user.is_admin?
           %li
             %a{:href => "http://still-ridge-7153.herokuapp.com/businesses/brand_list"} Brands
           %li
@@ -39,7 +39,7 @@
       %ul#myTopnav.topnav.nav-right-top 
         %li
           .dropdown
-            %button.dropbtn{:onclick => "myFunction2()"} 
+            %button.dropbtn{:onclick => "myFunction2()"} ABD
             = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
             %ul#myDropdown3.dropdown-content
               %li= link_to "My Profile", "http://still-ridge-7153.herokuapp.com/users/edit"
@@ -262,17 +262,14 @@
   /* When the user clicks on the button, 
   toggle between hiding and showing the dropdown content */
   function myFunction() {
-    removeShowClass();
     document.getElementById("myDropdown1").classList.toggle("show");
   }
 
   function myFunction1() {
-    removeShowClass();
     document.getElementById("myDropdown2").classList.toggle("show");
   }
 
   function myFunction2() {
-    removeShowClass();
     document.getElementById("myDropdown3").classList.toggle("show");
   }
 
