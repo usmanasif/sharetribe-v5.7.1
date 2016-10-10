@@ -39,8 +39,8 @@
       %ul#myTopnav.topnav.nav-right-top 
         %li
           .dropdown
-            %button.dropbtn{:onclick => "myFunction2()"} ABD
-            = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
+            %button.dropbtn{:onclick => "myFunction2()"} 
+              = @current_user.given_name.slice(0,1).capitalize + @current_user.given_name.slice(1..-1)
             %ul#myDropdown3.dropdown-content
               %li= link_to "My Profile", "http://still-ridge-7153.herokuapp.com/users/edit"
               %li= link_to "Logout", "http://still-ridge-7153.herokuapp.com/users/logout", :method => 'delete'
