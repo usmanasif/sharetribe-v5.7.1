@@ -18,9 +18,7 @@
               %nav.top-header-list
                 %ul
                   %li
-                    - if @current_user
-                      Hi User
-                    -else
+                    - unless @current_user
                       Hi Guest 
             .col-md-6.col-sm-6.col-xs-6
               %nav.cart-area
