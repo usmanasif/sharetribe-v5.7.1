@@ -215,5 +215,29 @@ class Listing < ActiveRecord::Base
   def unit_type
     Maybe(read_attribute(:unit_type)).to_sym.or_else(nil)
   end
+  
+  def self.json_for_notification(listing)
+    listing = Listing.select(:id, :title, :created_at, :description, :origin, :price_cents, :currency, :author_id).find(listing.id)
+    listing.description.squish!
+    image_url = ''
+    image_url = listing.listing_images.first.image.url 
+    author = Person.select(:id, :given_name, :family_name).find( listing.author_id ).to_json
+    listing = listing.to_json
+    h = Hash.new
+    h["listing"] = listing
+    h["image_url"] = image_url 
+    h["author"] = author
+    h.to_json
+    puts "*"*50 , notify_to_VA(h) , "*"*50
+  end
+
+  def notify_to_VA json
+    url = URI( APP_CONFIG["va_url"].to_s + "/api/v1/notification_services/sharetribe")
+    http = Net::HTTP.new(url.host, url.port)
+    request = Net::HTTP::Post.new(url)
+    request["content-type"] = 'application/json'
+    request.body = json
+    response = http.request(request)
+  end
 
 end
