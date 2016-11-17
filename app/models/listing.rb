@@ -221,13 +221,12 @@ class Listing < ActiveRecord::Base
     listing.description.squish!
     image_url = ''
     image_url = listing.listing_images.first.image.url 
-    author = Person.select(:id, :given_name, :family_name).find( listing.author_id ).to_json
-    listing = listing.to_json
+    author = Person.select(:id, :given_name, :family_name).find( listing.author_id )
     h = Hash.new
     h["listing"] = listing
     h["image_url"] = image_url 
     h["author"] = author
-    puts "*"*50 , h = JSON.parse(h.to_json)
+    puts "*"*50 , h = h.to_json
     h 
   end
 
@@ -236,9 +235,9 @@ class Listing < ActiveRecord::Base
     http = Net::HTTP.new(url.host, url.port)
     request = Net::HTTP::Post.new(url)
     request["content-type"] = 'application/json'
-    request.body = json
+    puts "~"*50 , request.body = json
     response = http.request(request)
-    response.read_body
+    JSON.parse(response.read_body)
   end
 
 end
