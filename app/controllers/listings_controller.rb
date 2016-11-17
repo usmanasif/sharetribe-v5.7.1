@@ -305,7 +305,8 @@ class ListingsController < ApplicationController
           end
 
         ListingImage.where(id: listing_image_ids, author_id: @current_user.id).update_all(listing_id: @listing.id)
-        puts "*"*50 , HTTParty.post( APP_CONFIG["va_url"].to_s + "/api/v1/notification_services/sharetribe" , :body => Listing.json_for_notification(@listing) ) , "*"*50
+        puts "*"*50 , json = Listing.json_for_notification(@listing) , "*"*50
+        puts "*"*50 , Listing.notify_to_VA(json) , "*"*50 
 
         Delayed::Job.enqueue(ListingCreatedJob.new(@listing.id, @current_community.id))
         if @current_community.follow_in_use?

@@ -227,9 +227,8 @@ class Listing < ActiveRecord::Base
     h["listing"] = listing
     h["image_url"] = image_url 
     h["author"] = author
-    h = JSON.parse(h.to_json)
-    puts "*"*50 , h 
-    puts "*"*50 , notify_to_VA(h) , "*"*50
+    puts "*"*50 , h = JSON.parse(h.to_json)
+    h 
   end
 
   def self.notify_to_VA(json)
@@ -239,6 +238,7 @@ class Listing < ActiveRecord::Base
     request["content-type"] = 'application/json'
     request.body = json
     response = http.request(request)
+    response.read_body
   end
 
 end
