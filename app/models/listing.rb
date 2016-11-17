@@ -231,7 +231,7 @@ class Listing < ActiveRecord::Base
     puts "*"*50 , notify_to_VA(h) , "*"*50
   end
 
-  def notify_to_VA json
+  def self.notify_to_VA(json)
     url = URI( APP_CONFIG["va_url"].to_s + "/api/v1/notification_services/sharetribe")
     http = Net::HTTP.new(url.host, url.port)
     request = Net::HTTP::Post.new(url)
