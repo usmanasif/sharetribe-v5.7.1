@@ -227,7 +227,8 @@ class Listing < ActiveRecord::Base
     h["listing"] = listing
     h["image_url"] = image_url 
     h["author"] = author
-    h.to_json
+    h = JSON.parse(h.to_json)
+    puts "*"*50 , h 
     puts "*"*50 , notify_to_VA(h) , "*"*50
   end
 
