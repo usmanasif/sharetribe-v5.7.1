@@ -35,6 +35,10 @@ module Kassi
     config.autoload_paths += Dir[Rails.root.join('app', 'view_utils')]
     config.autoload_paths += Dir[Rails.root.join('app', 'forms')]
     config.autoload_paths += Dir[Rails.root.join('app', 'validators')]
+    
+    config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOWALL"
+    #config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOWALL"
+    #config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOW-FROM https://"
 
     # Load also Jobs that are used by migrations
     config.autoload_paths += Dir[Rails.root.join('db', 'migrate_jobs', '**/')]
