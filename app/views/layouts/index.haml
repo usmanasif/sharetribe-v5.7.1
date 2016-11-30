@@ -10,17 +10,10 @@
 
   %body
     %header#header
-      //= render partial: 'layouts/vA_Header'
       .header-top
         .container
           .row
-            .col-md-6.col-sm-6.col-xs-6
-              %nav.top-header-list
-                %ul
-                  %li
-                    - unless @current_user
-                      Hi Guest 
-            .col-md-6.col-sm-6.col-xs-6
+            .col-md-12.col-sm-12.col-xs-12
               %nav.cart-area
                 %ul
                   %li
@@ -30,11 +23,12 @@
                         = icon_tag("rows", ["header-menu-icon"])
                         %span.visible-tablet-inline
                           = t("header.menu")
-                  %li
+                  %li{:style => "padding-right:15%;"}
+                    %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                      Post a new listing
                     .dropdown.login-menu 
                       %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                         Menu
-                        %span.caret
                       %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
                         %li
                           = link_to "/" do
@@ -209,5 +203,11 @@
   @media (min-width: 768px){
   .input-group-btn.select-drop-head {
         width: 25% !important;
+  }
+  .menu_btn_amzonLyout{
+  background: #eee;
+    border: 1px solid black;
+    font-size: 14px;
+    height: 29px;
   }
 }

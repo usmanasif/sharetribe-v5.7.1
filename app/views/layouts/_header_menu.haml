@@ -1,4 +1,4 @@
-#header-menu-toggle-menu.toggle-menu.header-toggle-menu-menu.hidden
+#header-menu-toggle-menu.toggle-menu.header-toggle-menu-menu.hidden.vA_simulator
 
   = link_to "/" do
     = icon_map_tag(icons, "home", ["icon-with-text"])
@@ -38,3 +38,10 @@
         = t("layouts.global-header.select_language")
 
       = render :partial => "layouts/locale_select", :collection => available_locales, :as => :loc_array, locals: { return_after_locale_change: return_after_locale_change }
+
+
+:css
+  .toggled .header-menu-toggle-container {
+    color: white; !important
+    background-color: #eee; !important
+  }

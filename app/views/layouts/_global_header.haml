@@ -2,7 +2,7 @@
 %header.header
   .header-wrapper
     .header-right
-      = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link"
+      = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
 
     .header-right.visible-tablet
       #header-menu-desktop-anchor.header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
@@ -33,9 +33,9 @@
 
     .header-left.hidden-tablet
       .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
+        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container.nav-header
           = icon_map_tag(icons, "rows", ["header-menu-icon"])
-          %span.visible-tablet-inline
+          %span.visible-tablet-inline.btn-menu
             = t("header.menu")
 
     = render :partial => "layouts/header_menu", locals: { return_after_locale_change: return_after_locale_change, available_locales: available_locales, icons: icons}
@@ -61,6 +61,11 @@
 
 
 
+:css
+  .vA_h_simulator{
+    background: #00a26c; !important
+  
+  }
 
 
 
@@ -145,3 +150,74 @@
 
 
 
+
+:css
+  .nav-header:hover,
+  .nav-header {
+    background: none;
+    height: auto;
+    line-height: 17px;
+    padding: 0;
+     background: none !important;
+
+  }
+  .header-menu-container {
+    display: block;
+    padding: 0;
+    height: auto;
+  }
+  .btn-menu {
+    background: #eee;
+    color: #000;
+    padding: 3px 10px;
+    margin: 0 2px;
+    border: 1px solid #000;
+    color: #000;
+    font-size: 16px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+   width: 126px !Important;
+    display: inline-block !Important;
+
+  }
+  .new-listing-link:hover {
+    background: none;
+    color: #000;
+  }
+  .new-listing-link {
+    background: #eee;
+    color: #000;
+    padding: 3px 10px;
+    margin: 0 2px;
+    border: 1px solid #000;
+    color: #000;
+    font-size: 16px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    height: auto;
+  }
+  .header{
+    height: 37px; important
+  }
+  .toggle.toggled{
+    background: #eee !important;
+    color: white !important;
+    border-color: #474747;
+  }
+  .toggle-menu{
+    background: #eee !important;
+    border-radius: 7px !important;
+  }
+  .toggle-menu a{
+    color: black !important;
+  }
+  .header-menu-toggle-container:active {
+    background: #eee !important;
+  }
+  .toggled.header-menu-toggle-container {
+    color: white;
+    background-color: #eee !important;
+  }
+  .header-menu-toggle-container:active {
+    background: none !important;
+  }
