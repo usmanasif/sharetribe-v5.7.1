@@ -44,7 +44,11 @@ body {/*
     -moz-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
 }
-.open>.dropdown-toggle.btn-default:focus,
+.open>.dropdown-toggle.btn-default:focus {
+    color: #0654ba !important;
+    background-color: #d4d4d4;
+    border-color: #8c8c8c;
+}
 .open>.dropdown-toggle.btn-default:hover {
     color: #0654ba !important;
     background-color: #d4d4d4;
