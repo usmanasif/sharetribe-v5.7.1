@@ -1869,7 +1869,7 @@ box-shadow: none;
 }
 .menu_btn_amzonLyout{
   background: #eee;
-  border: 1px solid black;
+  border: 1px solid black !important;
   font-size: 14px;
   height: 29px;
 }
