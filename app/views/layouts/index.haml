@@ -14,18 +14,86 @@
         .container
           .row
             .col-md-12.col-sm-12.col-xs-12
-              %nav.cart-area
+              %nav.cart-area.admin-menu-panel
                 %ul
+                  - if @current_user
+                    - conversations = @current_community.conversations.for_person(@current_user)
+                    - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
+                    %li
+                      = link_to person_inbox_path(@current_user) do
+                        = icon_tag("mail", ["icon-with-text"])
+                        - if unread_count > 0
+                          .mobile-badge{:class => get_badge_class(unread_count)}
+                          = unread_count
                   %li
-                    .header-left.hidden-tablet
-                      .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-                        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container
-                        = icon_tag("rows", ["header-menu-icon"])
-                        %span.visible-tablet-inline
-                          = t("header.menu")
-                  %li{:style => "padding-right:15%;"}
-                    %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                      Post a new listing
+                    .dropdown.login-admin-profile
+                      %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                        %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+                        %span.admin-text
+                          admin a
+                          %i.icon-caret-down.icon-dropdown
+                      %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                        %li
+                          = link_to "/" do
+                            = icon_tag("home", ["icon-with-text"])
+                            = t("header.home")
+                        %li
+                          = link_to new_listing_path, :class => "hidden-tablet" do
+                            = icon_tag("new_listing", ["icon-with-text"])
+                            = t("homepage.index.post_new_listing")
+                        - if @current_user
+                          - Maybe(@current_user).each do |user|
+                            - conversations = @current_community.conversations.for_person(user)
+                            - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+                            %li
+                              = link_to person_inbox_path(@current_user) do
+                                = icon_tag("mail", ["icon-with-text"])
+                                = t("layouts.conversations.messages")
+                                - if unread_count > 0
+                                  .mobile-badge{:class => get_badge_class(unread_count)}
+                                  = unread_count
+                            %li
+                              = link_to person_path(user) do
+                                = icon_tag("user", ["icon-with-text"])
+                                = t("header.profile")                        
+                            %li
+                              = link_to person_path(user, :show_closed => true) do
+                                = icon_tag("list", ["icon-with-text"])
+                                = t("header.manage_listings")                         
+                            %li
+                              = link_to person_settings_path(user) do
+                                = icon_tag("settings", ["icon-with-text"])
+                                = t("layouts.logged_in.settings")
+                            / %li
+                            /   = link_to logout_path do
+                            /     = icon_tag("logout", ["icon-with-text"])
+                            /     = t("layouts.logged_in.logout")
+                        %li
+                          = link_to about_infos_path do
+                            = icon_tag("information", ["icon-with-text"])
+                            = t("header.about")
+                        %li
+                          = link_to new_user_feedback_path do
+                            = icon_tag("feedback", ["icon-with-text"])
+                            = t("header.contact_us")
+                        %li
+                          - with_invite_link do
+                            = link_to new_invitation_path do
+                              = icon_tag("invite", ["icon-with-text"])
+                              = t("header.invite")
+                        %li
+                          - Maybe(@current_community).menu_links.each do |menu_links|
+                            - menu_links.each do |menu_link|
+                              = link_to menu_link.url(I18n.locale), :target => "_blank" do
+                                = icon_tag("redirect", ["icon-with-text"])
+                                = menu_link.title(I18n.locale)
+                        %li
+                          - if @current_user && @current_community && @current_user.has_admin_rights?
+                            = link_to edit_details_admin_community_path(@current_community) do
+                              = icon_tag("admin", ["icon-with-text"])
+                              = t("layouts.logged_in.admin")
+
+                  %li
                     .dropdown.login-menu 
                       %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                         Menu
@@ -89,6 +157,11 @@
                             = link_to edit_details_admin_community_path(@current_community) do
                               = icon_tag("admin", ["icon-with-text"])
                               = t("layouts.logged_in.admin")
+
+                  %li
+                    %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                      Post a new listing
+                  
     .container
       .header-content
         / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -157,7 +230,94 @@
   = yield
 
 
-/ :css
+:css
+  ul{
+    list-style-type: none;
+  }
+  .login-admin-profile {
+    display: table !Important;
+    width: 96%;
+    display: inline-block;
+    border: none;
+    border-radius: 0;
+    background: #eee;
+    line-height: 3.5625em;
+    display: block;
+    font-size: 1em;
+    color: #3c3c3c;
+  }
+  .image-holder-login-menu  {
+    display: table-cell;
+    width: 20px;
+    height: 20px;
+    background: #000;
+  }
+  .login-admin-profile .login-btn {
+    display: table-cell;
+    vertical-align: middle;
+    width: auto;
+    background: none !important;
+    padding: 0 !important;
+    border: none !important;
+    font-size: 14px;
+    width: auto;
+    height: 27px;
+    margin: 0;
+  }
+  .open>.dropdown-toggle.btn-default:hover {
+
+  }
+  .cart-area .open > .dropdown-toggle.btn-default:hover, .login-admin-profile .login-btn:active, .login-admin-profile .login-btn:focus,
+  .cart-area .open > .dropdown-toggle.btn-default:hover,
+  .login-admin-profile .login-btn:active,
+  .login-admin-profile .login-btn:focus {
+    outline: none;
+    box-shadow: none;
+    color: #fff;
+  }
+  .cart-area.admin-menu-panel li {
+    padding:0 !important;
+    margin-right: 5px;
+  }
+  .image-holder-login-admin-profile {
+    display: table-cell;
+    width: 30%;
+    margin-right: 18px;
+    vertical-align: middle;
+  }
+  .icon-with-text{
+    font-size: 21px
+  }
+  .admin-menu-panel .admin-text {
+    padding-right: 0.75em;
+    padding-left: 0.75em;
+  }
+  .admin-menu-panel .login-menu {
+    margin-right: 0 ;
+  }
+  .admin-menu-panel .dropdown-menu {
+    min-width: 14.5em !important;
+    position: absolute;
+    background: #eee !important;
+    border-radius: 7px !important;
+    z-index: 99999;
+    text-align: left;
+    margin-bottom: 0.75em;
+    margin-top: 10px;
+  }
+  .admin-menu-panel .dropdown-menu > li > a {
+    display: block;
+    position: relative;
+    color: white;
+    padding: 0.75em;
+    padding-right: 0.75em;
+    color: black !important;
+  }
+  .admin-menu-panel .dropdown-menu > li > a:hover  {
+    background: #a64c5d;
+    color: white;
+  }
+
 /   #header {
 /     padding: 0 0 0;
 /     margin: 0 0 50px;
@@ -212,3 +372,4 @@
 /       height: 29px;
 /     }
 /   }
+

@@ -129,8 +129,8 @@ Kassi::Application.routes.draw do
 
     get "/logout" => "sessions#destroy", :as => :logout
     get "/confirmation_pending" => "community_memberships#confirmation_pending", :as => :confirmation_pending
-    #get "/login" => "sessions#new", :as => :login
-    get "/login" => redirect( 'http://still-ridge-7153.herokuapp.com/')
+    get "/login" => "sessions#new", :as => :login
+    #get "/login" => redirect( 'http://still-ridge-7153.herokuapp.com/')
     get "/listing_bubble/:id" => "listings#listing_bubble", :as => :listing_bubble
     get "/listing_bubble_multiple/:ids" => "listings#listing_bubble_multiple", :as => :listing_bubble_multiple
     get '/:person_id/settings/payments/braintree/new' => 'braintree_accounts#new', :as => :new_braintree_settings_payment
