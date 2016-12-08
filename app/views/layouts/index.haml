@@ -20,11 +20,11 @@
                     - conversations = @current_community.conversations.for_person(@current_user)
                     - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
                     %li
-                      = link_to person_inbox_path(@current_user) do, :class => "count-holder"
+                      = link_to person_inbox_path(@current_user) do
                         = icon_tag("mail", ["icon-with-text"])
                         - if unread_count > 0
                           .mobile-badge{:class => get_badge_class(unread_count)}
-                            = unread_count
+                          = unread_count
                   %li
                     .dropdown.login-admin-profile
                       %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
@@ -253,25 +253,6 @@
   .admin-menu-panel .dropdown-menu > li > a:hover  {
     background: #a64c5d;
     color: white;
-  }
-  .mobile-badge {
-    position: absolute;
-    top: -5px;
-    left: 1.4375em;
-    background: #a64c5d;
-    color: white;
-    width: 20px;
-    height: 20px;
-    line-height: 19px;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;
-    border-radius: 10px;
-    text-align: center;
-  }
-  .count-holder {
-    position: relative;
   }
 
 /   #header {
