@@ -13,24 +13,24 @@
   = render :partial => "conversations/message", :collection => messages, as: :message_or_action
 
 
-- if @current_user.present?
-  %script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
-  :javascript
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
-      authDomain: "vendoradvisor-4df3f.firebaseapp.com",
-      databaseURL: "https://vendoradvisor-4df3f.firebaseio.com",
-      storageBucket: "vendoradvisor-4df3f.appspot.com",
-      messagingSenderId: "795403313668"
-    };
-    firebase.initializeApp(config);
-    var dbrefSB = firebase.database().ref().child('sharetribe_beep');
-    dbrefSB.on('value' , function(snap){
-      obj = snap.val();
-      $.each(obj , function(key , element ){
-      console.log('Beep' , obj);
-      });
 
+%script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
+:javascript
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
+    authDomain: "vendoradvisor-4df3f.firebaseapp.com",
+    databaseURL: "https://vendoradvisor-4df3f.firebaseio.com",
+    storageBucket: "vendoradvisor-4df3f.appspot.com",
+    messagingSenderId: "795403313668"
+  };
+  firebase.initializeApp(config);
+  var dbrefSB = firebase.database().ref().child('sharetribe_beep');
+  dbrefSB.on('value' , function(snap){
+    obj = snap.val();
+    $.each(obj , function( key , element ){
+    console.log( 'Beep' , element );
     });
+
+  });
 
