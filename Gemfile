@@ -11,7 +11,7 @@ gem 'puma'
 gem 'gibberish'
 gem 'daemons'
 gem 'whenever', :require => false
-
+gem 'firebase'
  
 gem 'coffee-rails', "~> 4.0.1"
 gem 'uglifier', "~> 2.7.2"
