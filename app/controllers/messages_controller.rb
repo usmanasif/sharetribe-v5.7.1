@@ -25,7 +25,7 @@ class MessagesController < ApplicationController
     if @message.save
       Delayed::Job.enqueue(MessageSentJob.new(@message.id, @current_community.id))
       firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
-      firebase.push("sharetribe_beep", @message.to_json)
+      firebase.push("sharetribe_beep", JSON.parse(@message.to_json)
     else
       flash[:error] = "reply_cannot_be_empty"
     end
