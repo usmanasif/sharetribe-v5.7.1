@@ -13,7 +13,7 @@
   = render :partial => "conversations/message", :collection => messages, as: :message_or_action
 
 
-- if current_user.present?
+- if @current_user.present?
   %script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
   :javascript
     // Initialize Firebase
