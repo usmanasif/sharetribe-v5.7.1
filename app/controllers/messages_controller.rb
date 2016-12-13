@@ -29,7 +29,19 @@ class MessagesController < ApplicationController
       p=Participation.where("conversation_id = #{@message.conversation_id} and person_id != '#{@current_user.id}' ").pluck :person_id
       p.each do |u|
         e = Email.find_by_person_id(u).address
-        firebase.push("sharetribe", { :user_id => e , :conversation => @message.conversation_id } )
+        t = '';
+        d = '';
+        c = Conversation.find(@message.conversation_id)
+        if c.listing_id
+          l= Listing.find(c.listing_id)
+          t = "New Activity"
+          d = "#{l.title}"
+        else
+          t = "Message Received"
+          d = "#{@current_user.given_name} sent you a free Message"
+        end
+        title = 
+        firebase.push("sharetribe", { :user_id => e , :conversation => @message.conversation_id , :title => t , :description => d } )
       end
     else
       flash[:error] = "reply_cannot_be_empty"
