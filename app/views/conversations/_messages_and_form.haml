@@ -12,11 +12,11 @@
 #messages
   = render :partial => "conversations/message", :collection => messages, as: :message_or_action
 
-
-
 %script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
 :javascript
   // Initialize Firebase
+  var c_u = "#{@current_user.id}"
+  var a = document.getElementById("message_conversation_id").value;
   var config = {
     apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
     authDomain: "vendoradvisor-4df3f.firebaseapp.com",
@@ -27,10 +27,31 @@
   firebase.initializeApp(config);
   var dbrefSB = firebase.database().ref().child('sharetribe_beep');
   dbrefSB.on('value' , function(snap){
+    var c = 0;
     obj = snap.val();
     $.each(obj , function( key , element ){
-    console.log( 'Beep' , element );
+      console.log(element.s_id == c_u && a == element.c_id)
+      if( a == element.c_id ){
+        c = c +1 ;
+        get_messages_update(element.c_id);
+        dbrefSB.child( key ).remove();
+      }
+      / update_unreadC();
     });
 
   });
 
+  function get_messages_update(cId){
+    $.post( "#{person_messages_get_conversation_path} ", {
+      c_id: cId
+    },
+    function(data, status){
+      if (status == 'success') {
+      $('#messages').html(data);
+      }
+    });
+  }
+
+  / function update_unreadC(){
+  / $.get( "<%= person_messages_get_message_count_path %>",function(data, status){ if(status == 'success'){console.log(data); if(data > 0){ 
+  / $(".unreadC").html(data);} } }); }

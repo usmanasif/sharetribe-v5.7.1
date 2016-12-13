@@ -2,5 +2,6 @@
   = link_to inbox_path, title: t("layouts.conversations.messages"), :id => "inbox-link", :class => "header-text-link header-hover header-inbox-link" do
     = icon_map_tag(icons, "mail", ["header-inbox"])
     - if unread_count > 0
-      .badge{:class => get_badge_class(unread_count)}
+      .badge.unreadC{:class => get_badge_class(unread_count)}
         = unread_count
+

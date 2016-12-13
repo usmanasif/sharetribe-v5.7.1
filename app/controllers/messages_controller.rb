@@ -26,6 +26,11 @@ class MessagesController < ApplicationController
       Delayed::Job.enqueue(MessageSentJob.new(@message.id, @current_community.id))
       firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
       firebase.push("sharetribe_beep", {:c_id => @message.conversation_id , :s_id => @message.sender_id } )
+      p=Participation.where("conversation_id = #{@message.conversation_id} and person_id != '#{@current_user.id}' ").pluck :person_id
+      p.each do |u|
+        e = Email.find_by_person_id(u).address
+        firebase.push("sharetribe", { :user_id => e , :conversation => @message.conversation_id } )
+      end
     else
       flash[:error] = "reply_cannot_be_empty"
     end
@@ -37,6 +42,20 @@ class MessagesController < ApplicationController
       format.html { redirect_to single_conversation_path(:conversation_type => "received", :person_id => @current_user.id, :id => params[:message][:conversation_id]) }
       format.js { render :layout => false, locals: { message: message } }
     end
+  end
+  
+  def get_conversation
+    conversation = MarketplaceService::Conversation::Query.conversation_for_person(
+      params["c_id"],
+      @current_user.id,
+      @current_community.id)
+    messages = TransactionViewUtils.conversation_messages(conversation[:messages], @current_community.name_display_type)
+
+    render :partial => "conversations/message", :collection => messages.reverse, as: :message_or_action
+  end
+
+  def get_message_count
+    MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
   end
 
   private
@@ -50,6 +69,7 @@ class MessagesController < ApplicationController
   def is_participant?(person, conversation_id)
     Conversation.find(conversation_id).participant?(person)
   end
+
 
 end
 

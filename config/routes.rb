@@ -386,6 +386,9 @@ Kassi::Application.routes.draw do
         end
         resources :person_messages
 
+        post 'messages/get_conversation', to: 'messages#get_conversation'
+        #get 'messages/get_message_count', to: 'messages#get_message_count'
+
         resource :inbox, :only => [:show]
 
         resources :messages, :controller => :conversations do
@@ -405,7 +408,7 @@ Kassi::Application.routes.draw do
             get :reject_preauthorized, to: 'accept_preauthorized_conversations#reject'
             put :acceptance_preauthorized, to: 'accept_preauthorized_conversations#accepted_or_rejected'
           end
-          resources :messages
+          resources :messages 
           resources :feedbacks, :controller => :testimonials do
             collection do
               put :skip
