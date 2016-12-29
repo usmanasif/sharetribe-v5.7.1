@@ -36,7 +36,7 @@
         get_messages_update(element.c_id);
         dbrefSB.child( key ).remove();
       }
-      / update_unreadC();
+      // update_unreadC();
     });
 
   });
@@ -52,6 +52,6 @@
     });
   }
 
-  / function update_unreadC(){
-  / $.get( "<%= person_messages_get_message_count_path %>",function(data, status){ if(status == 'success'){console.log(data); if(data > 0){ 
-  / $(".unreadC").html(data);} } }); }
+  // function update_unreadC(){
+  // $.get( "<%= person_messages_get_message_count_path %>",function(data, status){ if(status == 'success'){console.log(data); if(data // > 0){ 
+  // $(".unreadC").html(data);} } }); }
