@@ -40,8 +40,8 @@ class MessagesController < ApplicationController
           t = "Message Received"
           d = "#{@current_user.given_name} sent you a free Message"
         end
-        firebase.push("sharetribe", { :count => 1 , :visited => false , :user_id => e , 
-          :conversation => @message.conversation_id , :title => t , :description => d } )
+        firebase.push("sharetribe", { :count => 1 , :visited => false , :user_id => e , :href => person_inbox_path ,
+           :title => t , :description => d } )
       end
     else
       flash[:error] = "reply_cannot_be_empty"
