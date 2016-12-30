@@ -24,7 +24,7 @@
                         = icon_tag("mail", ["icon-with-text"])
                         - if unread_count > 0
                           .mobile-badge{:class => get_badge_class(unread_count)}
-                          = unread_count
+                            = unread_count
                     %li
                       .dropdown.login-admin-profile
                         %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
