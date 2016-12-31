@@ -30,7 +30,7 @@
                         %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                           %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
                           %span.admin-text
-                            - @current_user.username
+                            = @current_user.name(@current_community)
                             %i.icon-caret-down.icon-dropdown
                         %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
                           - if @current_user
@@ -96,8 +96,9 @@
                               = t("layouts.logged_in.admin")
 
                   %li
-                    %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                      Post a new listing
+                    = link_to new_listing_path do
+                      %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                        Post a new listing
                   
     .container
       .header-content
