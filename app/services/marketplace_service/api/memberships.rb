@@ -11,7 +11,7 @@ module MarketplaceService::API
       community = Community.find(community_id)
 
       membership = CommunityMembership.new(:person => user, :community => community, :consent => community.consent)
-      membership.status = "pending_email_confirmation"
+      membership.status = "accepted"
       membership.invitation = Invitation.find(invitation_id) if invitation_id.present?
 
       # If the community doesn't have any members, make the first one an admin
