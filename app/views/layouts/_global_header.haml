@@ -3,7 +3,8 @@
   .header-wrapper
     .header-right
       = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
-
+    .header-right
+      = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
     .header-right.visible-tablet
       #header-menu-desktop-anchor.header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
 

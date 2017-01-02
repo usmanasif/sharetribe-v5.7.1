@@ -34,8 +34,8 @@ class MessagesController < ApplicationController
         c = Conversation.find(@message.conversation_id)
         if c.listing_id
           l= Listing.find(c.listing_id)
-          t = "New Activity"
-          d = "#{l.title}"
+          t = "Message Received"
+          d = "Some activity in #{l.title}"
         else
           t = "Message Received"
           d = "#{@current_user.given_name} sent you a free Message"
