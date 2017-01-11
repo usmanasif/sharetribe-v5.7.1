@@ -330,7 +330,9 @@ class ListingsController < ApplicationController
             flash[:show_onboarding_popup] = true
           end
         end
-
+        firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+        firebase.push("sharetribe", { :count => 1 , :visited => false , :user_id => @current_user.emails.first.address , :href => listing_path(@listing) ,
+          :title => "Listing Added" , :description => "\"#{@listing.title}\" is now published successfully" } )
         redirect_to @listing, status: 303 and return
       else
         logger.error("Errors in creating listing: #{@listing.errors.full_messages.inspect}")
@@ -338,6 +340,7 @@ class ListingsController < ApplicationController
           "layouts.notifications.listing_could_not_be_saved",
           :contact_admin_link => view_context.link_to(t("layouts.notifications.contact_admin_link_text"), new_user_feedback_path, :class => "flash-error-link")
         ).html_safe
+
         redirect_to new_listing_path and return
       end
     end
