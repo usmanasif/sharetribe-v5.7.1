@@ -28,7 +28,7 @@ class IntApi::MarketplacesController < ApplicationController
     :cannot_access_without_confirmation,
     :ensure_consent_given,
     :ensure_user_belongs_to_community,
-    :can_access_only_organizations_communities only: [:login]
+    :can_access_only_organizations_communities, only: [:login]
 
   NewMarketplaceForm = Form::NewMarketplace
 
