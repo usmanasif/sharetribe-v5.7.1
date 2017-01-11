@@ -6,7 +6,7 @@ class IntApi::MarketplacesController < ApplicationController
   
   before_filter :set_access_control_headers
 
-  skip_before_filter before_filter :check_http_auth,
+  skip_before_filter :check_http_auth,
     :check_auth_token,
     :fetch_community,
     :fetch_community_plan_expiration_status,
