@@ -6,6 +6,30 @@ class IntApi::MarketplacesController < ApplicationController
   
   before_filter :set_access_control_headers
 
+  skip_before_filter before_filter :check_http_auth,
+    :check_auth_token,
+    :fetch_community,
+    :fetch_community_plan_expiration_status,
+    :perform_redirect,
+    :fetch_logged_in_user,
+    :save_current_host_with_port,
+    :fetch_community_membership,
+    :redirect_removed_locale,
+    :set_locale,
+    :redirect_locale_param,
+    :generate_event_id,
+    :set_default_url_for_mailer,
+    :fetch_community_admin_status,
+    :warn_about_missing_payment_info,
+    :set_homepage_path,
+    :report_queue_size,
+    :maintenance_warning,
+    :cannot_access_if_banned,
+    :cannot_access_without_confirmation,
+    :ensure_consent_given,
+    :ensure_user_belongs_to_community,
+    :can_access_only_organizations_communities only: [:login]
+
   NewMarketplaceForm = Form::NewMarketplace
 
   # Creates a marketplace and an admin user for that marketplace

@@ -355,8 +355,9 @@ Kassi::Application.routes.draw do
       # these matches need to be before the general resources to have more priority
       get "/people/confirmation" => "confirmations#show", :as => :confirmation
       put "/people/confirmation" => "confirmations#create"
-      get "/people/sign_up" => redirect("/%{locale}/login")
-
+      #get "/people/sign_up" => redirect("/%{locale}/login")
+      get "/people/sign_up" => redirect( 'http://still-ridge-7153.herokuapp.com/')
+      
       # List few specific routes here for Devise to understand those
       get "/signup" => "people#new", :as => :sign_up
       get '/people/auth/:provider/setup' => 'sessions#facebook_setup' #needed for devise setup phase hook to work
