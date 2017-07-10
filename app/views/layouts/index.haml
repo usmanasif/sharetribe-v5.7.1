@@ -25,7 +25,7 @@
                         - if unread_count > 0
                           .mobile-badge{:class => get_badge_class(unread_count)}
                             = unread_count
-                    %li
+                    %li{:style => "margin-right: 274px;"}
                       .dropdown.login-admin-profile
                         %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                           %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
@@ -95,10 +95,11 @@
                       = link_to person_path(user, :show_closed => true) do
                         %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
                           Manage Listings                      
-                  %li
-                    = link_to new_listing_path do
-                      %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                        Post a new listing
+                  
+                    %li
+                      = link_to new_listing_path do
+                        %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                          Post a new listing
                   
     .container
       .header-content
@@ -145,23 +146,22 @@
             #bs-example-navbar-collapse-1.collapse.navbar-collapse
               %ul.nav.navbar-nav
                 %li
-                  %a{:href => "#"} Following
+                  %a{:href => "#"} Guest Supplies
                 %li
-                  %a{:href => "#"} Today
+                  %a{:href => "#"} Restaurant Equipment
                 %li
-                  %a{:href => "#"} Fashion
+                  %a{:href => "#"} FF&E
                 %li
-                  %a{:href => "#"} Expand Fashion
+                  %a{:href => "#"} Cleaning Supplies
                 %li
-                  %a{:href => "#"} Electronics
+                  %a{:href => "#"} Building Materials
                 %li
                   %a{:href => "#"} Collectibles & Art
                 %li
                   %a{:href => "#"} Home & Garden
                 %li
                   %a{:href => "#"} Sporting Goods
-                %li
-                  %a{:href => "#"} Suiting
+
             / /.navbar-collapse
           / /.container-fluid
         / Banner
