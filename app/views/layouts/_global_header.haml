@@ -2,7 +2,7 @@
 %header.header
   .header-wrapper
     - if logged_in
-      .header-right
+      .header-right{:style => "margin-right: -60px;"}
         = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
       .header-right
         = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
@@ -80,9 +80,6 @@
   }
   .no_margin_va{
     margin-top: -15px;
-  }
-  #new-listing-link{
-    margin-right: -59px;
   }
 
 
