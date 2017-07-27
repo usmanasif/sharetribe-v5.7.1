@@ -1,7 +1,7 @@
 .container
   .banner
     .row
-      .col-md-6.col-sm-6.col-xs-12.slider
+      .col-md-4.col-sm-4.col-xs-12.slider
         #carousel-example-generic.carousel.slide{"data-ride" => "carousel"}
           / Indicators
           %ol.carousel-indicators
@@ -30,7 +30,7 @@
           %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic", :role => "button"}
             %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
             %span.sr-only Next
-      .col-md-6.col-sm-6.col-xs-12.slider
+      .col-md-4.col-sm-4.col-xs-12.slider
         #carousel-example-generic1.carousel.slide{"data-ride" => "carousel"}
           / Indicators
           %ol.carousel-indicators
@@ -59,6 +59,36 @@
           %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic1", :role => "button"}
             %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
             %span.sr-only Next
+      .col-md-4.col-sm-4.col-xs-12.slider
+        #carousel-example-generic2.carousel.slide{"data-ride" => "carousel"}
+          / Indicators
+          %ol.carousel-indicators
+            %li.active{"data-slide-to" => "0", "data-target" => "#carousel-example-generic2"}
+            %li{"data-slide-to" => "1", "data-target" => "#carousel-example-generic2"}
+            %li{"data-slide-to" => "2", "data-target" => "#carousel-example-generic2"}
+          / Wrapper for slides
+          .carousel-inner{:role => "listbox"}
+            -if @second_slider_images.present?
+              -@second_slider_images.each_with_index do |image , i|
+                -if i == 0
+                  .item.active
+                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+                -else  
+                  .item
+                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+            -if !@second_slider_images.present?
+              .item.active
+                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+              .item
+                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+          / Controls
+          %a.left.carousel-control{"data-slide" => "prev", :href => "#carousel-example-generic2", :role => "button"}
+            %span.glyphicon.glyphicon-chevron-left{"aria-hidden" => "true"}
+            %span.sr-only Previous
+          %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic2", :role => "button"}
+            %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
+            %span.sr-only Next
+
   / Products
   .container.featured-area
     .col-md-12

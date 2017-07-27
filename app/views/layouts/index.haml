@@ -25,37 +25,37 @@
                         - if unread_count > 0
                           .mobile-badge{:class => get_badge_class(unread_count)}
                             = unread_count
-                    %li{:style => "margin-right: 262px;"}
-                      .dropdown.login-admin-profile
-                        %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                          %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
-                          %span.admin-text
-                            = @current_user.name(@current_community)
-                            %i.icon-caret-down.icon-dropdown
-                        %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                          - if @current_user
-                            - Maybe(@current_user).each do |user|
-                              - conversations = @current_community.conversations.for_person(user)
-                              - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
-                              %li
-                                = link_to person_inbox_path(@current_user) do
-                                  = icon_tag("mail", ["icon-with-text"])
-                                  = t("layouts.conversations.messages")
-                                  - if unread_count > 0
-                                    .mobile-badge{:class => get_badge_class(unread_count)}
-                                    = unread_count
-                              %li
-                                = link_to person_path(user) do
-                                  = icon_tag("user", ["icon-with-text"])
-                                  = t("header.profile")                        
-                              %li
-                                = link_to person_settings_path(user) do
-                                  = icon_tag("settings", ["icon-with-text"])
-                                  = t("layouts.logged_in.settings")
-                              / %li
-                              /   = link_to logout_path do
-                              /     = icon_tag("logout", ["icon-with-text"])
-                              /     = t("layouts.logged_in.logout")
+                    / %li
+                    /   .dropdown.login-admin-profile
+                    /     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                    /       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+                    /       %span.admin-text
+                    /         = @current_user.name(@current_community)
+                    /         %i.icon-caret-down.icon-dropdown
+                    /     %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                    /       - if @current_user
+                    /         - Maybe(@current_user).each do |user|
+                    /           - conversations = @current_community.conversations.for_person(user)
+                    /           - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+                    /           %li
+                    /             = link_to person_inbox_path(@current_user) do
+                    /               = icon_tag("mail", ["icon-with-text"])
+                    /               = t("layouts.conversations.messages")
+                    /               - if unread_count > 0
+                    /                 .mobile-badge{:class => get_badge_class(unread_count)}
+                    /                 = unread_count
+                    /           %li
+                    /             = link_to person_path(user) do
+                    /               = icon_tag("user", ["icon-with-text"])
+                    /               = t("header.profile")                        
+                    /           %li
+                    /             = link_to person_settings_path(user) do
+                    /               = icon_tag("settings", ["icon-with-text"])
+                    /               = t("layouts.logged_in.settings")
+                    /           / %li
+                    /           /   = link_to logout_path do
+                    /           /     = icon_tag("logout", ["icon-with-text"])
+                    /           /     = t("layouts.logged_in.logout")
 
                   %li
                     .dropdown.login-menu 
@@ -66,6 +66,25 @@
                           = link_to "/" do
                             = icon_tag("home", ["icon-with-text"])
                             = t("header.home")
+
+                        - if @current_user
+                          - Maybe(@current_user).each do |user|
+                            - conversations = @current_community.conversations.for_person(user)
+                            - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+                            %li
+                              = link_to person_path(user) do
+                                = icon_tag("user", ["icon-with-text"])
+                                = t("header.profile")                        
+                            %li
+                              = link_to person_settings_path(user) do
+                                = icon_tag("settings", ["icon-with-text"])
+                                = t("layouts.logged_in.settings")  
+                        %li
+                          - if @current_user && @current_community && @current_user.has_admin_rights?
+                            = link_to edit_details_admin_community_path(@current_community) do
+                              = icon_tag("admin", ["icon-with-text"])
+                              = t("layouts.logged_in.admin")
+
                         %li
                           = link_to about_infos_path do
                             = icon_tag("information", ["icon-with-text"])
@@ -85,11 +104,8 @@
                               = link_to menu_link.url(I18n.locale), :target => "_blank" do
                                 = icon_tag("redirect", ["icon-with-text"])
                                 = menu_link.title(I18n.locale)
-                        %li
-                          - if @current_user && @current_community && @current_user.has_admin_rights?
-                            = link_to edit_details_admin_community_path(@current_community) do
-                              = icon_tag("admin", ["icon-with-text"])
-                              = t("layouts.logged_in.admin")
+
+                  
                   - Maybe(@current_user).each do |user|
                     %li
                       = link_to person_path(user, :show_closed => true) do

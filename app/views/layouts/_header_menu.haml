@@ -4,6 +4,21 @@
     = icon_map_tag(icons, "home", ["icon-with-text"])
     = t("header.home")
 
+  - if @current_user && @current_community && @current_user.has_admin_rights?
+    = link_to profile_path do
+      = icon_map_tag(icons, "user", ["icon-with-text"])
+      = t("header.profile")
+
+    = link_to settings_path do
+      = icon_map_tag(icons, "settings", ["icon-with-text"])
+      = t("layouts.logged_in.settings")
+
+
+    = link_to admin_details_edit_path do
+      = icon_map_tag(icons, "admin", ["icon-with-text"])
+      = t("layouts.logged_in.admin")
+
+
   = link_to new_listing_path, :class => "hidden-tablet" do
     = icon_map_tag(icons, "new_listing", ["icon-with-text"])
     = t("homepage.index.post_new_listing")
@@ -27,10 +42,6 @@
         = icon_map_tag(icons, "redirect", ["icon-with-text"])
         = menu_link.title(I18n.locale)
 
-  - if @current_user && @current_community && @current_user.has_admin_rights?
-    = link_to admin_details_edit_path do
-      = icon_map_tag(icons, "admin", ["icon-with-text"])
-      = t("layouts.logged_in.admin")
 
   .hidden-desktop
     - if available_locales.size > 1
