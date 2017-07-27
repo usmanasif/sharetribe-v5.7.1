@@ -4,7 +4,7 @@
     = icon_map_tag(icons, "home", ["icon-with-text"])
     = t("header.home")
 
-  - if @current_user && @current_community && @current_user.has_admin_rights?
+  - if @current_user
     = link_to profile_path do
       = icon_map_tag(icons, "user", ["icon-with-text"])
       = t("header.profile")
