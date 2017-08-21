@@ -3,30 +3,30 @@ class ListingsController < ApplicationController
   class ListingDeleted < StandardError; end
 
   # Skip auth token check as current jQuery doesn't provide it automatically
-  skip_before_filter :verify_authenticity_token, :only => [:close, :update, :follow, :unfollow]
+  skip_before_action :verify_authenticity_token, :only => [:close, :update, :follow, :unfollow]
 
-  before_filter :only => [ :edit, :edit_form_content, :update, :close, :follow, :unfollow ] do |controller|
+  before_action :only => [ :edit, :edit_form_content, :update, :close, :follow, :unfollow ] do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_view_this_content")
   end
 
-  before_filter :only => [ :new, :new_form_content, :create ] do |controller|
+  before_action :only => [ :new, :new_form_content, :create ] do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_create_new_listing", :sign_up_link => view_context.link_to(t("layouts.notifications.create_one_here"), sign_up_path)).html_safe
   end
 
-  before_filter :save_current_path, :only => :show
-  before_filter :ensure_authorized_to_view, :only => [ :show, :follow, :unfollow ]
+  before_action :save_current_path, :only => :show
+  before_action :ensure_authorized_to_view, :only => [ :show, :follow, :unfollow ]
 
-  before_filter :only => [ :close ] do |controller|
+  before_action :only => [ :close ] do |controller|
     controller.ensure_current_user_is_listing_author t("layouts.notifications.only_listing_author_can_close_a_listing")
   end
 
-  before_filter :only => [ :edit, :edit_form_content, :update ] do |controller|
+  before_action :only => [ :edit, :edit_form_content, :update ] do |controller|
     controller.ensure_current_user_is_listing_author t("layouts.notifications.only_listing_author_can_edit_a_listing")
   end
 
-  before_filter :ensure_is_admin, :only => [ :move_to_top, :show_in_updates_email ]
+  before_action :ensure_is_admin, :only => [ :move_to_top, :show_in_updates_email ]
 
-  before_filter :is_authorized_to_post, :only => [ :new, :create ]
+  before_action :is_authorized_to_post, :only => [ :new, :create ]
 
   layout "index", only: [:show]
 
@@ -66,7 +66,7 @@ class ListingsController < ApplicationController
             .search(
               community_id: @current_community.id,
               search: search,
-              engine: search_engine,
+              engine: FeatureFlagHelper.search_engine,
               raise_errors: raise_errors,
               includes: includes
             ).and_then { |res|
@@ -114,7 +114,7 @@ class ListingsController < ApplicationController
                              page: page,
                              per_page: per_page
                            },
-                           engine: search_engine,
+                           engine: FeatureFlagHelper.search_engine,
                            raise_errors: raise_errors,
                            includes: [:listing_images, :author, :location])
                      end
@@ -204,6 +204,25 @@ class ListingsController < ApplicationController
       admin_getting_started_guide_path,
       Admin::OnboardingWizard.new(@current_community.id).setup_status)
 
+    availability_enabled = @listing.availability.to_sym == :booking
+    blocked_dates_start_on = 1.day.ago.to_date
+    blocked_dates_end_on = 12.months.from_now.to_date
+
+    blocked_dates_result =
+      if availability_enabled
+
+        get_blocked_dates(
+          start_on: blocked_dates_start_on,
+          end_on: blocked_dates_end_on,
+          community: @current_community,
+          user: @current_user,
+          listing: @listing)
+      else
+        Result::Success.new([])
+      end
+
+    currency = Maybe(@listing.price).currency.or_else(Money::Currency.new(@current_community.currency))
+
     view_locals = {
       form_path: form_path,
       payment_gateway: payment_gateway,
@@ -215,8 +234,20 @@ class ListingsController < ApplicationController
       received_testimonials: received_testimonials,
       received_positive_testimonials: received_positive_testimonials,
       feedback_positive_percentage: feedback_positive_percentage,
-      youtube_link_ids: youtube_link_ids
+      youtube_link_ids: youtube_link_ids,
+      manage_availability_props: manage_availability_props(@current_community, @listing),
+      availability_enabled: availability_enabled,
+      blocked_dates_result: blocked_dates_result,
+      blocked_dates_end_on: DateUtils.to_midnight_utc(blocked_dates_end_on),
+      currency_opts: MoneyViewUtils.currency_opts(I18n.locale, currency)
     }
+
+    Analytics.record_event(
+      flash.now,
+      "ListingViewed",
+      { listing_id: @listing.id,
+        listing_uuid: @listing.uuid_object.to_s,
+        payment_process: process })
 
     render(locals: onboarding_popup_locals.merge(view_locals))
   end
@@ -266,11 +297,33 @@ class ListingsController < ApplicationController
     params[:listing].delete("origin_loc_attributes") if params[:listing][:origin_loc_attributes][:address].blank?
 
     shape = get_shape(Maybe(params)[:listing][:listing_shape_id].to_i.or_else(nil))
+    listing_uuid = UUIDUtils.create
 
-    listing_params = ListingFormViewUtils.filter(params[:listing], shape)
-    listing_unit = Maybe(params)[:listing][:unit].map { |u| ListingViewUtils::Unit.deserialize(u) }.or_else(nil)
+    if shape.present? && shape[:availability] == :booking
+      bookable_res = create_bookable(@current_community.uuid_object, listing_uuid, @current_user.uuid_object)
+      unless bookable_res.success
+        flash[:error] = t("listings.error.create_failed_to_connect_to_booking_service")
+        return redirect_to new_listing_path
+      end
+    end
+
+    create_listing(shape, listing_uuid)
+  end
+
+
+  # rubocop:disable Metrics/AbcSize
+  def create_listing(shape, listing_uuid)
+    with_currency = params.to_unsafe_hash[:listing].merge({currency: @current_community.currency})
+    valid_until_enabled = !@current_community.hide_expiration_date
+    listing_params = ListingFormViewUtils.filter(with_currency, shape, valid_until_enabled)
+    listing_unit = Maybe(params.to_unsafe_hash)[:listing][:unit].map { |u| ListingViewUtils::Unit.deserialize(u) }.or_else(nil)
     listing_params = ListingFormViewUtils.filter_additional_shipping(listing_params, listing_unit)
-    validation_result = ListingFormViewUtils.validate(listing_params, shape, listing_unit)
+    validation_result = ListingFormViewUtils.validate(
+      params: listing_params,
+      shape: shape,
+      unit: listing_unit,
+      valid_until_enabled: valid_until_enabled
+    )
 
     unless validation_result.success
       flash[:error] = t("listings.error.something_went_wrong", error_code: validation_result.data.join(', '))
@@ -281,11 +334,13 @@ class ListingsController < ApplicationController
     m_unit = select_unit(listing_unit, shape)
 
     listing_params = create_listing_params(listing_params).merge(
+        uuid_object: listing_uuid,
         community_id: @current_community.id,
         listing_shape_id: shape[:id],
         transaction_process_id: shape[:transaction_process_id],
         shape_name_tr_key: shape[:name_tr_key],
-        action_button_tr_key: shape[:action_button_tr_key]
+        action_button_tr_key: shape[:action_button_tr_key],
+        availability: shape[:availability]
     ).merge(unit_to_listing_opts(m_unit)).except(:unit)
 
     @listing = Listing.new(listing_params)
@@ -294,7 +349,7 @@ class ListingsController < ApplicationController
       @listing.author = @current_user
 
       if @listing.save
-        upsert_field_values!(@listing, params[:custom_fields])
+        upsert_field_values!(@listing, params.to_unsafe_hash[:custom_fields])
 
         listing_image_ids =
           if params[:listing_images]
@@ -309,6 +364,12 @@ class ListingsController < ApplicationController
         puts "*"*50 , json = Listing.json_for_notification(@listing) , "*"*50
         puts "*"*50 , Listing.notify_to_VA(json) , "*"*50 
 =end
+
+        if params[:listing_ordered_images].present?
+          params[:listing_ordered_images].split(",").each_with_index do |image_id, position|
+            ListingImage.where(id: image_id, author_id: @current_user.id).update_all(position: position+1)
+          end
+        end
 
         Delayed::Job.enqueue(ListingCreatedJob.new(@listing.id, @current_community.id))
         if @current_community.follow_in_use?
@@ -326,9 +387,11 @@ class ListingsController < ApplicationController
         if state_changed
           report_to_gtm({event: "km_record", km_event: "Onboarding listing created"})
 
-          with_feature(:onboarding_redesign_v1) do
-            flash[:show_onboarding_popup] = true
-          end
+          flash[:show_onboarding_popup] = true
+        end
+
+        if shape[:availability] == :booking
+          redirect_to listing_path(@listing, anchor: 'manage-availability'), status: 303 and return
         end
         firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
         firebase.push("sharetribe", { :count => 1 , :visited => false , :user_id => @current_user.emails.first.address , :href => listing_path(@listing) ,
@@ -345,6 +408,7 @@ class ListingsController < ApplicationController
       end
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   def edit
     @selected_tribe_navi_tab = "home"
@@ -397,10 +461,25 @@ class ListingsController < ApplicationController
 
     shape = get_shape(params[:listing][:listing_shape_id])
 
-    listing_params = ListingFormViewUtils.filter(params[:listing], shape)
+    if shape.present? && shape[:availability] == :booking
+      bookable_res = create_bookable(@current_community.uuid_object, @listing.uuid_object, @current_user.uuid_object)
+      unless bookable_res.success
+        flash[:error] = t("listings.error.update_failed_to_connect_to_booking_service")
+        return redirect_to edit_listing_path(@listing)
+      end
+    end
+
+    valid_until_enabled = !@current_community.hide_expiration_date
+    with_currency = params.require(:listing).merge({currency: @current_community.currency}).permit!.to_h
+    listing_params = ListingFormViewUtils.filter(with_currency, shape, valid_until_enabled)
     listing_unit = Maybe(params)[:listing][:unit].map { |u| ListingViewUtils::Unit.deserialize(u) }.or_else(nil)
     listing_params = ListingFormViewUtils.filter_additional_shipping(listing_params, listing_unit)
-    validation_result = ListingFormViewUtils.validate(listing_params, shape, listing_unit)
+    validation_result = ListingFormViewUtils.validate(
+      params: listing_params,
+      shape: shape,
+      unit: listing_unit,
+      valid_until_enabled: valid_until_enabled
+    )
 
     unless validation_result.success
       flash[:error] = t("listings.error.something_went_wrong", error_code: validation_result.data.join(', '))
@@ -409,29 +488,39 @@ class ListingsController < ApplicationController
 
     listing_params = normalize_price_params(listing_params)
     m_unit = select_unit(listing_unit, shape)
+    listing_reopened = @listing.closed?
 
-    open_params = @listing.closed? ? {open: true} : {}
+    open_params = listing_reopened ? {open: true} : {}
 
     listing_params = create_listing_params(listing_params).merge(
       transaction_process_id: shape[:transaction_process_id],
       shape_name_tr_key: shape[:name_tr_key],
       action_button_tr_key: shape[:action_button_tr_key],
-      last_modified: DateTime.now
+      last_modified: DateTime.now,
+      availability: shape[:availability]
     ).merge(open_params).merge(unit_to_listing_opts(m_unit)).except(:unit)
 
+    old_availability = @listing.availability.to_sym
     update_successful = @listing.update_fields(listing_params)
 
-    upsert_field_values!(@listing, params[:custom_fields])
+    upsert_field_values!(@listing, params.to_unsafe_hash[:custom_fields])
+    finalise_update(@listing, shape, @current_community, update_successful, old_availability)
+  end
 
+  def finalise_update(listing, shape, community, update_successful, old_availability)
     if update_successful
-      @listing.location.update_attributes(params[:location]) if @listing.location
-      flash[:notice] = t("layouts.notifications.listing_updated_successfully")
-      Delayed::Job.enqueue(ListingUpdatedJob.new(@listing.id, @current_community.id))
-      redirect_to @listing
+      if listing.location
+        location_params = permit_location_params(params)
+        listing.location.update_attributes(location_params)
+      end
+      flash[:notice] = update_flash(old_availability: old_availability, new_availability: shape[:availability])
+      Delayed::Job.enqueue(ListingUpdatedJob.new(listing.id, community.id))
+      reprocess_missing_image_styles(listing) if listing.closed?
+      redirect_to listing
     else
-      logger.error("Errors in editing listing: #{@listing.errors.full_messages.inspect}")
+      logger.error("Errors in editing listing: #{listing.errors.full_messages.inspect}")
       flash[:error] = t("layouts.notifications.listing_could_not_be_saved", :contact_admin_link => view_context.link_to(t("layouts.notifications.contact_admin_link_text"), new_user_feedback_path, :class => "flash-error-link")).html_safe
-      redirect_to edit_listing_path(@listing)
+      redirect_to edit_listing_path(listing)
     end
   end
 
@@ -447,7 +536,7 @@ class ListingsController < ApplicationController
         redirect_to @listing
       }
       format.js {
-        render :layout => false, locals: {payment_gateway: payment_gateway, process: process, country_code: community_country_code }
+        render :layout => false, locals: {payment_gateway: payment_gateway, process: process, country_code: community_country_code, availability_enabled: @listing.availability.to_sym == :booking }
       }
     end
   end
@@ -470,16 +559,16 @@ class ListingsController < ApplicationController
 
     # Listings are sorted by `created_at`, so change it to now.
     if @listing.update_attribute(:updates_email_at, Time.now)
-      render :nothing => true, :status => 200
+      render :body => nil, :status => 200
     else
       logger.error("An error occured while trying to move the listing (id=#{Maybe(@listing).id.or_else('No id available')}) to the top of the homepage")
-      render :nothing => true, :status => 500
+      render :body => nil, :status => 500
     end
   end
 
   def ensure_current_user_is_listing_author(error_message)
     @listing = Listing.find(params[:id])
-    return if current_user?(@listing.author) || @current_user.has_admin_rights?
+    return if current_user?(@listing.author) || @current_user.has_admin_rights?(@current_community)
     flash[:error] = error_message
     redirect_to @listing and return
   end
@@ -508,6 +597,61 @@ class ListingsController < ApplicationController
   end
   private
 
+  def update_flash(old_availability:, new_availability:)
+    case [new_availability.to_sym == :booking, old_availability.to_sym == :booking]
+    when [true, false]
+      t("layouts.notifications.listing_updated_availability_management_enabled")
+    when [false, true]
+      t("layouts.notifications.listing_updated_availability_management_disabled")
+    else
+      t("layouts.notifications.listing_updated_successfully")
+    end
+  end
+
+  def create_bookable(community_uuid, listing_uuid, author_uuid)
+    res = HarmonyClient.post(
+      :create_bookable,
+      body: {
+        marketplaceId: community_uuid,
+        refId: listing_uuid,
+        authorId: author_uuid
+      },
+      opts: {
+        max_attempts: 3
+      })
+
+    if !res[:success] && res[:data][:status] == 409
+      Result::Success.new("Bookable for listing with UUID #{listing_uuid} already created")
+    else
+      res
+    end
+  end
+
+  def get_blocked_dates(start_on:, end_on:, community:, user:, listing:)
+    HarmonyClient.get(
+      :query_timeslots,
+      params: {
+        marketplaceId: community.uuid_object,
+        refId: listing.uuid_object,
+        start: start_on,
+        end: end_on
+      }
+    ).rescue {
+      Result::Error.new(nil, code: :harmony_api_error)
+    }.and_then { |res|
+      available_slots = dates_to_ts_set(
+        res[:body][:data].map { |timeslot| timeslot[:attributes][:start].to_date }
+      )
+      Result::Success.new(
+        dates_to_ts_set(start_on..end_on).subtract(available_slots)
+      )
+    }
+  end
+
+  def dates_to_ts_set(dates)
+    Set.new(dates.map { |d| DateUtils.to_midnight_utc(d) })
+  end
+
   def select_shape(shapes, id)
     if shapes.size == 1
       shapes.first
@@ -531,6 +675,7 @@ class ListingsController < ApplicationController
         end
 
       community_country_code = LocalizationUtils.valid_country_code(@current_community.country)
+      community_currency = Money::Currency.new(@current_community.currency)
 
       commission(@current_community, process).merge({
         shape: shape,
@@ -540,7 +685,8 @@ class ListingsController < ApplicationController
         pickup_enabled: @listing.pickup_enabled?,
         shipping_price_additional: shipping_price_additional,
         always_show_additional_shipping_price: shape[:units].length == 1 && shape[:units].first[:kind] == :quantity,
-        paypal_fees_url: PaypalCountryHelper.fee_link(community_country_code)
+        paypal_fees_url: PaypalCountryHelper.fee_link(community_country_code),
+        currency_opts: MoneyViewUtils.currency_opts(I18n.locale, community_currency)
       })
     end
   end
@@ -575,7 +721,7 @@ class ListingsController < ApplicationController
   end
 
   def select_unit(listing_unit, shape)
-    m_unit = Maybe(shape)[:units].map { |units|
+    Maybe(shape)[:units].map { |units|
       units.length == 1 ? units.first : units.find { |u| u == listing_unit }
     }
   end
@@ -624,7 +770,7 @@ class ListingsController < ApplicationController
   def commission(community, process)
     payment_type = MarketplaceService::Community::Query.payment_type(community.id)
     payment_settings = TransactionService::API::Api.settings.get_active(community_id: community.id).maybe
-    currency = community.default_currency
+    currency = community.currency
 
     case [payment_type, process]
     when matches([__, :none])
@@ -645,11 +791,7 @@ class ListingsController < ApplicationController
        commission_from_seller: p_set[:commission_from_seller],
        minimum_price_cents: p_set[:minimum_price_cents]}
     else
-      {seller_commission_in_use: !!community.commission_from_seller,
-       payment_gateway: payment_type,
-       minimum_commission: Money.new(0, currency),
-       commission_from_seller: community.commission_from_seller,
-       minimum_price_cents: community.absolute_minimum_price(currency).cents}
+      raise ArgumentError.new("Unknown payment_type, process combination: [#{payment_type}, #{process}]")
     end
   end
 
@@ -670,7 +812,7 @@ class ListingsController < ApplicationController
 
     raise ListingDeleted if @listing.deleted?
 
-    unless @listing.visible_to?(@current_user, @current_community) || (@current_user && @current_user.has_admin_rights?)
+    unless @listing.visible_to?(@current_user, @current_community)
       if @current_user
         flash[:error] = if @listing.closed?
           t("layouts.notifications.listing_closed")
@@ -707,7 +849,7 @@ class ListingsController < ApplicationController
         option_id = answer_value.to_i
         answer = DropdownFieldValue.new
         answer.custom_field_option_selections = [CustomFieldOptionSelection.new(:custom_field_value => answer,
-                                                                                :custom_field_option_id => answer_value,
+                                                                                :custom_field_option_id => option_id,
                                                                                 :listing_id => listing_id)]
         answer
       when :text
@@ -771,7 +913,7 @@ class ListingsController < ApplicationController
 
   def is_authorized_to_post
     if @current_community.require_verification_to_post_listings?
-      unless @current_user.has_admin_rights? || @current_community_membership.can_post_listings?
+      unless @current_user.has_admin_rights?(@current_community) || @current_community_membership.can_post_listings?
         redirect_to verification_required_listings_path
       end
     end
@@ -806,16 +948,10 @@ class ListingsController < ApplicationController
     when matches([nil]),
          matches([__, :none])
       [true, ""]
-    when matches([:braintree])
-      can_post = !PaymentRegistrationGuard.new(community, user, listing).requires_registration_before_posting?
-      settings_link = payment_settings_path(community.payment_gateway.gateway_type, user)
-      error_msg = t("listings.new.you_need_to_fill_payout_details_before_accepting", :payment_settings_link => view_context.link_to(t("listings.new.payment_settings_link"), settings_link)).html_safe
-
-      [can_post, error_msg]
     when matches([:paypal])
       can_post = PaypalHelper.community_ready_for_payments?(community.id)
       error_msg =
-        if user.has_admin_rights?
+        if user.has_admin_rights?(community)
           t("listings.new.community_not_configured_for_payments_admin",
             payment_settings_link: view_context.link_to(
               t("listings.new.payment_settings_link"),
@@ -835,7 +971,7 @@ class ListingsController < ApplicationController
   end
 
   def delivery_config(require_shipping_address, pickup_enabled, shipping_price, shipping_price_additional, currency)
-    shipping = delivery_price_hash(:shipping, shipping_price, shipping_price_additional)
+    shipping = delivery_price_hash(:shipping, shipping_price, shipping_price_additional) if require_shipping_address
     pickup = delivery_price_hash(:pickup, Money.new(0, currency), Money.new(0, currency))
 
     case [require_shipping_address, pickup_enabled]
@@ -867,19 +1003,24 @@ class ListingsController < ApplicationController
     if params[:origin_loc_attributes].nil?
       listing_params
     else
-      location_params = params[:origin_loc_attributes].permit(
-        :address,
-        :google_address,
-        :latitude,
-        :longitude
-      ).merge(
-        location_type: :origin_loc
-      )
+      params = ActionController::Parameters.new(params)
+      location_params = permit_location_params(params).merge(location_type: :origin_loc)
 
       listing_params.merge(
         origin_loc_attributes: location_params
       )
     end
+  end
+
+  def permit_location_params(params)
+    p = if params[:location].present?
+          params.require(:location)
+        elsif params[:origin_loc_attributes].present?
+          params.require(:origin_loc_attributes)
+        elsif params[:listing].present? && params[:listing][:origin_loc_attributes].present?
+          params.require(:listing).require(:origin_loc_attributes)
+        end
+    p.permit(:address, :google_address, :latitude, :longitude) if p.present?
   end
 
   def get_transaction_process(community_id:, transaction_process_id:)
@@ -946,5 +1087,19 @@ class ListingsController < ApplicationController
         price_info: ListingViewUtils.shipping_info(delivery_type, price, shipping_price_additional),
         default: true
       }
+  end
+
+  # Create image sizes that might be missing
+  # from a reopened listing
+  def reprocess_missing_image_styles(listing)
+    listing.listing_images.pluck(:id).each { |image_id|
+      Delayed::Job.enqueue(CreateSquareImagesJob.new(image_id))
+    }
+  end
+
+  def manage_availability_props(community, listing)
+    ManageAvailabilityHelper.availability_props(
+      community: community,
+      listing: listing)
   end
 end

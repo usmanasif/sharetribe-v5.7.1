@@ -14,7 +14,7 @@ require 'database_cleaner'
 
 # Turn off all automatic database cleaning to gain full control of
 # the cleanup process
-Cucumber::Rails::World.use_transactional_fixtures = false
+Cucumber::Rails::World.use_transactional_tests = false
 Cucumber::Rails::Database.autorun_database_cleaner = false
 
 # Using two hacks here:
@@ -22,6 +22,8 @@ Cucumber::Rails::Database.autorun_database_cleaner = false
 #   between Cucumber thread and the server thread
 # - ConnectionPool tries its best to allow one thread at the time
 #   to access the database to prevent race conditions
+# - Add own mutex to isolate connection use further (ConnectionPool
+#   fails sometimes)
 class ActiveRecord::Base
   mattr_accessor :shared_connection
   @@shared_connection = nil
@@ -31,6 +33,16 @@ class ActiveRecord::Base
   end
 end
 ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
+
+module MutexLockedQuerying
+  @@semaphore = Mutex.new
+
+  def query(*)
+    @@semaphore.synchronize { super }
+  end
+end
+
+Mysql2::Client.prepend(MutexLockedQuerying)
 
 def clean_db
   DatabaseCleaner.clean_with :deletion

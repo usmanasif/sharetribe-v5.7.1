@@ -3,6 +3,7 @@
 # Table name: people
 #
 #  id                                 :string(22)       not null, primary key
+#  uuid                               :binary(16)       not null
 #  community_id                       :integer          not null
 #  created_at                         :datetime
 #  updated_at                         :datetime
@@ -27,6 +28,7 @@
 #  password_salt                      :string(255)
 #  given_name                         :string(255)
 #  family_name                        :string(255)
+#  display_name                       :string(255)
 #  phone_number                       :string(255)
 #  description                        :text(65535)
 #  image_file_name                    :string(255)
@@ -38,8 +40,6 @@
 #  authentication_token               :string(255)
 #  community_updates_last_sent_at     :datetime
 #  min_days_between_community_updates :integer          default(1)
-#  is_organization                    :boolean
-#  organization_name                  :string(255)
 #  deleted                            :boolean          default(FALSE)
 #  cloned_from                        :string(22)
 #
@@ -54,6 +54,7 @@
 #  index_people_on_reset_password_token          (reset_password_token) UNIQUE
 #  index_people_on_username                      (username)
 #  index_people_on_username_and_community_id     (username,community_id) UNIQUE
+#  index_people_on_uuid                          (uuid) UNIQUE
 #
 
 require 'spec_helper'
@@ -234,12 +235,11 @@ describe Person, type: :model do
 
   describe "inherits_settings_from" do
     let(:person) { FactoryGirl.build(:person) }
-    let(:community) { FactoryGirl.build(:community, :only_organizations => true, :default_min_days_between_community_updates => 30) }
+    let(:community) { FactoryGirl.build(:community, :default_min_days_between_community_updates => 30) }
 
     it "inherits_settings_from" do
       person.inherit_settings_from(community)
 
-      expect(person.is_organization).to be_truthy
       expect(person.min_days_between_community_updates).to eql(30)
     end
 

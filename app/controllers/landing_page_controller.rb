@@ -1,7 +1,6 @@
-# rubocop:disable ClassLength
-
 class LandingPageController < ActionController::Metal
 
+  # Shorthand for accessing CustomLandingPage service namespace
   CLP = CustomLandingPage
 
   # Needed for rendering
@@ -11,26 +10,49 @@ class LandingPageController < ActionController::Metal
   include AbstractController::Rendering
   include ActionController::ConditionalGet
   include ActionView::Layouts
+
+
   append_view_path "#{Rails.root}/app/views"
 
-  # Include route helpers
-  include Rails.application.routes.url_helpers
+  # Ensure ActiveSupport::Notifications events are fired
+  include ActionController::Instrumentation
 
   # Adds helper_method
   include ActionController::Helpers
 
+  # Add redirect_to
+  include ActionController::Redirecting
+
+  # Include route helpers.
+  #
+  # This needs to be included last! Otherwise you may get error saying
+  # that you need to include url_helpers in order to use #url_for
+  #
+  include Rails.application.routes.url_helpers
+
+  helper CLP::MarkdownHelper
+
   CACHE_TIME = APP_CONFIG[:clp_cache_time].to_i.seconds
   CACHE_HEADER = "X-CLP-Cache"
 
+  FONT_PATH = APP_CONFIG[:font_proximanovasoft_url]
+
+
   def index
-    cid = community_id(request)
-    default_locale = community_default_locale(request)
+    return if perform_redirect!
+
+    com = community(request)
+    cid = com.id
+    is_private = com.private?
+    user_logged_in = user(request).present?
+    cta = is_private && !user_logged_in ? "signup" : "search" # cta: Call to action
+    default_locale = community(request).default_locale
     version = CLP::LandingPageStore.released_version(cid)
     locale_param = params[:locale]
 
     begin
       content = nil
-      cache_meta = fetch_cache_meta(cid, version, locale_param)
+      cache_meta = CLP::Caching.fetch_cache_meta(cid, version, locale_param, cta)
       cache_hit = true
 
       if cache_meta.nil?
@@ -39,14 +61,11 @@ class LandingPageController < ActionController::Metal
           community_id: cid,
           default_locale: default_locale,
           locale_param: locale_param,
-          version: version
+          version: version,
+          cta: cta
         )
-        cache_meta = build_cache_meta(content)
-
-        # write metadata first, so that it expires first
-        write_cache_meta!(cid, version, locale_param, cache_meta, CACHE_TIME)
-        # cache html longer than metadata, but keyed by content (digest)
-        write_cached_content!(cid, version, content, cache_meta[:digest], CACHE_TIME + 10.seconds)
+        cache_meta = CLP::Caching.cache_content!(
+          cid, version, locale_param, content, CACHE_TIME, cta)
       end
 
       if stale?(etag: cache_meta[:digest],
@@ -54,7 +73,7 @@ class LandingPageController < ActionController::Metal
                 template: false,
                 public: true)
 
-        content = fetch_cached_content(cid, version, cache_meta[:digest])
+        content = CLP::Caching.fetch_cached_content(cid, version, cache_meta[:digest])
         if content.nil?
           # This should not happen since html is cached longer than metadata
           cache_hit = false
@@ -62,7 +81,8 @@ class LandingPageController < ActionController::Metal
             community_id: cid,
             default_locale: default_locale,
             locale_param: locale_param,
-            version: version
+            version: version,
+            cta: cta
           )
         end
 
@@ -74,33 +94,49 @@ class LandingPageController < ActionController::Metal
       # for conditional get.
 
       headers[CACHE_HEADER] = cache_hit ? "1" : "0"
-      expires_in(CACHE_TIME, public: true)
+
+      if is_private
+        # Don't add browser cache to private marketplaces
+        # In private marketplaces, we need to render different
+        # HTML is the user is logged in
+        expires_now
+      else
+        expires_in(CACHE_TIME, public: true)
+      end
     rescue CLP::LandingPageContentNotFound
       render_not_found()
     end
   end
 
   def preview
-    cid = community_id(request)
-    default_locale = community_default_locale(request)
+    return if perform_redirect!
+
+    com = community(request)
+    cid = com.id
+    is_private = com.private?
+    user_logged_in = user(request).present?
+    cta = is_private && !user_logged_in ? "signup" : "search" # cta: Call to action
+
+    default_locale = community(request).default_locale
+
     preview_version = parse_int(params[:preview_version])
     locale_param = params[:locale]
 
     begin
       structure = CLP::LandingPageStore.load_structure(cid, preview_version)
 
-      # Uncomment for dev purposes
-      # structure = JSON.parse(data_str)
+      # Uncomment to use static data instead of dynamic from DB
+      # structure = JSON.parse(CustomLandingPage::ExampleData::DATA_STR)
 
       # Tell robots to not index and to not follow any links
       headers["X-Robots-Tag"] = "none"
 
       self.status = 200
       self.response_body = render_landing_page(
-        community_id: cid,
         default_locale: default_locale,
         locale_param: locale_param,
-        structure: structure
+        structure: structure,
+        cta: cta
       )
     rescue CLP::LandingPageContentNotFound
       render_not_found()
@@ -110,37 +146,60 @@ class LandingPageController < ActionController::Metal
 
   private
 
-  def build_html(community_id:, default_locale:, locale_param:, version:)
+  def perform_redirect!
+    redirect_params = {
+      community: community(request),
+      plan: plan(request),
+      request: request
+    }
+
+    MarketplaceRouter.perform_redirect(redirect_params) do |target|
+      url = target[:url] || send(target[:route_name], protocol: target[:protocol])
+      redirect_to(url, status: target[:status])
+    end
+  end
+
+  # Override basic instrumentation and provide additional info for
+  # lograge to consume. These are pulled and logged in environment
+  # configs.
+  def append_info_to_payload(payload)
+    super
+    payload[:community_id] = community(request)&.id
+    payload[:current_user_id] = user(request)&.id
+
+    ControllerLogging.append_request_info_to_payload!(request, payload)
+  end
+
+  def initialize_i18n!(cid, locale)
+    I18nHelper.initialize_community_backend!(cid, [locale])
+  end
+
+  def build_html(community_id:, default_locale:, locale_param:, version:, cta:)
     structure = CLP::LandingPageStore.load_structure(community_id, version)
     render_landing_page(
-      community_id: community_id,
       default_locale: default_locale,
       structure: structure,
-      locale_param: locale_param
+      locale_param: locale_param,
+      cta: cta
     )
   end
 
-  def build_cache_meta(content)
-    {last_modified: Time.now(), digest: Digest::MD5.hexdigest(content)}
+  def build_paths(search_path, locale_param)
+    { "search" => search_path.call(),
+      "all_categories" => search_path.call(category: "all"),
+      "signup" => sign_up_path(locale: locale_param),
+      "login" => login_path(locale: locale_param),
+      "about" => about_infos_path(locale: locale_param),
+      "contact_us" => new_user_feedback_path(locale: locale_param),
+      "post_a_new_listing" => new_listing_path(locale: locale_param),
+      "how_to_use" => how_to_use_infos_path(locale: locale_param),
+      "terms" => terms_infos_path(locale: locale_param),
+      "new_invitation" => new_invitation_path(locale: locale_param),
+      "privacy" => privacy_infos_path(locale: locale_param)
+    }
   end
 
-  def fetch_cache_meta(community_id, version, locale)
-    Rails.cache.read("clp/#{community_id}/#{version}/#{locale}")
-  end
-
-  def write_cache_meta!(community_id, version, locale, cache_meta, cache_time)
-    Rails.cache.write("clp/#{community_id}/#{version}/#{locale}", cache_meta, expires_in: cache_time)
-  end
-
-  def fetch_cached_content(community_id, version, digest)
-    Rails.cache.read("clp/#{community_id}/#{version}/#{digest}")
-  end
-
-  def write_cached_content!(community_id, version, content, digest, cache_time)
-    Rails.cache.write("clp/#{community_id}/#{version}/#{digest}", content, expires_in: cache_time)
-  end
-
-  def build_denormalizer(cid:, default_locale:, locale_param:, sitename:)
+  def build_denormalizer(cid:, default_locale:, locale_param:, landing_page_locale:, sitename:, cta:)
     search_path = ->(opts = {}) {
       PathHelpers.search_path(
         community_id: cid,
@@ -152,27 +211,21 @@ class LandingPageController < ActionController::Metal
     }
 
     # Application paths
-    paths = { "search" => search_path.call(),
-              "all_categories" => search_path.call(category: "all"),
-              "signup" => sign_up_path(locale: locale_param),
-              "about" => about_infos_path(locale: locale_param),
-              "contact_us" => new_user_feedback_path(locale: locale_param),
-              "post_a_new_listing" => new_listing_path(locale: locale_param)
-            }
+    paths = build_paths(search_path, locale_param)
 
-    marketplace_data = CLP::MarketplaceDataStore.marketplace_data(cid, locale)
+    marketplace_data = CLP::MarketplaceDataStore.marketplace_data(cid, landing_page_locale)
+    name_display_type = marketplace_data["name_display_type"]
 
-    build_category_path = ->(category_name_param) {
-      search_path.call(category: category_name_param)
-    }
+    category_data = CLP::CategoryStore.categories(cid, landing_page_locale, search_path)
 
     CLP::Denormalizer.new(
       link_resolvers: {
         "path" => CLP::LinkResolver::PathResolver.new(paths),
-        "marketplace_data" => CLP::LinkResolver::MarketplaceDataResolver.new(marketplace_data),
-        "assets" => CLP::LinkResolver::AssetResolver.new(APP_CONFIG[:clp_asset_host], sitename),
-        "translation" => CLP::LinkResolver::TranslationResolver.new(locale),
-        "category" => CLP::LinkResolver::CategoryResolver.new(cid, locale, build_category_path)
+        "marketplace_data" => CLP::LinkResolver::MarketplaceDataResolver.new(marketplace_data, cta),
+        "assets" => CLP::LinkResolver::AssetResolver.new(APP_CONFIG[:clp_asset_url], sitename),
+        "translation" => CLP::LinkResolver::TranslationResolver.new(landing_page_locale),
+        "category" => CLP::LinkResolver::CategoryResolver.new(category_data),
+        "listing" => CLP::LinkResolver::ListingResolver.new(cid, landing_page_locale, locale_param, name_display_type)
       }
     )
   end
@@ -183,33 +236,88 @@ class LandingPageController < ActionController::Metal
     nil
   end
 
-  def community_id(request)
-    request.env[:current_marketplace]&.id
+  def community(request)
+    @current_community ||= request.env[:current_marketplace]
   end
 
-  def community_default_locale(request)
-    request.env[:current_marketplace]&.default_locale
+  def user(request)
+    @user ||= request.env["warden"]&.user
   end
 
-  def render_landing_page(community_id:, default_locale:, locale_param:, structure:)
-    locale, sitename = structure["settings"].values_at("locale", "sitename")
-    font_path = APP_CONFIG[:font_proximanovasoft_url].present? ? APP_CONFIG[:font_proximanovasoft_url] : "/landing_page/fonts"
+  def plan(request)
+    @current_plan ||= request.env[:current_plan]
+  end
+
+  def community_customization(request, locale)
+    community(request).community_customizations.where(locale: locale).first
+  end
+
+  def community_context(request, locale)
+    c = community(request)
+
+    { id: c.id,
+      favicon: c.favicon.url,
+      apple_touch_icon: c.stable_image_url(:logo, :apple_touch),
+      facebook_locale: facebook_locale(locale),
+      facebook_connect_id: c.facebook_connect_id,
+      google_maps_key: MarketplaceHelper.google_maps_key(c.id),
+      google_analytics_key: c.google_analytics_key }
+  end
+
+  def render_landing_page(default_locale:, locale_param:, structure:, cta:)
+    c = community(request)
+
+    landing_page_locale, sitename = structure["settings"].values_at("locale", "sitename")
+    topbar_locale = locale_param.present? ? locale_param : default_locale
+
+    initialize_i18n!(c&.id, landing_page_locale)
+
+    # Init feature flags with marketplace specific flags, skip personal
+    FeatureFlagHelper.init(community_id: c.id,
+                           user_id: nil,
+                           request: request,
+                           is_admin: false,
+                           is_marketplace_admin: false)
+
+    props = topbar_props(c,
+                         community_customization(request, landing_page_locale),
+                         request.fullpath,
+                         locale_param,
+                         topbar_locale,
+                         true)
+    marketplace_context = marketplace_context(c, topbar_locale, request)
+
 
     denormalizer = build_denormalizer(
-      cid: community_id,
+      cid: c&.id,
+      cta: cta,
       locale_param: locale_param,
       default_locale: default_locale,
+      landing_page_locale: landing_page_locale,
       sitename: sitename
     )
 
     render_to_string :landing_page,
-           locals: { font_path: font_path,
+           locals: { font_path: FONT_PATH,
+                     landing_page_locale: landing_page_locale,
+                     landing_page_url: "#{c.full_url}#{request.fullpath}",
                      styles: landing_page_styles,
                      javascripts: {
-                       location_search: location_search_js
+                       location_search: location_search_js,
+                       translations: js_translations(topbar_locale)
+                     },
+                     topbar: {
+                       enabled: true,
+                       props: props,
+                       marketplace_context: marketplace_context,
+                       props_endpoint: ui_api_topbar_props_path(locale: topbar_locale, landing_page: true)
                      },
                      page: denormalizer.to_tree(structure, root: "page"),
-                     sections: denormalizer.to_tree(structure, root: "composition") }
+                     sections: denormalizer.to_tree(structure, root: "composition"),
+                     community_context: community_context(request, landing_page_locale),
+                     feature_flags: FeatureFlagHelper.feature_flags,
+                     asset_host: APP_CONFIG.asset_host,
+                   }
   end
 
   def render_not_found(msg = "Not found")
@@ -217,579 +325,84 @@ class LandingPageController < ActionController::Metal
     self.response_body = msg
   end
 
-  # rubocop:disable Metrics/MethodLength
-  def data_str
-    <<JSON
-{
-  "settings": {
-    "marketplace_id": 9999,
-    "locale": "en",
-    "sitename": "turbobikes"
-  },
+  def topbar_props(community, community_customization, request_path, locale_param, topbar_locale, landing_page)
+    # TopbarHelper pulls current lang from I18n
+    I18n.locale = topbar_locale
 
-  "page": {
-    "title": {"type": "marketplace_data", "id": "name"}
-  },
+    path =
+      if locale_param.present?
+        request_path.gsub(/^\/#{locale_param}/, "").gsub(/^\//, "")
+      else
+        request_path.gsub(/^\//, "")
+      end
 
-  "sections": [
-    {
-      "id": "myhero1",
-      "kind": "hero",
-      "variation": {"type": "marketplace_data", "id": "search_type"},
-      "title": {"type": "marketplace_data", "id": "slogan"},
-      "subtitle": {"type": "marketplace_data", "id": "description"},
-      "background_image": {"type": "assets", "id": "myheroimage"},
-      "search_button": {"type": "translation", "id": "search_button"},
-      "search_path": {"type": "path", "id": "search"},
-      "search_placeholder": {"type": "marketplace_data", "id": "search_placeholder"},
-      "signup_path": {"type": "path", "id": "signup"},
-      "signup_button": {"type": "translation", "id": "signup_button"},
-      "search_button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "search_button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "signup_button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "signup_button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"}
-    },
-    {
-      "id": "categories7",
-      "kind": "categories",
-      "title": "Section title goes here",
-      "paragraph": "Section paragraph goes here",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "All categories",
-      "button_path": {"type": "path", "id": "all_categories"},
-      "category_color_hover": {"type": "marketplace_data", "id": "primary_color"},
-      "categories": [
-        {
-          "category": {
-            "title": "Mountain bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "type": "category",
-            "id": 1
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "Parts",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        }
-      ]
-    },
-    {
-      "id": "categories6",
-      "kind": "categories",
-      "title": "Section title goes here",
-      "paragraph": "Section paragraph goes here",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "All categories",
-      "button_path": {"type": "path", "id": "all_categories"},
-      "category_color_hover": {"type": "marketplace_data", "id": "primary_color"},
-      "categories": [
-        {
-          "category": {
-            "title": "Mountain bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        }
-      ]
-    },
-    {
-      "id": "categories5",
-      "kind": "categories",
-      "title": "Section title goes here",
-      "paragraph": "Section paragraph goes here",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "All categories",
-      "button_path": {"type": "path", "id": "all_categories"},
-      "category_color_hover": {"type": "marketplace_data", "id": "primary_color"},
-      "categories": [
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        }
-      ]
-    },
-    {
-      "id": "categories4",
-      "kind": "categories",
-      "title": "Section title goes here",
-      "paragraph": "Section paragraph goes here",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "All categories",
-      "button_path": {"type": "path", "id": "all_categories"},
-      "category_color_hover": {"type": "marketplace_data", "id": "primary_color"},
-      "categories": [
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        }
-      ]
-    },
-    {
-      "id": "categories3",
-      "kind": "categories",
-      "title": "Section title goes here",
-      "paragraph": "Section paragraph goes here",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "All categories",
-      "button_path": {"type": "path", "id": "all_categories"},
-      "category_color_hover": {"type": "marketplace_data", "id": "primary_color"},
-      "categories": [
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        },
-        {
-          "category": {
-            "title": "City bikes",
-            "path": "https://google.com"
-          },
-          "background_image": {"type": "assets", "id": "myheroimage"}
-        }
-      ]
-    },
-    {
-      "id": "info1_v1",
-      "kind": "info",
-      "variation": "single_column",
-      "title": "Section title goes here [Info #1 - V1]",
-      "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Curabitur blandit tempus porttitor. Nulla vitae elit libero.",
-
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "Section link",
-      "button_path": {"type": "path", "id": "post_a_new_listing"},
-      "background_image": {"type": "assets", "id": "myinfoimage"}
-    },
-    {
-      "id": "info1_v2",
-      "kind": "info",
-      "variation": "single_column",
-      "title": "Section title goes here [Info #1 - V2]",
-      "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Curabitur blandit tempus porttitor. Nulla vitae elit libero.",
-      "background_image": {"type": "assets", "id": "myinfoimage2"}
-    },
-    {
-      "id": "info1_v3",
-      "kind": "info",
-      "variation": "single_column",
-      "title": "Section title goes here [Info #1 - V3]",
-      "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Curabitur blandit tempus porttitor. Nulla vitae elit libero.",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "button_title": "Section link",
-      "button_path": {"value": "https://google.com"}
-    },
-    {
-      "id": "info1_v4",
-      "kind": "info",
-      "variation": "single_column",
-      "title": "Section title goes here [Info #1 - V4]",
-      "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Donec ullamcorper nulla non metus auctor fringilla. Curabitur blandit tempus porttitor. Nulla vitae elit libero."
-    },
-    {
-      "id": "info2_v1",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #2 - V1]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "icon": "quill",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "icon": "piggy-bank",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "icon": "globe-1",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        }
-      ]
-    },
-    {
-      "id": "info2_v2",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #2 - V2]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        }
-      ]
-    },
-    {
-      "id": "info2_v3",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #2 - V3]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "icon": "quill",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        },
-        {
-          "icon": "piggy-bank",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        },
-        {
-          "icon": "globe-1",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        }
-      ]
-    },
-    {
-      "id": "info2_v4",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #2 - V4]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Curabitur blandit tempus porttitor. Nulla vitae elit libero, a pharetra augue. Vivamus sagittis lacus vel."
-        }
-      ]
-    },
-    {
-      "id": "info3_v1",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #3 - V1]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "icon": "quill",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "icon": "piggy-bank",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        }
-      ]
-    },
-    {
-      "id": "info3_v2",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #3 - V2]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus.",
-          "button_title": "Section link",
-          "button_path": {"value": "https://google.com"}
-        }
-      ]
-    },
-    {
-      "id": "info3_v3",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #3 - V3]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "icon": "quill",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus."
-        },
-        {
-          "icon": "piggy-bank",
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus."
-        }
-      ]
-    },
-    {
-      "id": "info3_v4",
-      "kind": "info",
-      "variation": "multi_column",
-      "title": "Section title goes here [Info #3 - V4]",
-      "button_color": {"type": "marketplace_data", "id": "primary_color"},
-      "button_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "columns": [
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus."
-        },
-        {
-          "title": "Our mission",
-          "paragraph": "Paragraph. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Donec id elit non mi porta gravida at eget metus."
-        }
-      ]
-    },
-    {
-      "id": "footer",
-      "kind": "footer",
-      "theme": "dark",
-      "social_media_icon_color": {"type": "marketplace_data", "id": "primary_color"},
-      "social_media_icon_color_hover": {"type": "marketplace_data", "id": "primary_color_darken"},
-      "links": [
-        {"label": "About", "href": {"type": "path", "id": "about"}},
-        {"label": "Contact us", "href": {"type": "path", "id": "contact_us"}},
-        {"label": "Sharetribe", "href": {"value": "https://www.sharetribe.com"}}
-      ],
-      "social": [
-        {"service": "facebook", "url": "https://www.facebook.com"},
-        {"service": "twitter", "url": "https://www.twitter.com"},
-        {"service": "instagram", "url": "https://www.instagram.com"}
-      ],
-      "copyright": "Copyright Marketplace Ltd 2016"
-    },
-
-    {
-      "id": "thecategories",
-      "kind": "categories",
-      "slogan": "blaablaa",
-      "category_ids": [123, 432, 131]
-    }
-  ],
-
-  "composition": [
-    { "section": {"type": "sections", "id": "myhero1"}},
-    { "section": {"type": "sections", "id": "categories7"}},
-    { "section": {"type": "sections", "id": "categories6"}},
-    { "section": {"type": "sections", "id": "categories5"}},
-    { "section": {"type": "sections", "id": "categories4"}},
-    { "section": {"type": "sections", "id": "categories3"}},
-    { "section": {"type": "sections", "id": "info1_v1"}},
-    { "section": {"type": "sections", "id": "info1_v2"}},
-    { "section": {"type": "sections", "id": "info1_v3"}},
-    { "section": {"type": "sections", "id": "info1_v4"}},
-    { "section": {"type": "sections", "id": "info2_v1"}},
-    { "section": {"type": "sections", "id": "info2_v2"}},
-    { "section": {"type": "sections", "id": "info2_v3"}},
-    { "section": {"type": "sections", "id": "info2_v4"}},
-    { "section": {"type": "sections", "id": "info3_v1"}},
-    { "section": {"type": "sections", "id": "info3_v2"}},
-    { "section": {"type": "sections", "id": "info3_v3"}},
-    { "section": {"type": "sections", "id": "info3_v4"}},
-    { "section": {"type": "sections", "id": "footer"}}
-  ],
-
-  "assets": [
-    { "id": "myheroimage", "src": "hero.jpg" },
-    { "id": "myinfoimage", "src": "info.jpg" },
-    { "id": "myinfoimage2", "src": "church.jpg" }
-  ]
-}
-JSON
+    TopbarHelper.topbar_props(
+      community: community,
+      path_after_locale_change: path,
+      search_placeholder: community_customization&.search_placeholder,
+      locale_param: locale_param,
+      current_path: request_path,
+      landing_page: landing_page,
+      host_with_port: request.host_with_port)
   end
-  # rubocop:enable Metrics/MethodLength
+
+  # This is copied from the React on Rails source with our own rails
+  # context extensions. It's repeated code and a potential source of
+  # fragility. We need to address this and think if it's a good idea
+  # to leverage the railsContext at all.
+  def marketplace_context(community, locale, request)
+    uri = Addressable::URI.parse(request.original_url)
+
+    location = uri.path + (uri.query.present? ? "?#{uri.query}" : "")
+
+    result = {
+      # URL settings
+      href: request.original_url,
+      location: location,
+      scheme: uri.scheme,
+      host: uri.host,
+      port: uri.port,
+      pathname: uri.path,
+      search: uri.query,
+
+      # Locale settings
+      i18nLocale: locale,
+      i18nDefaultLocale: I18n.default_locale,
+      httpAcceptLanguage: request.env["HTTP_ACCEPT_LANGUAGE"],
+
+      # Extension(s)
+      marketplaceId: community.id,
+      loggedInUsername: nil
+    }.merge(CommonStylesHelper.marketplace_colors(community))
+
+    result
+  end
+
+  def facebook_locale(locale)
+    I18nHelper.facebook_locale_code(Sharetribe::AVAILABLE_LOCALES, locale)
+  end
 
   def landing_page_styles
-    Rails.application.assets.find_asset("landing_page/styles.scss").to_s.html_safe
+    find_asset_path("landing_page/styles.scss")
   end
 
   def location_search_js
-    Rails.application.assets.find_asset("location_search.js").to_s.html_safe
+    find_asset_path("location_search.js")
+  end
+
+  def js_translations(topbar_locale)
+    find_asset_path("i18n/#{topbar_locale}.js")
+  end
+
+  def find_asset_path(asset_name)
+    if Rails.configuration.assets.compile
+      Rails.application.assets.find_asset(asset_name)
+    else
+      CompassRails.sprockets.find_asset(asset_name)
+    end.to_s.html_safe
+  end
+
+  def locale
+    raise ArgumentError.new("You called `locale` method. This was probably a mistake. Most likely you'd want to use `landing_page_locale`, `default_locale`, or `locale_param`")
   end
 end

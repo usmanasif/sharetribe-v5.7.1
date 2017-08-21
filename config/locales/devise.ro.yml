@@ -38,7 +38,7 @@ ro:
       reasons:
         inactive: inactiv
         unconfirmed: neconfirmat
-        locked: ~
+        locked: blocat
       update_needs_confirmation: "V-ați updatat cu succes contul, dar trebuie să vă verificăm noua adresă de e-mail. Vă rugăm să vă verificati adresa, dand click pe link-ul de confirmare."
       signed_up: "Bine ati venit! V-ati autentificat cu succes."
       updated: "Cont actualizat cu succes."
@@ -48,11 +48,11 @@ ro:
       send_instructions: "În scurt timp veți primi un email cu instrucțiuni pentru deblocarea contului."
       unlocked: "Contul dvs. a fost deblocat. Autentificați-vă pentru a continua."
     omniauth_callbacks:
-      success: ~
-      failure: ~
+      success: "Autorizat cu succes prin contul %{kind}."
+      failure: "Nu ați putut fi autorizat prin %{kind} pentru că \"%{reason}\"."
     mailer:
       confirmation_instructions:
-        subject: "Instrucţiuni de confirmare"
+        subject: "Instrucţiuni de confirmare pentru acces %{service_name}"
       reset_password_instructions:
         subject: "Instrucţiuni pentru a reseta parola"
       unlock_instructions:

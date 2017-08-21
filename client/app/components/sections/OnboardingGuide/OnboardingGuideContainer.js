@@ -9,8 +9,8 @@ import * as OnboardingGuideActions from '../../../actions/OnboardingGuideActions
 
 import * as ownPropTypes from '../../../utils/PropTypes';
 
-const OnbardingGuideContainer = ({ actions, data, railsContext, routes }) =>
-        r(OnboardingGuide, { actions, data, railsContext, routes });
+const OnbardingGuideContainer = ({ actions, data, marketplaceContext, routes }) =>
+        r(OnboardingGuide, { actions, data, marketplaceContext, routes });
 
 const { shape, func } = PropTypes;
 
@@ -18,20 +18,20 @@ OnbardingGuideContainer.propTypes = {
   actions: shape({
     updateGuidePage: func.isRequired,
   }).isRequired,
-  railsContext: ownPropTypes.railsContext,
+  marketplaceContext: ownPropTypes.marketplaceContext,
   routes: ownPropTypes.routes,
 };
 
-function mapStateToProps(state) {
+const mapStateToProps = function mapStateToProps(state) {
   return {
     data: state.onboarding_guide_page,
-    railsContext: state.railsContext,
+    marketplaceContext: state.marketplaceContext,
     routes: state.routes,
   };
-}
+};
 
-function mapDispatchToProps(dispatch) {
+const mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return { actions: bindActionCreators(OnboardingGuideActions, dispatch) };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(OnbardingGuideContainer);

@@ -11,6 +11,7 @@ module ListingIndexService::API
     end
 
     def search(community_id:, search:, includes: [], engine: :sphinx, raise_errors: false)
+
       unless includes.to_set <= RELATED_RESOURCES
         return Result::Error.new("Unknown included resources: #{(includes.to_set - RELATED_RESOURCES).to_a}")
       end
@@ -23,11 +24,8 @@ module ListingIndexService::API
 
       search_result.maybe().map { |res|
         Result::Success.new(
-          ListingIndexResult.call(
-          count: res[:count],
-          listings: res[:listings].map { |search_res|
-            search_res.merge(url: "#{search_res[:id]}-#{search_res[:title].to_url}")
-          }))
+          process_results(res, engine)
+        )
       }.or_else {
         raise search_result.data if raise_errors
         log_error(search_result, community_id)
@@ -36,6 +34,15 @@ module ListingIndexService::API
     end
 
     private
+
+    def process_results(results, engine)
+      ListingIndexResult.call(
+        count: results[:count],
+        listings: results[:listings].map { |search_res|
+          search_res.merge(url: "#{search_res[:id]}-#{search_res[:title].to_url}")
+        }
+      )
+    end
 
     def search_engine(engine, raise_errors)
       case engine

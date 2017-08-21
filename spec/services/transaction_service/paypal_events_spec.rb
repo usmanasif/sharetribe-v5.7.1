@@ -2,19 +2,29 @@ require 'spec_helper'
 
 describe TransactionService::PaypalEvents do
 
-  TokenStore = PaypalService::Store::Token
-  PaymentStore = PaypalService::Store::PaypalPayment
-  TransactionModel = ::Transaction
-  PaypalAccountModel = ::PaypalAccount
+  let(:token_store) { PaypalService::Store::Token }
+  let(:payment_store) { PaypalService::Store::PaypalPayment }
+  let(:transaction_model) { ::Transaction }
+  let(:paypal_account_model) { ::PaypalAccount }
+
+  def run_worker!(quiet: true)
+    Delayed::Worker.new(
+      quiet: quiet # you might want to change this to false for debugging
+    ).work_off
+  end
 
   # Simulate TransactionService::Transactions.create but without calling to paypal payments API
   def create_test_transaction(opts)
-    transaction = TransactionModel.new(
+    transaction = transaction_model.new(
       community_id: opts[:community_id],
+      community_uuid: opts[:community_uuid],
       listing_id: opts[:listing_id],
+      listing_uuid: opts[:listing_uuid],
       listing_title: opts[:listing_title],
       listing_author_id: opts[:listing_author_id],
+      listing_author_uuid: opts[:listing_author_uuid],
       starter_id: opts[:starter_id],
+      starter_uuid: opts[:starter_uuid],
       unit_price: opts[:unit_price],
       listing_quantity: Maybe(opts)[:listing_quantity].or_else(1),
       payment_gateway: opts[:payment_gateway],
@@ -48,24 +58,29 @@ describe TransactionService::PaypalEvents do
   end
 
   before(:each) do
-    @cid = 3
+    @community = FactoryGirl.create(:community)
+    @cid = @community.id
     @payer = FactoryGirl.create(:payer)
     @listing = FactoryGirl.create(:listing,
                                   price: Money.new(45000, "EUR"),
                                   listing_shape_id: 123, # This is not used, but needed because the Entity value is mandatory
                                   transaction_process_id: 123) # This is not used, but needed because the Entity value is mandatory
 
-    @paypal_account = PaypalAccountModel.create(person_id: @listing.author, community_id: @cid, email: "author@sharetribe.com", payer_id: "abcdabcd")
+    @paypal_account = paypal_account_model.create(person_id: @listing.author, community_id: @cid, email: "author@sharetribe.com", payer_id: "abcdabcd")
 
     @transaction_info = {
       payment_process: :preauthorize,
       payment_gateway: :paypal,
       community_id: @cid,
+      community_uuid: @community.uuid, # raw UUID
       starter_id: @payer.id,
+      starter_uuid: @payer.uuid, # raw UUID
       listing_id: @listing.id,
       listing_title: @listing.title,
+      listing_uuid: @listing.uuid, # raw UUID
       unit_price: @listing.price,
       listing_author_id: @listing.author_id,
+      listing_author_uuid: @listing.author.uuid, # raw UUID
       listing_quantity: 1,
       automatic_confirmation_after_days: 3,
       commission_from_seller: 10,
@@ -81,7 +96,7 @@ describe TransactionService::PaypalEvents do
     @conversation_with_msg = @transaction_with_msg.conversation
 
     token_code_no_msg = SecureRandom.uuid
-    TokenStore.create({
+    token_store.create({
         community_id: @cid,
         token: token_code_no_msg,
         transaction_id: @transaction_no_msg.id,
@@ -94,7 +109,7 @@ describe TransactionService::PaypalEvents do
       })
 
     token_code_with_msg = SecureRandom.uuid
-    TokenStore.create({
+    token_store.create({
         community_id: @cid,
         token: token_code_with_msg,
         transaction_id: @transaction_with_msg.id,
@@ -106,8 +121,8 @@ describe TransactionService::PaypalEvents do
         express_checkout_url: "htts://test.com/#{token_code_with_msg}"
       })
 
-    @token_no_msg = TokenStore.get(@cid, token_code_no_msg)
-    @token_with_msg = TokenStore.get(@cid, token_code_with_msg)
+    @token_no_msg = token_store.get(@cid, token_code_no_msg)
+    @token_with_msg = token_store.get(@cid, token_code_with_msg)
   end
 
 
@@ -117,8 +132,8 @@ describe TransactionService::PaypalEvents do
       TransactionService::PaypalEvents.request_cancelled(:success, @token_with_msg)
 
       # Both transactions are there but marked as deleted
-      expect(TransactionModel.count).to eq(2)
-      expect(TransactionModel.all.map(&:deleted)).to eq([true, true])
+      expect(transaction_model.count).to eq(2)
+      expect(transaction_model.all.map(&:deleted)).to eq([true, true])
     end
 
     it "calling with token that doesn't match a transaction is a no-op" do
@@ -131,7 +146,7 @@ describe TransactionService::PaypalEvents do
 
   context "#payment_updated - initiated => payment-review" do
     before(:each) do
-      @payment_review_payment = PaymentStore.create(@cid, @transaction_with_msg.id, {
+      @payment_review_payment = payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -155,7 +170,7 @@ describe TransactionService::PaypalEvents do
 
   context "#payment_updated - initiated => authorized" do
     before(:each) do
-      @authorized_payment = PaymentStore.create(@cid, @transaction_with_msg.id, {
+      @authorized_payment = payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -171,6 +186,7 @@ describe TransactionService::PaypalEvents do
 
     it "transitions transaction to preauthorized state" do
       TransactionService::PaypalEvents.payment_updated(:success, @authorized_payment)
+      run_worker!
 
       tx = MarketplaceService::Transaction::Query.transaction(@transaction_with_msg.id)
       expect(tx[:status]).to eq("preauthorized")
@@ -187,7 +203,7 @@ describe TransactionService::PaypalEvents do
 
   context "#payment_updated - initiated => voided" do
     before(:each) do
-      PaymentStore.create(@cid, @transaction_no_msg.id, {
+      payment_store.create(@cid, @transaction_no_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -196,12 +212,12 @@ describe TransactionService::PaypalEvents do
           order_date: Time.now,
           order_total: Money.new(22000, "EUR"),
         })
-      @voided_payment_no_msg = PaymentStore.update(community_id: @cid, transaction_id: @transaction_no_msg.id, data: {
+      @voided_payment_no_msg = payment_store.update(community_id: @cid, transaction_id: @transaction_no_msg.id, data: {
           pending_reason: :none,
           payment_status: :voided
         })
 
-      PaymentStore.create(@cid, @transaction_with_msg.id, {
+      payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -210,7 +226,7 @@ describe TransactionService::PaypalEvents do
           order_date: Time.now,
           order_total: Money.new(22000, "EUR"),
         })
-      @voided_payment_with_msg = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @voided_payment_with_msg = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           pending_reason: :none,
           payment_status: :voided
         })
@@ -221,8 +237,8 @@ describe TransactionService::PaypalEvents do
       TransactionService::PaypalEvents.payment_updated(:success, @voided_payment_with_msg)
 
       # Both transactions are there but marked as deleted
-      expect(TransactionModel.count).to eq(2)
-      expect(TransactionModel.all.map(&:deleted)).to eq([true, true])
+      expect(transaction_model.count).to eq(2)
+      expect(transaction_model.all.map(&:deleted)).to eq([true, true])
     end
 
     it "is safe to call for non-existent transaction" do
@@ -276,7 +292,7 @@ describe TransactionService::PaypalEvents do
 
   context "#payment_updated - preauthorized => voided" do
     before(:each) do
-      PaymentStore.create(@cid, @transaction_with_msg.id, {
+      payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -286,7 +302,7 @@ describe TransactionService::PaypalEvents do
           order_total: Money.new(22000, "EUR"),
         })
 
-      @authorized_payment = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @authorized_payment = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           payment_status: "pending",
           pending_reason: "authorization",
           authorization_id: "12345678",
@@ -295,8 +311,9 @@ describe TransactionService::PaypalEvents do
         })
 
       TransactionService::PaypalEvents.payment_updated(:success, @authorized_payment)
+      run_worker!
 
-      @voided_payment_with_msg = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @voided_payment_with_msg = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           pending_reason: :none,
           payment_status: :voided
         })
@@ -304,13 +321,13 @@ describe TransactionService::PaypalEvents do
 
     it "on error transitions the associated transaction to errored" do
       TransactionService::PaypalEvents.payment_updated(:error, @voided_payment_with_msg)
-      expect(TransactionModel.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "errored"
+      expect(transaction_model.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "errored"
     end
   end
 
   context "#payment_preauthorized -> expired" do
     before(:each) do
-      PaymentStore.create(@cid, @transaction_with_msg.id, {
+      payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -320,7 +337,7 @@ describe TransactionService::PaypalEvents do
           order_total: Money.new(22000, "EUR"),
         })
 
-      @authorized_payment = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @authorized_payment = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           payment_status: "pending",
           pending_reason: "authorization",
           authorization_id: "12345678",
@@ -329,8 +346,9 @@ describe TransactionService::PaypalEvents do
         })
 
       TransactionService::PaypalEvents.payment_updated(:success, @authorized_payment)
+      run_worker!
 
-      @expired_payment = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @expired_payment = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           payment_status: "expired",
           authorization_id: "12345678"
         })
@@ -340,14 +358,14 @@ describe TransactionService::PaypalEvents do
     it "transitions associated transaction to rejected on expiration" do
       TransactionService::PaypalEvents.payment_updated(:success, @expired_payment)
 
-       expect(TransactionModel.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "rejected"
+      expect(transaction_model.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "rejected"
       expect(TransactionTransition.where(transaction_id: @transaction_with_msg.id).pluck(:metadata)).to include({ "paypal_payment_status" => "expired" })
     end
   end
 
   context "#payment_updated preauthorized -> denied" do
     before(:each) do
-      PaymentStore.create(@cid, @transaction_with_msg.id, {
+      payment_store.create(@cid, @transaction_with_msg.id, {
           payer_id: "sduyfsudf",
           receiver_id: "98ysdf98ysdf",
           merchant_id: "asdfasdf",
@@ -357,7 +375,7 @@ describe TransactionService::PaypalEvents do
           order_total: Money.new(22000, "EUR"),
         })
 
-      @authorized_payment = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @authorized_payment = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           payment_status: "pending",
           pending_reason: "authorization",
           authorization_id: "12345678",
@@ -366,16 +384,18 @@ describe TransactionService::PaypalEvents do
         })
 
       TransactionService::PaypalEvents.payment_updated(:success, @authorized_payment)
+      run_worker!
 
-      @pending_ext_payment = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @pending_ext_payment = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           payment_status: "pending",
           pending_reason: "multicurrency",
           authorization_id: "12345678"
         })
 
       TransactionService::PaypalEvents.payment_updated(:success, @pending_ext_payment)
+      run_worker!
 
-      @denied_payment_with_msg = PaymentStore.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
+      @denied_payment_with_msg = payment_store.update(community_id: @cid, transaction_id: @transaction_with_msg.id, data: {
           pending_reason: :none,
           payment_status: :denied
       })
@@ -383,7 +403,7 @@ describe TransactionService::PaypalEvents do
 
     it "on payment deny transitions the associated transaction to rejected" do
       TransactionService::PaypalEvents.payment_updated(:success, @denied_payment_with_msg)
-      expect(TransactionModel.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "rejected"
+      expect(transaction_model.where(id: @transaction_with_msg.id).pluck(:current_state).first).to eq "rejected"
       expect(TransactionTransition.where(transaction_id: @transaction_with_msg.id).pluck(:metadata)).to include({ "paypal_payment_status" => "denied" })
     end
   end

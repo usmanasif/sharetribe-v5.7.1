@@ -263,49 +263,6 @@ function initialize_login_form(password_forgotten) {
   $('#login_form input.text_field:first').focus();
 }
 
-function initialize_payments_form(locale) {
-  var form_id = "#payment_settings_form";
-  $(form_id).validate({
-    rules: {
-      // regex validation here kept failing always, so relying on backend validation for the ID
-      "checkout_account_form[company_id_or_personal_id]": {required: true, minlength: 9, maxlength: 11},
-      "checkout_account_form[phone_number]": {required: true, maxlength: 25},
-      "checkout_account_form[organization_address]": {required: true, minlength: 6}
-    },
-    messages: {
-    },
-    onkeyup: false, //Only do validations when form focus changes
-    submitHandler: function(form) {
-      disable_and_submit(form_id, form, "false", locale);
-    }
-  });
-}
-
-function initialize_braintree_account_form(locale) {
-  var form_id = "#braintree_account_form";
-  $(form_id).validate({
-    rules: {
-      "braintree_account[first_name]": {required: true},
-      "braintree_account[last_name]": {required: true},
-      "braintree_account[email]": {required: true, email: true},
-      "braintree_account[phone]": {required: true},
-      "braintree_account[address_street_address]": {required: true},
-      "braintree_account[address_postal_code]": {required: true, minlength: 2, maxlength: 6},
-      "braintree_account[address_locality]": {required: true},
-      "braintree_account[address_region]": {required: true},
-      "braintree_account[date_of_birth]": {required: true},
-      "braintree_account[routing_number]": {required: true, minlength: 9, maxlength: 9},
-      "braintree_account[account_number]": {required: true},
-    },
-    messages: {
-    },
-    onkeyup: false, //Only do validations when form focus changes
-    submitHandler: function(form) {
-      disable_and_submit(form_id, form, "false", locale);
-    }
-  });
-}
-
 function initialize_send_message_form(locale) {
   auto_resize_text_areas("text_area");
   $('textarea').focus();
@@ -350,7 +307,6 @@ function initialize_reply_form(locale) {
 function initialize_listing_view(locale) {
   $('#listing-image-link').click(function() { $('#listing-image-lightbox').lightbox_me({centered: true, zIndex: 1000000}); });
   auto_resize_text_areas("listing_comment_content_text_area");
-  $('textarea').focus();
   prepare_ajax_form(
     "#new_comment",
     locale,
@@ -362,49 +318,12 @@ function initialize_listing_view(locale) {
   });
 }
 
-function initialize_accept_transaction_form(
-  commission_percentage,
-  service_fee_vat,
-  form_type,
-  form_id,
-  minimum_price,
-  subunit_to_unit,
-  minimum_price_message) {
-
-  auto_resize_text_areas("text_area");
-
-  if (commission_percentage != null) {
-    if (form_type === "simple") {
-      $(".trigger-focusout").keyup(function(value) {
-	update_simple_form_price_fields(commission_percentage);
-      });
-      $(form_id).validate({
-	rules: {
-          "listing_conversation[payment_attributes][sum]": {money: true, minimum_price_required: [minimum_price, subunit_to_unit]}
-        },
-        messages: {
-          "listing_conversation[payment_attributes][sum]": {minimum_price_required: minimum_price_message}
-        },
-      });
-    } else {
-      function update() {
-        update_complex_form_price_fields(commission_percentage, service_fee_vat);
-      }
-
-      $(".trigger-focusout").focusout(update);
-      update();
-    }
-
-  }
-}
-
-function updateSellerGetsValue(priceInputSelector, displayTargetSelector, currencySelector, communityCommissionPercentage, minCommission, showReversed) {
+function updateSellerGetsValue(currencyOpts, priceInputSelector, displayTargetSelector, communityCommissionPercentage, minCommission, showReversed) {
   // true == Show the fee instead of what's left after the fee
   showReversed = showReversed || false;
 
   $display = $(displayTargetSelector);
   $input = $(priceInputSelector);
-  $currency = $(currencySelector);
 
   function updateYouWillGet() {
     var sum = ST.paymentMath.parseFloatFromFieldValue($input.val());
@@ -416,63 +335,22 @@ function updateSellerGetsValue(priceInputSelector, displayTargetSelector, curren
       displaySum = sum - ST.paymentMath.totalCommission(sum, communityCommissionPercentage, minCommission);
     }
 
+    displaySumInCents = displaySum * Math.pow(10, currencyOpts.digits);
+
     $display.text(
-      [ST.paymentMath.displayMoney(Math.max(0, displaySum)),
-       $currency.val()]
-        .join(" "));
+      ST.paymentMath.displayMoney(Math.max(0, displaySumInCents),
+                                  currencyOpts.symbol,
+                                  currencyOpts.digits,
+                                  currencyOpts.format,
+                                  currencyOpts.separator,
+                                  currencyOpts.delimiter)
+    );
   }
 
   $input.keyup(updateYouWillGet);
-  $currency.change(updateYouWillGet);
 
   // Run once immediately
   updateYouWillGet();
-}
-
-function update_simple_form_price_fields(commission_percentage) {
-  var sum = ST.paymentMath.parseFloatFromFieldValue($(".invoice-sum-field").val());
-  var service_fee_sum = ST.paymentMath.totalCommission(sum, commission_percentage, 0, 0);
-  var seller_sum = sum - service_fee_sum;
-  $("#service-fee").text(ST.paymentMath.displayMoney(service_fee_sum));
-  $("#payment-to-seller").text(ST.paymentMath.displayMoney(seller_sum));
-}
-
-function update_complex_form_price_fields(commissionPercentage, serviceFeeVat) {
-  var euro = '\u20AC'
-
-  var rows = $(".field-row").toArray().map(function(row) {
-    var row = $(row);
-    var sumEl = row.find(".payment-row-sum-field");
-    var vatEl = row.find(".payment-row-vat-field");
-    var totalEl = row.find(".total-label");
-    var sum = ST.paymentMath.parseFloatFromFieldValue(sumEl.val());
-    var vat = ST.paymentMath.parseFloatFromFieldValue(vatEl.val());
-
-    vat = Math.min(Math.max(vat, 0), 100);
-    var sumWithVat = sum + (sum * vat / 100);
-
-    return {
-      totalEl: totalEl,
-      sumWithVat: sumWithVat
-    };
-  });
-
-  var total = rows.reduce(function(total, rowObj) {
-    return total + rowObj.sumWithVat;
-  }, 0);
-
-  var totalFee = ST.paymentMath.totalCommission(total, commissionPercentage);
-  var totalFeeWithoutVat = totalFee / (1 + serviceFeeVat / 100);
-  var youWillGet = total - totalFee;
-
-  rows.forEach(function(rowObj) {
-    rowObj.totalEl.text(rowObj.sumWithVat.toFixed(2) + euro);
-  });
-
-  $("#service-fee-sum").text(totalFeeWithoutVat.toFixed(2) + euro);
-  $("#service-fee-total").text(totalFee.toFixed(2) + euro);
-
-  $("#total").text(youWillGet.toFixed(2) + euro);
 }
 
 function initialize_give_feedback_form(locale, grade_error_message, text_error_message) {
@@ -546,13 +424,6 @@ function initialize_terms_form() {
   $('#terms_link').click(function(link) {
     link.preventDefault();
     $('#terms').lightbox_me({ centered: true, zIndex: 1000000 });
-  });
-}
-
-function initialize_payment_gateway_terms_lightbox(gateway_name) {
-  $('#' + gateway_name + '_terms_link').click(function(link) {
-    link.preventDefault();
-    $('#' + gateway_name + '_terms').lightbox_me({ centered: true, zIndex: 1000001 });
   });
 }
 
@@ -781,10 +652,14 @@ function initialize_admin_edit_tribe_look_and_feel_form(locale, community_id, in
   var form_id = "#edit_community_" + community_id;
   $(form_id).validate({
      rules: {
-       "community[custom_color1]": {required: false, minlength: 6, maxlength: 6, regex: "^([a-fA-F0-9]+)?$"}
+       "community[custom_color1]": {required: false, minlength: 6, maxlength: 6, regex: "^([a-fA-F0-9]+)?$"},
+       "community[description_color]": {required: false, minlength: 6, maxlength: 6, regex: "^([a-fA-F0-9]+)?$"},
+       "community[slogan_color]": {required: false, minlength: 6, maxlength: 6, regex: "^([a-fA-F0-9]+)?$"}
      },
      messages: {
-      "community[custom_color1]": { regex: invalid_color_code_message }
+       "community[custom_color1]": { regex: invalid_color_code_message },
+       "community[description_color]": { regex: invalid_color_code_message },
+       "community[slogan_color]": { regex: invalid_color_code_message }
     },
      submitHandler: function(form) {
        disable_and_submit(form_id, form, "false", locale);
@@ -943,50 +818,6 @@ function initialize_pending_consent_form(email_invalid_message, invitation_requi
       "form[invitation_code]": { remote: invalid_invitation_code_message }
     }
   });
-}
-
-function initialize_braintree_preauthorize_form(locale, beforeSubmit) {
-  $('#transaction-agreement-read-more').click(function() { $('#transaction-agreement-content').lightbox_me({centered: true, zIndex: 1000000}); });
-
-  var opts = {
-    errorPlacement: function(error, element) {
-      if (element.attr("name") == "listing_conversation[contract_agreed]") {
-        error.appendTo(element.parent().parent());
-      } else {
-        error.insertAfter(element);
-      }
-    }
-  }
-
-  validateBraintreeForm(locale, beforeSubmit, opts);
-}
-
-function initialize_braintree_payment_form(locale, beforeSubmit) {
-  validateBraintreeForm(locale, beforeSubmit);
-}
-
-function validateBraintreeForm(locale, beforeSubmit, opts) {
-  opts = opts || {};
-  beforeSubmit = beforeSubmit || function(callback) { callback() };
-
-  var form_id = "#braintree-payment-form";
-
-  var defaultValidationOptions = {
-    rules: {
-      "braintree_payment[cardholder_name]": {required: true, minlength: 2, maxlength: 50},
-      "braintree_payment[credit_card_number]": {required: true, creditcard: true},
-      "braintree_payment[cvv]": {required: true, digits: true, minlength: 3, maxlength: 4},
-    },
-    submitHandler: function(form) {
-      beforeSubmit(function() {
-        disable_and_submit(form_id, form, "false", locale);
-      });
-    }
-  }
-
-  var validationOptions = _.defaults(opts, defaultValidationOptions);
-
-  $(form_id).validate(validationOptions);
 }
 
 function set_textarea_maxlength() {

@@ -3,25 +3,20 @@ import { Component } from 'react';
 import css from './ColorsAndTypography.css';
 
 const defaultRailsContext = {
-  host: 'test.lvh.me',
-  href: 'http://test.lvh.me:3000/',
-  httpAcceptLanguage: 'en-US,en;q=0.8,fi;q=0.6',
-  i18nDefaultLocale: 'en',
   i18nLocale: 'en',
+  i18nDefaultLocale: 'en',
   location: '/',
-  marketplaceId: 1,
-  marketplace_color1: '#ee4',
-  marketplace_color2: '#00a26c',
   pathname: '/',
-  port: 3000,
-  scheme: 'http',
-  search: null,
-  serverSide: false,
+  marketplaceId: 1,
+
+  marketplace_color1: '#64A',
+
+  loggedInUsername: 'foo',
 };
 
-const withProps = function withProps(component, props) {
+const withProps = function withProps(component, props, children) {
   return div([
-    r(component, props),
+    r(component, props, children),
     r.strong({ style: { marginTop: '2em', display: 'block' } }, 'Props:'),
     r.pre({
       style: {
@@ -38,7 +33,7 @@ const storify = (ComposedComponent, containerStyle) => (
   class EnhancedComponent extends Component {
     render() {
       return div(null, [
-        div({ className: css.componentWrapper, key: 'componentWrapper' }, [
+        div({ key: 'componentWrapper' }, [
           div(containerStyle, ComposedComponent),
         ]),
 

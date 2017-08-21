@@ -1,8 +1,6 @@
-class Admin::ListingShapesController < ApplicationController
-  before_filter :ensure_is_admin
+class Admin::ListingShapesController < Admin::AdminBaseController
 
-  before_filter :ensure_no_braintree_or_checkout
-  before_filter :set_url_name
+  before_action :set_url_name
 
   LISTING_SHAPES_NAVI_LINK = "listing_shapes"
 
@@ -35,7 +33,9 @@ class Admin::ListingShapesController < ApplicationController
       return redirect_to action: :index
     end
 
-    render_new_form(template, process_summary, available_locales())
+    render_new_form(form: template,
+                    process_summary: process_summary,
+                    available_locs: available_locales())
   end
 
   def edit
@@ -47,7 +47,10 @@ class Admin::ListingShapesController < ApplicationController
 
     return redirect_to error_not_found_path if shape.nil?
 
-    render_edit_form(params[:url_name], shape, process_summary, available_locales())
+    render_edit_form(url_name: params[:url_name],
+                     form: shape,
+                     process_summary: process_summary,
+                     available_locs: available_locales())
   end
 
   def create
@@ -66,7 +69,10 @@ class Admin::ListingShapesController < ApplicationController
       redirect_to action: :index
     else
       flash.now[:error] = t("admin.listing_shapes.new.create_failure", error_msg: create_result.error_msg)
-      render_new_form(shape, process_summary, available_locales())
+
+      render_new_form(form: shape,
+                      process_summary: process_summary,
+                      available_locs: available_locales())
     end
 
   end
@@ -92,14 +98,16 @@ class Admin::ListingShapesController < ApplicationController
         report_to_gtm([{event: "km_record", km_event: "Onboarding payments setup"},
                        {event: "km_record", km_event: "Onboarding payment disabled"}])
 
-        with_feature(:onboarding_redesign_v1) do
-          flash[:show_onboarding_popup] = true
-        end
+        flash[:show_onboarding_popup] = true
       end
       return redirect_to admin_listing_shapes_path
     else
       flash.now[:error] = t("admin.listing_shapes.edit.update_failure", error_msg: update_result.error_msg)
-      return render_edit_form(params[:url_name], shape, process_summary, available_locales())
+
+      return render_edit_form(url_name: params[:url_name],
+                              form: shape,
+                              process_summary: process_summary,
+                              available_locs: available_locales())
     end
   end
 
@@ -140,7 +148,7 @@ class Admin::ListingShapesController < ApplicationController
       listing_api.shapes.update(community_id: @current_community.id, listing_shape_id: d[:value][:id], opts: opts)
     }
 
-    render nothing: true, status: 200
+    render body: nil, status: 200
   end
 
   def close_listings
@@ -183,15 +191,19 @@ class Admin::ListingShapesController < ApplicationController
     {
       shipping_enabled: !process_summary[:preauthorize_available] || !author_is_seller,
       online_payments: !process_summary[:preauthorize_available] || !author_is_seller,
+      availability: !process_summary[:preauthorize_available] || !author_is_seller,
     }
   end
 
-  def render_new_form(form, process_summary, available_locs)
-    locals = common_locals(form, 0, process_summary, available_locs)
+  def render_new_form(form:, process_summary:, available_locs:)
+    locals = common_locals(form: form,
+                           count: 0,
+                           process_summary: process_summary,
+                           available_locs: available_locs)
     render("new", locals: locals)
   end
 
-  def render_edit_form(url_name, form, process_summary, available_locs)
+  def render_edit_form(url_name:, form:, process_summary:, available_locs:)
     can_delete_res = can_delete_shape?(url_name, all_shapes(community_id: @current_community.id, include_categories: true))
     cant_delete = !can_delete_res.success
     cant_delete_reason = cant_delete ? can_delete_res.error_msg : nil
@@ -203,7 +215,10 @@ class Admin::ListingShapesController < ApplicationController
         open: true
       }).data
 
-    locals = common_locals(form, count, process_summary, available_locs).merge(
+    locals = common_locals(form: form,
+                           count: count,
+                           process_summary: process_summary,
+                           available_locs: available_locs).merge(
       url_name: url_name,
       name: pick_translation(form[:name]),
       cant_delete: cant_delete,
@@ -212,11 +227,14 @@ class Admin::ListingShapesController < ApplicationController
     render("edit", locals: locals)
   end
 
-  def common_locals(form, count, process_summary, available_locs)
+  def common_locals(form:, count:, process_summary:, available_locs:)
     { selected_left_navi_link: LISTING_SHAPES_NAVI_LINK,
       uneditable_fields: uneditable_fields(process_summary, form[:author_is_seller]),
       shape: FormViewLayer.shape_to_locals(form),
       count: count,
+      harmony_in_use: APP_CONFIG.harmony_api_in_use.to_s == "true",
+      display_knowledge_base_articles: APP_CONFIG.display_knowledge_base_articles.to_s == "true",
+      knowledge_base_url: APP_CONFIG.knowledge_base_url,
       locale_name_mapping: available_locs.map { |name, l| [l, name] }.to_h
     }
   end
@@ -322,14 +340,6 @@ class Admin::ListingShapesController < ApplicationController
     }.second
   end
 
-  def ensure_no_braintree_or_checkout
-    gw = PaymentGateway.where(community_id: @current_community.id).first
-    if !@current_user.is_admin? && gw
-      flash[:error] = "Not available for your payment gateway: #{gw.type}"
-      redirect_to admin_details_edit_path
-    end
-  end
-
   # FormViewLayer provides helper functions to transform:
   # - Shape hash to renderable format
   # - params from form back to Shape
@@ -338,14 +348,10 @@ class Admin::ListingShapesController < ApplicationController
     module_function
 
     def params_to_shape(params)
-      form_params = HashUtils.symbolize_keys(params)
-
-      units = parse_predefined_units(form_params[:units])
-        .concat(parse_existing_custom_units(Maybe(form_params)[:custom_units][:existing].or_else([])))
-        .concat(parse_new_custom_units(Maybe(form_params)[:custom_units][:new].or_else([])))
+      form_params = HashUtils.symbolize_keys(params.to_unsafe_hash)
 
       parsed_params = form_params.merge(
-        units: units,
+        units: parse_units_from_params(form_params),
         author_is_seller: form_params[:author_is_seller] == "false" ? false : true # default true
       )
 
@@ -355,13 +361,56 @@ class Admin::ListingShapesController < ApplicationController
     def shape_to_locals(shape)
       shape = Shape.call(shape)
 
+      units = split_availability_and_pricing_units(shape)
+
       shape.merge(
-        predefined_units: expand_predefined_units(shape[:units]),
-        custom_units: encode_custom_units(shape[:units].select { |unit| unit[:type] == :custom })
+        availability_unit: units[:availability],
+        predefined_units: expand_predefined_units(units[:pricing]),
+        custom_units: encode_custom_units(units[:pricing].select { |unit| unit[:type] == :custom })
       )
     end
 
     # private
+
+    # Splits units to availability units and pricing units.
+    #
+    # In the backend we have only one concept, units. However, in the UI
+    # we are showing pricing unit checkboxes and availability unit radio
+    # buttons. This method maps backend units to the two unit formats
+    # we have in the UI
+    #
+    def split_availability_and_pricing_units(shape)
+      if shape[:availability] == :booking
+        {
+          pricing: [],
+          availability: shape[:units].first[:type]
+        }
+      else
+        {
+          pricing: shape[:units],
+          availability: nil
+        }
+      end
+    end
+
+    # Combines availability units and pricing units to just "units".
+    #
+    # In the backend we have only one concept, units. However, in the UI
+    # we are showing pricing unit checkboxes and availability unit radio
+    # buttons. This method maps the UI units to backend units.
+    #
+    def parse_units_from_params(form_params)
+      selected_predefined_units =
+        if form_params[:availability] == "booking"
+          [form_params[:availability_unit]]
+        else
+          form_params[:units]
+        end
+
+      parse_predefined_units(selected_predefined_units)
+        .concat(parse_existing_custom_units(Maybe(form_params)[:custom_units][:existing].or_else([])))
+        .concat(parse_new_custom_units(Maybe(form_params)[:custom_units][:new].or_else([])))
+    end
 
     def expand_predefined_units(shape_units)
       shape_units_set = shape_units.map { |t| t[:type] }.to_set

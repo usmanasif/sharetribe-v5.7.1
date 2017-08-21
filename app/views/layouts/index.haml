@@ -16,7 +16,7 @@
             .col-md-12.col-sm-12.col-xs-12
               %nav.cart-area.admin-menu-panel
                 %ul
-                  - if @current_user
+                  -if @current_user
                     - conversations = @current_community.conversations.for_person(@current_user)
                     - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
                     %li
@@ -57,50 +57,53 @@
                               /     = icon_tag("logout", ["icon-with-text"])
                               /     = t("layouts.logged_in.logout")
 
-                  %li
-                    .dropdown.login-menu 
-                      %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                        Menu
-                      %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                        %li
-                          = link_to "/" do
-                            = icon_tag("home", ["icon-with-text"])
-                            = t("header.home")
-                        %li
-                          = link_to about_infos_path do
-                            = icon_tag("information", ["icon-with-text"])
-                            = t("header.about")
-                        %li
-                          = link_to new_user_feedback_path do
-                            = icon_tag("feedback", ["icon-with-text"])
-                            = t("header.contact_us")
-                        %li
-                          - with_invite_link do
-                            = link_to new_invitation_path do
-                              = icon_tag("invite", ["icon-with-text"])
-                              = t("header.invite")
-                        %li
-                          - Maybe(@current_community).menu_links.each do |menu_links|
-                            - menu_links.each do |menu_link|
-                              = link_to menu_link.url(I18n.locale), :target => "_blank" do
-                                = icon_tag("redirect", ["icon-with-text"])
-                                = menu_link.title(I18n.locale)
-                        %li
-                          - if @current_user && @current_community && @current_user.has_admin_rights?
-                            = link_to edit_details_admin_community_path(@current_community) do
-                              = icon_tag("admin", ["icon-with-text"])
-                              = t("layouts.logged_in.admin")
-                  - Maybe(@current_user).each do |user|
+                    
                     %li
-                      = link_to person_path(user, :show_closed => true) do
-                        %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                          Manage Listings                      
-                  
-                    %li{:style => "margin-right: 20px;"}
-                      = link_to new_listing_path do
-                        %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                          Post a new listing
-                  
+                      .dropdown.login-menu 
+                        %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                          Menu
+                        %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                          %li
+                            = link_to "/" do
+                              = icon_tag("home", ["icon-with-text"])
+                              = t("header.home")
+                          %li
+                            = link_to about_infos_path do
+                              = icon_tag("information", ["icon-with-text"])
+                              = t("header.about")
+                          %li
+                            = link_to new_user_feedback_path do
+                              = icon_tag("feedback", ["icon-with-text"])
+                              = t("header.contact_us")
+                          %li
+                            - with_invite_link do
+                              = link_to new_invitation_path do
+                                = icon_tag("invite", ["icon-with-text"])
+                                = t("header.invite")
+                          %li
+                            - Maybe(@current_community).menu_links.each do |menu_links|
+                              - menu_links.each do |menu_link|
+                                = link_to menu_link.url(I18n.locale), :target => "_blank" do
+                                  = icon_tag("redirect", ["icon-with-text"])
+                                  = menu_link.title(I18n.locale)
+                          %li
+                            -if @current_user && @current_community && @current_user.has_admin_rights?(@current_community)
+                              = link_to edit_details_admin_community_path(@current_community) do
+                                = icon_tag("admin", ["icon-with-text"])
+                                = t("layouts.logged_in.admin")
+
+                    - Maybe(@current_user).each do |user|
+                      %li
+                        = link_to person_path(user, :show_closed => true) do
+                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                            Manage Listings                      
+                    
+                      %li{:style => "margin-right: 20px;"}
+                        = link_to new_listing_path do
+                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                            Post New Listing
+
+
     .container
       .header-content
         / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -165,7 +168,10 @@
             / /.navbar-collapse
           / /.container-fluid
         / Banner
-  = yield
+
+                  
+
+    = yield
 
 
 :css

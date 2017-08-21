@@ -32,7 +32,12 @@ World(FillInHelpers)
 
 module WithinHelpers
   def with_scope(locator)
-    locator ? within(locator) { yield } : yield
+    if locator
+      expect(page).to have_css(locator)
+      within(locator) { yield }
+    else
+      yield
+    end
   end
 end
 World(WithinHelpers)
@@ -84,14 +89,6 @@ end
 
 When /^I remove the focus"?$/ do
   page.execute_script("$('input').blur();")
-end
-
-Then /^there should be an active ajax request$/ do
-  # WARNING! This step is unreliable!
-  # Some ajax requests are faster than the polling interval, thus
-  # this step never sees the ajax request and thinks there never
-  # were any requests
-  expect { page.evaluate_script("$.active") > 0 }.to become_true
 end
 
 When /^ajax requests are completed$/ do
@@ -280,7 +277,16 @@ Given /^I will(?:| (not)) confirm all following confirmation dialogs in this pag
 end
 
 When /^I confirm alert popup$/ do
-  page.driver.browser.switch_to.alert.accept unless ENV['PHANTOMJS']
+  unless ENV['PHANTOMJS']
+    # wait is necessary for firefox if alerts have slide-out animations
+    wait = Selenium::WebDriver::Wait.new ignore: Selenium::WebDriver::Error::NoAlertPresentError
+    alert = wait.until { page.driver.browser.switch_to.alert }
+    alert.accept
+    begin
+      page.driver.browser.switch_to.alert
+    rescue Selenium::WebDriver::Error::NoSuchAlertError
+    end
+  end
 end
 
 Then /^I should see validation error$/ do

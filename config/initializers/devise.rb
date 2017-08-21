@@ -253,14 +253,15 @@ Devise.setup do |config|
 
   # This will configure a setup phase hook, that will use SessionsController#facebook_setup as callback
   # It allows dynamic configuring on community basis
-  config.omniauth :facebook, :setup => true
+  facebook_api_version = FacebookSdkVersion::SERVER
+
+  config.omniauth :facebook,
+                  setup: true,
+                  client_options: {
+                    site: "https://graph.facebook.com/#{facebook_api_version}",
+                    authorize_url: "https://www.facebook.com/#{facebook_api_version}/dialog/oauth"
+                  }
 
   # ==> Warden configuration
-  # If you want to use other strategies, that are not supported by Devise, or
-  # change the failure app, you can configure them inside the config.warden block.
-  #
-  # config.warden do |manager|
-  #   manager.intercept_401 = false
-  #   manager.default_strategies(:scope => :user).unshift :some_external_strategy
-  # end
+  # see config/initializers/warden.rb
 end

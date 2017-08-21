@@ -18,13 +18,11 @@
 #  index_emails_on_address                   (address)
 #  index_emails_on_address_and_community_id  (address,community_id) UNIQUE
 #  index_emails_on_community_id              (community_id)
+#  index_emails_on_confirmation_token        (confirmation_token)
 #  index_emails_on_person_id                 (person_id)
 #
 
-class Email < ActiveRecord::Base
-
-  # TODO Rails 4, Remove
-  include ActiveModel::ForbiddenAttributesProtection
+class Email < ApplicationRecord
 
   include ApplicationHelper
   belongs_to :person
@@ -56,7 +54,7 @@ class Email < ActiveRecord::Base
   end
 
   def self.send_confirmation(email, community)
-    MailCarrier.deliver_later(PersonMailer.email_confirmation(email, community))
+    Delayed::Job.enqueue(EmailConfirmationJob.new(email.id, community.id), priority: 2)
   end
 
   def self.find_by_address_and_community_id(address, community_id)

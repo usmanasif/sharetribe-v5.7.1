@@ -3,6 +3,7 @@
 # Table name: people
 #
 #  id                                 :string(22)       not null, primary key
+#  uuid                               :binary(16)       not null
 #  community_id                       :integer          not null
 #  created_at                         :datetime
 #  updated_at                         :datetime
@@ -27,6 +28,7 @@
 #  password_salt                      :string(255)
 #  given_name                         :string(255)
 #  family_name                        :string(255)
+#  display_name                       :string(255)
 #  phone_number                       :string(255)
 #  description                        :text(65535)
 #  image_file_name                    :string(255)
@@ -38,8 +40,6 @@
 #  authentication_token               :string(255)
 #  community_updates_last_sent_at     :datetime
 #  min_days_between_community_updates :integer          default(1)
-#  is_organization                    :boolean
-#  organization_name                  :string(255)
 #  deleted                            :boolean          default(FALSE)
 #  cloned_from                        :string(22)
 #
@@ -54,6 +54,7 @@
 #  index_people_on_reset_password_token          (reset_password_token) UNIQUE
 #  index_people_on_username                      (username)
 #  index_people_on_username_and_community_id     (username,community_id) UNIQUE
+#  index_people_on_uuid                          (uuid) UNIQUE
 #
 
 require 'json'
@@ -62,7 +63,7 @@ require "open-uri"
 
 # This class represents a person (a user of Sharetribe).
 
-class Person < ActiveRecord::Base
+class Person < ApplicationRecord
 
   include ErrorsHelper
   include ApplicationHelper
@@ -78,20 +79,16 @@ class Person < ActiveRecord::Base
   attr_accessor :guid, :password2, :form_login,
                 :form_given_name, :form_family_name, :form_password,
                 :form_password2, :form_email, :consent,
-                :input_again, :community_category, :send_notifications
+                :input_again, :send_notifications
 
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
 
-  attr_protected :is_admin
-
   has_many :listings, -> { where(deleted: 0) }, :dependent => :destroy, :foreign_key => "author_id"
   has_many :emails, :dependent => :destroy, :inverse_of => :person
 
   has_one :location, -> { where(location_type: :person) }, :dependent => :destroy
-  has_one :braintree_account, :dependent => :destroy
-  has_one :checkout_account, dependent: :destroy
 
   has_many :participations, :dependent => :destroy
   has_many :conversations, :through => :participations, :dependent => :destroy
@@ -133,12 +130,10 @@ class Person < ActiveRecord::Base
     "email_when_conversation_accepted",
     "email_when_conversation_rejected",
     "email_about_new_received_testimonials",
-    "email_about_accept_reminders",
     "email_about_confirm_reminders",
     "email_about_testimonial_reminders",
     "email_about_completed_transactions",
     "email_about_new_payments",
-    "email_about_payment_reminders",
     "email_about_new_listings_by_followed_people"
 
     # These should not yet be shown in UI, although they might be stored in DB
@@ -150,14 +145,13 @@ class Person < ActiveRecord::Base
     "email_from_admins"
   ]
 
-  PERSONAL_EMAIL_ENDINGS = ["gmail.com", "hotmail.com", "yahoo.com"]
-
   serialize :preferences
 
   validates_length_of :phone_number, :maximum => 25, :allow_nil => true, :allow_blank => true
   validates_length_of :username, :within => 3..20
   validates_length_of :given_name, :within => 1..255, :allow_nil => true, :allow_blank => true
   validates_length_of :family_name, :within => 1..255, :allow_nil => true, :allow_blank => true
+  validates_length_of :display_name, :within => 1..30, :allow_nil => true, :allow_blank => true
 
   validates_format_of :username,
                        :with => /\A[A-Z0-9_]*\z/i
@@ -165,7 +159,6 @@ class Person < ActiveRecord::Base
   USERNAME_BLACKLIST = YAML.load_file("#{Rails.root}/config/username_blacklist.yml")
 
   validates :username, :exclusion => USERNAME_BLACKLIST
-  validate :community_email_type_is_correct
 
   has_attached_file :image, :styles => {
                       :medium => "288x288#",
@@ -186,6 +179,19 @@ class Person < ActiveRecord::Base
     set_default_preferences unless self.preferences
   end
 
+  after_initialize :add_uuid
+  def add_uuid
+    self.uuid ||= UUIDUtils.create_raw
+  end
+
+  def uuid_object
+    if self[:uuid].nil?
+      nil
+    else
+      UUIDUtils.parse_raw(self[:uuid])
+    end
+  end
+
   # Creates a new email
   def email_attributes=(attributes)
     ActiveSupport::Deprecation.warn(
@@ -204,15 +210,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def community_email_type_is_correct
-    if ["university", "community"].include? community_category
-      email_ending = email.split('@')[1]
-      if PERSONAL_EMAIL_ENDINGS.include? email_ending
-        errors.add(:email, "This looks like a non-organization email address. Remember to use the email of your organization.")
-      end
-    end
-  end
-
   def last_community_updates_at
     community_updates_last_sent_at || DEFAULT_TIME_FOR_COMMUNITY_UPDATES.ago
   end
@@ -222,23 +219,19 @@ class Person < ActiveRecord::Base
   end
 
   def self.username_available?(username, community_id)
-    !username.in?(USERNAME_BLACKLIST) &&
+    !USERNAME_BLACKLIST.include?(username.downcase) &&
       !Person
         .where("username = :username AND (is_admin = '1' OR community_id = :cid)", username: username, cid: community_id)
         .present?
   end
 
-  # Deprecated: This is view logic (how to display name) and thus should not be in model layer
-  # Consider using PersonViewUtils
   def name_or_username(community_or_display_type=nil)
     if community_or_display_type.present? && community_or_display_type.class == Community
       display_type = community_or_display_type.name_display_type
     else
       display_type = community_or_display_type
     end
-    if is_organization
-      return organization_name
-    elsif given_name.present?
+    if given_name.present?
       if display_type
         case display_type
         when "first_name_with_initial"
@@ -255,15 +248,15 @@ class Person < ActiveRecord::Base
       return username
     end
   end
+  deprecate name_or_username: "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils.",
+            deprecator: MethodDeprecator.new
 
-  # Deprecated: This is view logic (how to display name) and thus should not be in model layer
-  # Consider using PersonViewUtils
   def full_name
     "#{given_name} #{family_name}"
   end
+  deprecate full_name: "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils.",
+            deprecator: MethodDeprecator.new
 
-  # Deprecated: This is view logic (how to display name) and thus should not be in model layer
-  # Consider using PersonViewUtils
   def first_name_with_initial
     if family_name
       initial = family_name[0,1]
@@ -272,27 +265,27 @@ class Person < ActiveRecord::Base
     end
     "#{given_name} #{initial}"
   end
+  deprecate first_name_with_initial: "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils.",
+            deprecator: MethodDeprecator.new
 
-  # Deprecated: This is view logic (how to display name) and thus should not be in model layer
-  # Consider using PersonViewUtils
   def name(community_or_display_type)
+    deprecation_message = "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils."
+    MethodDeprecator.new.deprecation_warning(:name, deprecation_message)
     return name_or_username(community_or_display_type)
   end
+  # FIXME deprecate on Person#name brakes airbrake
+  # deprecate name: "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils.",
+  #          deprecator: MethodDeprecator.new
 
-  # Deprecated: This is view logic (how to display name) and thus should not be in model layer
-  # Consider using PersonViewUtils
   def given_name_or_username
-    if is_organization
-      # Quick and somewhat dirty solution. `given_name_or_username`
-      # is quite explicit method name and thus it should return the
-      # given name or username. Maybe this should be cleaned in the future.
-      return organization_name
-    elsif given_name.present?
+    if given_name.present?
       return given_name
     else
       return username
     end
   end
+  deprecate given_name_or_username: "This is view logic (how to display name) and thus should not be in model layer. Consider using PersonViewUtils.",
+            deprecator: MethodDeprecator.new
 
   def set_given_name(name)
     update_attributes({:given_name => name })
@@ -337,9 +330,10 @@ class Person < ActiveRecord::Base
     self.save
   end
 
-  def store_picture_from_facebook()
+  def store_picture_from_facebook!()
     if self.facebook_id
-      resp = RestClient.get("http://graph.facebook.com/#{self.facebook_id}/picture?type=large&redirect=false")
+      resp = RestClient.get(
+        "http://graph.facebook.com/#{FacebookSdkVersion::SERVER}/#{self.facebook_id}/picture?type=large&redirect=false")
       url = JSON.parse(resp)["data"]["url"]
       self.picture_from_url(url)
     end
@@ -432,12 +426,12 @@ class Person < ActiveRecord::Base
     community_membership.consent
   end
 
-  def is_marketplace_admin?
-    community_membership.admin?
+  def is_marketplace_admin?(community)
+    community_membership.community_id == community.id && community_membership.admin?
   end
 
-  def has_admin_rights?
-    is_admin? || is_marketplace_admin?
+  def has_admin_rights?(community)
+    is_admin? || is_marketplace_admin?(community)
   end
 
   def should_receive?(email_type)
@@ -482,6 +476,17 @@ class Person < ActiveRecord::Base
     EmailService.emails_to_smtp_addresses(send_message_to)
   end
 
+  # Primary email is the first email address that is
+  #
+  # - confirmed
+  # - notifications allowed
+  #
+  # Returns Email record
+  #
+  def primary_email
+    EmailService.emails_to_send_message(emails).first
+  end
+
   # Notice: If no confirmed notification emails is found, this
   # method returns the first confirmed emails
   def confirmed_notification_email_to
@@ -505,7 +510,14 @@ class Person < ActiveRecord::Base
   def update_facebook_data(facebook_id)
     self.update_attribute(:facebook_id, facebook_id)
     if self.image_file_size.nil?
-      self.store_picture_from_facebook
+      begin
+        self.store_picture_from_facebook!
+      rescue StandardError => e
+        # We can just catch and log the error, because if the profile picture upload fails
+        # we still want to make the user creation pass, just without the profile picture,
+        # which user can upload later
+        logger.error(e.message, :facebook_existing_user_profile_picture_upload_failed, { person_id: self.id })
+      end
     end
   end
 
@@ -543,8 +555,6 @@ class Person < ActiveRecord::Base
 
   # A person inherits some default settings from the community in which she is joining
   def inherit_settings_from(current_community)
-    # Mark as organization user if signed up through market place which is only for orgs
-    self.is_organization = current_community.only_organizations
     self.min_days_between_community_updates = current_community.default_min_days_between_community_updates
   end
 
@@ -554,12 +564,6 @@ class Person < ActiveRecord::Base
     # 1 day limit to match even if there's 23.55 minutes passed since last sending.
     return true if community_updates_last_sent_at.nil?
     return community_updates_last_sent_at + min_days_between_community_updates.days - 45.minutes < Time.now
-  end
-
-  # Return true if this user should use a payment
-  # system in this transaction
-  def should_pay?(conversation, community)
-    conversation.requires_payment?(community) && conversation.status.eql?("accepted") && id.eql?(conversation.buyer.id)
   end
 
   # Returns and email that is pending confirmation

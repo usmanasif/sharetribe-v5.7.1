@@ -12,12 +12,12 @@ describe Admin::CommunityMembershipsController, type: :controller do
 
   describe "users CSV export" do
     it "returns 200" do
-      get :index, {format: :csv, community_id: @community.id}
+      get :index, params: {format: :csv, community_id: @community.id}
       expect(response.status).to eq(200)
     end
 
     it "returns CSV with actual data" do
-      get :index, {format: :csv, community_id: @community.id}
+      get :index, params: {format: :csv, community_id: @community.id} 
       response_arr = CSV.parse(response.body)
       expect(response_arr.count).to eq(3)
       user = Hash[*response_arr[0].zip(response_arr[1]).flatten]
@@ -25,12 +25,14 @@ describe Admin::CommunityMembershipsController, type: :controller do
 
       expect(user["first_name"]).to eq(@person.given_name)
       expect(user["last_name"]).to eq(@person.family_name)
+      expect(user["display_name"]).to eq(@person.display_name || "")
       expect(user["phone_number"]).to eq(@person.phone_number)
       expect(user["email_address"]).to eq(@person.emails.first.address)
       expect(user["status"]).to eq("accepted")
 
       expect(user2["first_name"]).to eq(@person.given_name)
       expect(user2["last_name"]).to eq(@person.family_name)
+      expect(user2["display_name"]).to eq(@person.display_name || "")
       expect(user2["phone_number"]).to eq(@person.phone_number)
       expect(user2["email_address"]).to eq(@other_email.address)
       expect(user2["status"]).to eq("accepted")
@@ -40,6 +42,9 @@ end
 
 describe Admin::CommunityTransactionsController, type: :controller do
   before(:each) do
+    # the @request is shared between test groups here so clear the request store
+    RequestStore.clear!
+
     @community = FactoryGirl.create(:community)
     @person = create_admin_for(@community)
     @listing = FactoryGirl.create(:listing, community_id: @community.id, transaction_process_id: 123, author: @person)
@@ -48,17 +53,18 @@ describe Admin::CommunityTransactionsController, type: :controller do
     @request.env[:current_marketplace] = @community
     @transaction = FactoryGirl.create(:transaction, starter: @person, listing: @listing, community: @community)
 
-    FeatureFlagService::API::Api.features.enable(community_id: @community.id, features: [:export_transactions_as_csv])
+    allow(FeatureFlagHelper).to receive(:feature_enabled?)
+      .with(:export_transactions_as_csv).and_return(true)
   end
 
   describe "transactions CSV export" do
     it "returns 200" do
-      get :index, {format: :csv, per_page: 99999, community_id: @community.id}
+      get :index, params: {format: :csv, per_page: 99999, community_id: @community.id}
       expect(response.status).to eq(200)
     end
 
     it "returns CSV with actual data" do
-      get :index, {format: :csv, per_page: 99999, community_id: @community.id}
+      get :index, params: {format: :csv, per_page: 99999, community_id: @community.id}
       response_arr = CSV.parse(response.body)
       tx = Hash[*response_arr[0].zip(response_arr[1]).flatten]
 

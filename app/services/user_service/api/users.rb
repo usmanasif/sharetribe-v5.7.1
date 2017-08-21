@@ -93,12 +93,6 @@ module UserService::API
         # Delte auth tokens
         person.auth_tokens.destroy_all
 
-        # Delete Braintree and Checkout accounts
-        # Please note: This is a bit wrong place for this. Braintree and Checkout should be in their own services,
-        # but we don't have those services currently
-        Maybe(person.braintree_account).each { |relation| relation.destroy }
-        Maybe(person.checkout_account).each { |relation| relation.destroy }
-
         Result::Success.new
       end
     end
@@ -121,6 +115,10 @@ module UserService::API
         .or_else("fb_name_missing")[0...18]
 
       generate_username_from_base(base, community_id)
+    end
+
+    def replace_with_default_locale(community_id:, locales:, default_locale:)
+      Person.where(community_id: community_id, locale: locales).update_all(locale: default_locale)
     end
 
     # private

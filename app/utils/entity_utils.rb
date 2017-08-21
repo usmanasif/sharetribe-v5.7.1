@@ -132,6 +132,11 @@ module EntityUtils
         {code: :lte, msg: "Value must be less than or equal to #{limit}. Was: #{v} (#{v.class.name})." }
       end
     },
+    uuid: ->(_, v, _) {
+      unless (v.nil? || v.is_a?(UUIDTools::UUID))
+        {code: :uuid, msg: "Value must be an instance of UUIDTools::UUID. Was: #{v} (#{v.class.name})."}
+      end
+    },
     validate_with: -> (validator, v, _) {
       validator.call(v)
     }
@@ -405,6 +410,10 @@ module EntityUtils
     end
 
     def with_result(specs:, data:, on_success:, on_failure:)
+      if data.is_a?(ActionController::Parameters)
+        ActiveSupport::Deprecation.warn("EntityUtils used with ActionController::Parameters. Convert Parameters to Hash using `.to_unsafe_hash` before using EntityUtils")
+        data = data.to_unsafe_hash
+      end
       raise(TypeError, "Expecting an input hash. You gave: #{data}") unless data.is_a? Hash
       result = EntityUtils.transform_and_validate(specs, data)
 

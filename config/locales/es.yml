@@ -1,4 +1,10 @@
 es:
+  number:
+    currency:
+      format:
+        separator: " "
+        delimiter: ","
+        format: "%n%u"
   admin:
     categories:
       edit:
@@ -79,16 +85,22 @@ es:
         favicon: ~
         favicon_info_text: ~
         community_custom_color1: "Color principal"
-        community_custom_color2: ~
+        community_slogan_color: ~
+        community_slogan_color_instructions_text: ~
+        community_description_color: ~
+        community_description_color_instructions_text: ~
+        new_listing_button_custom_color: ~
         logo_instructions_text_with_dimensions: ~
+        logo_instructions_text_with_dimensions_no_placing: ~
         logo_icon_instructions_text_with_dimensions: ~
+        logo_icon_instructions_text_with_dimensions_no_placing: ~
         cover_photo_visibility: ~
         cover_photo_instructions_text_with_dimensions: ~
         small_cover_photo_visibility: ~
         small_cover_photo_instructions_text_with_dimensions: ~
         main_content_width: ~
         custom_color1_instructions_text: "Puedes cambiar el color principal de la interfaz de usuario de esta comunidad ingresando un valor de color hexadecimal. <a href=\"http://www.colorpicker.com/?colorcode=D96E21\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> puede ayudarte a elegir el color y copiar el código aquí."
-        custom_color2_instructions_text: "Puedes cambiar el color del botón de %{post_new_listing} con un valor de color hexadecimal. <a href=\"http://www.colorpicker.com/?colorcode=00a26c\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> puede ayudarte a elegir el color y copiar el código aquí."
+        new_listing_button_instructions_text: ~
         default_browse_view: ~
         default_browse_view_instructions_text: ~
         grid: ~
@@ -122,6 +134,7 @@ es:
         sender_name_placeholder: ~
         sender_email_label: ~
         sender_email_placeholder: ~
+        amazon_ses_notification: ~
         this_is_how_it_will_look: ~
         send_verification_button: ~
         successfully_saved: ~
@@ -142,38 +155,6 @@ es:
         follow_the_instructions: ~
       getting_started:
         getting_started: ~
-        welcome_to_your_marketplace: ~
-        intro: ~
-        live_site_link_text: ~
-        look_and_feel: ~
-        logo_link_text: ~
-        custom_domain: ~
-        categories_and_custom_fields: ~
-        categories_link_text: ~
-        custom_fields_link_text: ~
-        filters_link_text: ~
-        order_types: ~
-        order_types_link_text: ~
-        payments: ~
-        payments_link_text: ~
-        info_texts: ~
-        about_page_link_text: ~
-        terms_of_use_link_text: ~
-        privacy_policy_link_text: ~
-        welcome_email_link_text: ~
-        instruction_texts_link_text: ~
-        social_media: ~
-        facebook_link_text: ~
-        twitter_link_text: ~
-        analytics: ~
-        analytics_link_text: ~
-        settings: ~
-        settings_link_text: ~
-        final_words: ~
-        invite_link_text: ~
-        view_users_link_text: ~
-        view_transactions_link_text: ~
-        contact_support_link_text: ~
       available_languages:
         en: ~
         en-AU: ~
@@ -199,7 +180,6 @@ es:
       settings:
         settings: ~
         general: ~
-        users_can_review_each_other_after_transaction: ~
         access: ~
         join_with_invite_only: ~
         users_can_invite_new_users: ~
@@ -208,15 +188,16 @@ es:
         search_preferences: ~
         default_search_type: ~
         keyword_search: ~
+        keyword_and_location_search: ~
         location_search: ~
         select_distance_unit: ~
         km: ~
         miles: ~
+        show_only_nearby: ~
         listing_preferences: ~
         transaction_preferences: ~
         show_listing_publishing_date: ~
         show_category_in_listing_list: ~
-        hide_expiration_date: ~
         listing_comments_in_use: ~
         email_preferences: ~
         automatic_newsletters: ~
@@ -224,7 +205,6 @@ es:
         google_analytics_key: ~
         twitter_handle: ~
         update_settings: ~
-        automatically_confirmed: ~
         automatically_confirmed_no_escrow: ~
         automatic_newsletter_frequency: ~
         newsletter_daily: ~
@@ -242,6 +222,7 @@ es:
         manage_members: ~
         email: ~
         name: ~
+        display_name: ~
         join_date: ~
         admin: ~
         posting_allowed: ~
@@ -252,6 +233,13 @@ es:
         save_user_status_error: ~
         ban_user_confirmation: ~
         ban_me_error: ~
+      new_layout:
+        new_layout: ~
+        description_roadmap_new: ~
+        enabled_for_you: ~
+        enabled_for_all: ~
+        new_topbar: ~
+        searchpage: ~
       social_media:
         social_media: ~
         twitter_handle: ~
@@ -286,6 +274,14 @@ es:
         language: ~
         url: ~
         empty: ~
+        max_number_of_links: ~
+        all: ~
+        max_number_of_links_info: ~
+        about_page: ~
+      topbar:
+        topbar: ~
+        new_listing_button_label: ~
+        invalid_post_listing_button_label: ~
       transactions:
         export_all_as_csv: ~
         transactions: ~
@@ -310,15 +306,6 @@ es:
           initiated: ~
           pending_ext: ~
         not_available: ~
-      braintree_payment_gateway:
-        braintree_payment_gateway: ~
-        environment: ~
-        private_key: ~
-        public_key: ~
-        client_side_encryption_key: ~
-        merchant_id: ~
-        master_merchant_id: ~
-        commission_from_seller: ~
       paypal_account:
         paypal_admin_account: ~
     custom_fields:
@@ -333,6 +320,9 @@ es:
       edit_location:
         edit_location_field: ~
         this_field_is_required: ~
+      edit_expiration:
+        edit_expiration_field: ~
+        enable: ~
       form:
         field_required:
           this_field_is_required: ~
@@ -388,10 +378,16 @@ es:
       users_and_transactions: ~
       configure: ~
       emails_title: ~
-      support: ~
       subscription: ~
       preview: ~
     listing_shapes:
+      availability_title: ~
+      read_more: ~
+      read_more_availability_management: ~
+      allow_providers_to_manage_availability: ~
+      per_day_availability: ~
+      per_night_availability: ~
+      pricing_units_disabled_info: ~
       index:
         listing_shapes: ~
         description: ~
@@ -467,14 +463,16 @@ es:
     paypal_accounts:
       marketplace_paypal_integration: ~
       preferences_updated: ~
-      marketplace_currency_used: ~
       contact_support_link_text: ~
       integration_info_text: ~
       link_paypal_personal_account_label: ~
       link_paypal_personal_account: ~
       personal_payment_preferences_link_text: ~
       read_more_about_paypal: ~
-      set_minimum_price_and_fee: ~
+      edit_payment_settings: ~
+      supported_currencies_information_text: ~
+      currency_change_warning_text: ~
+      marketplace_currency_label: ~
       minimum_listing_price_label: ~
       transaction_fee_label: ~
       minimum_transaction_fee_label: ~
@@ -554,8 +552,6 @@ es:
     accept:
       details: ~
       order_by: ~
-      respond_to_offer: "Responder a una oferta"
-      respond_to_request: "Responder a una solicitud"
       accept_offer: "Aceptar la oferta"
       accept_request: "Aceptar la solicitud"
       reject_offer: "No en este momento"
@@ -564,9 +560,6 @@ es:
       update_later: ~
       optional_message: "Mensaje opcional"
       price_to_pay: "Total precio por pagar"
-      you_need_to_fill_payout_details_before_accepting: "Tienes que completar los datos de pago antes de poder aceptar la solicitud y recibir el pago. Ve a %{payment_settings_link} para añadir toda la información."
-      payment_settings_link: "Configuración de la forma de pago"
-      minimum_price_error_message: "El precio no puede ser menor a %{amount}"
       accept: ~
       decline: ~
       quantity_label: ~
@@ -647,7 +640,6 @@ es:
       last_message_at: "(último mensaje %{time})"
       price: ~
       sum: ~
-      price_excludes_vat: ~
       total: ~
     status:
       payment_errored: ~
@@ -706,54 +698,11 @@ es:
       reject_preauthorized_request: ~
       confirm: "Marcar transacción completada."
       cancel: "No se llevó a cabo."
-  braintree_accounts:
-    new:
-      add_payout_details: "Añade los detalles de pago"
-      first_name: Nombre
-      last_name: Apellido
-      email: "Dirección de correo electrónico"
-      phone: Teléfono
-      address_street_address: Dirección
-      address_postal_code: "Código postal"
-      address_locality: Ciudad
-      address_region: Estado
-      date_of_birth: "Fecha de nacimiento"
-      ssn: "Número de Seguro Social"
-      routing_number: "Routing number del banco"
-      account_number: "Número de cuenta"
-      save: Guardar
-    show:
-      payout_details: "Datos para realizar pagos"
-      first_name: Nombre
-      last_name: Apellidos
-      email: "Correo Electrónico"
-      phone: Teléfono
-      address_street_address: Dirección
-      address_postal_code: "Código postal"
-      address_locality: Ciudad
-      address_region: Estado
-      date_of_birth: "Fecha de nacimiento"
-      ssn: "Número de Seguro Social"
-      routing_number: "Routing number del banco"
-      account_number: "Número de cuenta"
-  braintree_payments:
-    edit:
-      new_credit_card_payment: "Nuevo pago con tarjeta de crédito"
-      payment_receiver: ~
-      cardholder_name: "Titula de la Tarjeta"
-      credit_card_number: "Número de la Tarjeta de Crédito"
-      cvv: "Código de seguridad"
-      credit_card_expiration_date: "Fecha de caducidad"
-      confirm_payment: ~
-      exp: ~
   feedback:
     feedback_subject: ~
     feedback_body: ~
     unlogged_user: ~
     anonymous_user: ~
-  preauthorize_payments:
-    edit:
-      confirm_payment: ~
   community_memberships:
     access_denied:
       access_denied: ~
@@ -788,9 +737,6 @@ es:
       powered_by: ~
       create_own: ~
       learn_more: ~
-    braintree_account_approved:
-      account_ready: "Ya estás listo para recibir pagos"
-      message: "Tus detalles de pago han sido confirmados y ya puedes recibir pagos a través de %{service_name}."
     confirm_reminder:
       you_have_not_yet_confirmed_or_canceled_request: |-
           Aún no ha confirmado ni cancelado la solicitud
@@ -798,18 +744,10 @@ es:
           %{other_party_full_name}. Si la solicitud ha sido completada,
           debes confirmarla. Después podrás dar tú opinión a
           %{other_party_given_name}
-      you_have_not_yet_confirmed_or_canceled_request_escrow_automatic_confirmation: ~
       remember_to_confirm_request: "Recuerda confirmar o cancelar la solicitud"
       if_will_not_happen_you_should_cancel: "Si piensas que esta solicitud no sera completada por una u otra razón, puedes %{cancel_it_link}"
-      if_will_not_happen_you_should_cancel_escrow: ~
-      if_will_not_happen_you_should_cancel_escrow_automatic_confirmation: ~
       cancel_it_link_text: Cancelar
       automatic_confirmation: ~
-    payment_reminder:
-      remember_to_pay: "Recuerda pagar por %{listing_title}"
-      you_have_not_yet_paid: "No ha pagado por %{listing_title}  que %{other_party_name} ha aceptado en ofrecerle."
-      if_will_not_happen_you_should_cancel: "Si piensas que esta solicitud no será completada por una u otra razón, aún puedes %{cancel_it_link}"
-      cancel_it_link_text: Cancelar
     payment_settings_reminder:
       remember_to_add_payment_details: "Recuerda agregar los detalles de pago para poder recibir pagos"
       you_have_added_listing_with_payment: "Has añadido un nuevo anuncio %{listing_link} con pago, pero aún no has añadido tus detalles de pago. Recuerda que debes introducir y configurar tus datos de pago para poder recibir pagos de otros usuarios."
@@ -833,18 +771,11 @@ es:
       giving_feedback_is_good_idea: ~
       give_feedback_to: ~
       show_thread: ~
-    escrow_canceled:
-      subject: ~
-      has_marked_request_as_canceled: ~
-      if_this_was_error: ~
-      please_contant_admin_link: ~
     confirmation_instructions:
       confirmation_instructions_signature: "Saludos cordiales,<br/>El Equipo de %{service_name}"
-      welcome_to_kassi: "Bienvenido (a) a %{service_name}!"
       need_to_confirm: "Antes de empezar a utilizar %{service_name}, deberás confirmar tu dirección de correo electrónico con el siguiente link:"
       confirmation_link_text: "Confirmar mi cuenta"
       or_paste_link: "Como otra alternativa, puedes copiar el siguiente link a la barra de direcciones de tu explorador de web."
-      turning_on_confirmations_in_this_community: "Comenzamos a utilizar e-mails de confirmación en la comunidad %{service_name}."
     common:
       hey: "Hola %{name},"
       kassi_team: "El equipo %{service_name}"
@@ -897,7 +828,6 @@ es:
       price_payer_paid: "Precio que %{payer_full_name} pagó"
       service_fee: "Comisión de servicio de %{service_name}:"
       you_will_get: ~
-      money_will_be_transferred: ~
     receipt_to_payer:
       receipt_of_payment: "Recibo del pago realizado."
       you_have_made_new_payment: "Le has pagado <b>%{payment_sum}</b> a  %{recipient_full_name}  por <b>%{listing_title}</b>. Aquí está el comprobante."
@@ -926,7 +856,6 @@ es:
       title_link_text: "%{community_name}"
       intro_paragraph: "Aquí están algunas actualizaciones que han ocurrido en %{community_link} durante el pasado %{time_since_last_update}."
       intro_paragraph_link_text: "%{community_name}"
-      post_a_new_listing: "Publica un nuevo listado!"
       reduce_email_footer_text: "¿Demasiados emails? %{settings_link} o %{unsubscribe_link}."
       settings_link_text: "Edita tu configuración de email aquí"
       unsubscribe_link_text: "cancelar suscripción"
@@ -947,6 +876,8 @@ es:
       subject: ~
       transaction_requested_by_user: ~
       you_have_time_to_accept: ~
+      if_you_do_accept: ~
+      if_you_do_not_accept: ~
       click_here_to_reply: ~
     transaction_preauthorized_reminder:
       subject: ~
@@ -959,29 +890,20 @@ es:
       love_marketplace_crew: ~
       welcome_email_footer_text: "¿Qué tipo de emails desea recibir de %{service_name}? %{settings_link}"
       settings_link_text: "Revisa tu configuración"
-      welcome_email_subject_for_marketplace_creator: ~
-      welcome_to_marketplace_creator: ~
-      congrats_for_creating_your_marketplace: ~
-      here_is_your_account_information: ~
-      your_email_address: ~
-      your_marketplace_address: ~
-      your_marketplace_admin_area: ~
-      just_follow_details: ~
-      we_will_guide_you_along_the_way: ~
-      are_you_new_to_online_marketplaces: ~
-      have_questions: ~
-      our_happiness_team_is_here_to_help: ~
-      love: ~
-      sharetribe_crew: ~
-      knowledge_base_link_text: ~
-      contact_support_link_text: ~
-      admin_panel_link_text: ~
     new_listing_by_followed_person:
       subject: ~
       has_posted_a_new_listing: ~
       you_are_receiving_this_because: ~
       view_listing: ~
+    new_member_notification:
+      new_member_has_joined: ~
+      this_is_automatic_message: ~
+      person_name: ~
+      person_email: ~
   error_messages:
+    booking:
+      booking_failed_payment_voided: ~
+      double_booking_payment_voided: ~
     onboarding:
       server_rendering: ~
     listings:
@@ -996,6 +918,7 @@ es:
     transaction_agreement:
       required_error: ~
     paypal:
+      transaction_cannot_complete: ~
       buyer_cannot_pay_error: ~
       pending_review_error: ~
       seller_express_checkout_disabled: ~
@@ -1026,8 +949,8 @@ es:
       javascript_is_disabled_in_your_browser: "Javascript está desactivado en tu buscador"
       kassi_does_not_currently_work_without_javascript: "Desafortunadamente en la actualidad %{service_name} no funciona sin javascript. Intenta activar javascript en las preferencias de tu buscador y vuelva a cargar la página. Si deseas utilizar %{service_name} sin javascript, por favor envíanos una sugerencia utilizando el formulario que aparece a continuación."
       contact_us: contáctenos
-      send_feedback: "Enviar feedback"
-      your_feedback_to_admins: "Envía tu sugerencia al administrador"
+      send_feedback: ~
+      your_feedback_to_admins: ~
     send: Enviar
     your_email_address: "Tu dirección email"
   errors:
@@ -1203,6 +1126,9 @@ es:
       search: ~
       signup: ~
       search_placeholder: ~
+      search_location_placeholder: ~
+    listings:
+      no_listing_image: ~
   layouts:
     admin:
       admin: "Panel de administración de %{service_name}"
@@ -1213,17 +1139,17 @@ es:
     no_tribe:
       inbox: "Buzón de entrada"
       settings: Configuración
-      feedback: Contáctenos
+      feedback: ~
     application:
       join_this_community: "Únete a la comunidad"
       read_more: "Leer más"
-      feedback: "Sugerencia al equipo de %{service_name}"
-      default_feedback: "¿Tuviste algún problema con %{service_name}?¿Tienes alguna sugerencia para mejorar el servicio? ¿Notaste algún contenido sospechoso? ¿O quieres conversar sobre un tema con nosotros? Cuéntanos!"
+      feedback: ~
+      dont_use_to_contact_support: ~
       feedback_forum: "Forum de sugerencias"
       feedback_handle: Feedback
       give_feedback: Contáctenos
       or_check_our: "...o revisa nuestro"
-      send_feedback_to_admin: "Enviar sugerencia"
+      send_feedback_to_admin: ~
       to_see_what_others_have_suggested: "Ver lo que otros usuarios han sugerido."
       your_email_address: "Tu dirección email (obligatorio)"
       connect: Regístrate
@@ -1293,7 +1219,7 @@ es:
       error_with_session: "Error con la sesión."
       feedback_considered_spam: "Sugerencia no enviada debido a su formato. Inténtalo de nuevo o utiliza el foro para sugerencias."
       feedback_not_saved: "El feedback no pudo ser enviado."
-      feedback_saved: "Gracias por el feedback! Te contactaremos tan pronto como sea posible."
+      feedback_saved: ~
       feedback_sent_to: "Feedback enviado a %{target_person}"
       feedback_skipped: "Feedback omitido"
       invitation_cannot_be_sent: "No se pudo enviar la invitación"
@@ -1318,6 +1244,8 @@ es:
       offer_rejected: "Oferta rechazada"
       offer_canceled: "Oferta cancelada"
       listing_updated_successfully: "Listado actualizado!"
+      listing_updated_availability_management_enabled: ~
+      listing_updated_availability_management_disabled: ~
       only_kassi_administrators_can_access_this_area: "Sólo los administradores de %{service_name} pueden acceder a esta área"
       only_listing_author_can_close_a_listing: "Sólo el creador de una lista puede cerrarla"
       only_listing_author_can_edit_a_listing: "Sólo el creador de una lista puede editarla"
@@ -1374,21 +1302,17 @@ es:
       you_must_log_in_to_view_your_settings: "Debes registrarte en %{service_name} para ver tu configuración"
       you_must_log_in_to_add_news_item: "Debes iniciar sesión en %{service_name} para añadir un nuevo artículo"
       you_must_log_in_to_change_profile_settings: ~
-      you_must_log_in_to_change_payment_settings: ~
       you_must_log_in_to_accept_or_reject: ~
       you_must_log_in_to_confirm_or_cancel: ~
       you_need_to_confirm_your_account_first: "Deberás confirmar tu cuenta primero."
       you_must_fill_all_the_fields: "Debes llenar todos los campos"
       you_unfollowed_listing: "Ya no estás siguiendo este anuncio"
       joining_community_failed: "Error al unirte a esta comunidad"
-      can_not_login_with_private_user: ~
       can_not_delete_email: ~
       user_does_not_have_email_to_delete: "La dirección de correo electrónico que quieres eliminar no existe"
       email_deleted: "Dirección de correo electrónico eliminada"
-      payment_details_add_successful: "Se han añadido los datos de pago exitosamente"
-      payment_details_add_error: "No se han podido añadir los datos de pago"
       listing_author_payment_details_missing: ~
-      stylesheet_needs_recompiling: ~
+      images_are_processing: ~
       automatically_logged_out_please_sign_in: ~
     settings:
       account: Cuenta
@@ -1428,6 +1352,9 @@ es:
       open_in_google_maps: ~
     error:
       something_went_wrong: ~
+      something_went_wrong_plain: ~
+      create_failed_to_connect_to_booking_service: ~
+      update_failed_to_connect_to_booking_service: ~
     follow_links:
       follow: "Seguir este anuncio"
       unfollow: "Dejar de seguir este anuncio"
@@ -1490,8 +1417,6 @@ es:
         no_service_fee_you_will_get_paypal_text: ~
         after_service_fee_you_will_get_paypal_text: ~
         paypal_fee_info_link_text: ~
-        after_service_fee_you_will_get_vat: ~
-        price_excludes_vat: "El precio no incluye IVA."
         delivery: ~
         shipping: ~
         shipping_price: ~
@@ -1553,7 +1478,6 @@ es:
       request_type: "Tipo de solicitud"
       requests: Solicitudes
       rideshare: "Traslado compartido"
-      search_verb: Buscar
       you_have_something_others_do_not: "¿Tienes algo que ofecer?"
       feed_title: "%{listing_type} en %{community_name} de %{service_name}%{optional_category}"
     left_panel_link:
@@ -1577,8 +1501,8 @@ es:
       booking_to: ~
       how_paypal_works: ~
       payment_help: ~
+      unable_load_availability: ~
     new:
-      post_a_new_listing: "Publica un nuevo listado"
       listing: listado
       selected_category: "Categoría: %{category}"
       selected_subcategory: "Subcategoría: %{subcategory}"
@@ -1630,7 +1554,6 @@ es:
       times: veces
       times_viewed: Visto
       processing_uploaded_image: "(Procesando imagen...)"
-      price_excludes_vat: "(No incluye IVA)"
       listing_created_at: "Publicación creada"
       price:
         per_quantity_unit: ~
@@ -1653,6 +1576,8 @@ es:
       verification_required: ~
   listing_conversations:
     preauthorize:
+      dates_not_available: ~
+      error_in_checking_availability: ~
       details: ~
       by: ~
       payment: ~
@@ -1660,6 +1585,9 @@ es:
       you_will_be_charged: ~
       day: ~
       days: ~
+      night: ~
+      nights: ~
+      invalid_parameters: ~
     transaction_agreement_checkbox:
       read_more: ~
   mapview:
@@ -1681,7 +1609,6 @@ es:
       request_type: "Tipo de solicitud"
       requests: Solicitudes
       rideshare: "Traslado compartido"
-      search_verb: Buscar
       you_have_something_others_do_not: "¿Tienes algo para ofrecer?"
     please_comment: Comentario
   mercury:
@@ -1689,26 +1616,6 @@ es:
   okl:
     member_id: "Número de identificación"
     member_id_or_email: "Identificación de usuario o email"
-  payments:
-    new:
-      new_payment: "Nuevo pago"
-      continue: Continuar
-      payment_receiver: "Receptor del pago"
-      sum: "Monto a pagar"
-    form:
-      total: Total
-      service_charge: "Cargo por el servicio"
-      product: ~
-      price: ~
-      price_for: ~
-      continue_to_pay: Continuar
-      invoice: Factura
-      service_fee: "Comisión de servicio de %{service_name}:"
-      you_will_get: "Recibirás:"
-    braintree:
-      terms:
-        braintree_terms_also_included: "NOTA: Braintree es un servicio de transferencia de pagos y al utilizarlo aceptas sus términos y condiciones de uso %{terms_link_text}, además de los términos que aparecen más abajo."
-        terms_link_text: "Términos de uso de Braintree"
   paypal_accounts:
     payout_info_title: ~
     paypal_account_email_connected: ~
@@ -1719,6 +1626,7 @@ es:
     connected_account: ~
     paypal_receive_funds_info_label_australia_only: ~
     paypal_receive_funds_info_label: ~
+    paypal_receive_funds_info_australia_only: ~
     paypal_receive_funds_info: ~
     upgrade_paypal_account_link_text: ~
     admin_account_not_connected: ~
@@ -1807,7 +1715,6 @@ es:
       invitation_code: "Código de invitación:"
       not_required: ", no es necesario"
       notification_is_mandatory: ~
-      organization_name: ~
       password_again: "Confirma la contraseña:"
       show_my_name_to_others: "Mostrar mi nombre real a otros usuarios de %{service_name}"
       sign_up: "Crear una nueva cuenta en %{service_name}"
@@ -1869,16 +1776,6 @@ es:
       following: ~
       follow: ~
       unfollow: ~
-  search:
-    show:
-      all_results: "Todos los resultados"
-      loading_more_search_results: "Cargar más resultados de búsqueda"
-      offers: Ofertas
-      requests: Solicitudes
-      search: Buscar
-      search_results: "Resultados de búsqueda"
-      search_returned_no_results: "La búsqueda no ha generado resultados."
-      search_verb: buscar
   sessions:
     new:
       create_new_account: "Crear una cuenta nueva"
@@ -1909,8 +1806,11 @@ es:
       confirm_your_email: "Confirma tu e-mail"
       account_confirmation_instructions: "Pronto recibirás un e-mail con un link al que deberás hacer clic para confirmar la cuenta e-mail ingresada. Después de confirmar tu e-mail puedes comenzar a usar %{service_name}."
       account_confirmation_instructions_title_admin: ~
-      your_marketplace_has_now_been_created: ~
+      before_full_access_you_need_to_confirm_email: ~
+      before_confirmation_only_access_admin_dashboard: ~
+      admin_dashboard_link_text: ~
       account_confirmation_instructions_admin: ~
+      contact_support_link_text: ~
   settings:
     account:
       change: Cambiar
@@ -1946,7 +1846,6 @@ es:
       i_want_to_get_email_notification_when: "Quiero recibir una notificación por correo electrónico cuando..."
       newsletters: Boletines
       community_updates: "Actualizaciones de la comunidad"
-      email_about_accept_reminders: "...He olvidado aceptar un evento"
       email_about_confirm_reminders: "...He olvidado marcar una solicitud como completa."
       email_about_new_comments_to_own_listing: ".. .alguien comenta en mi oferta o solicitud"
       email_about_new_messages: ".. .alguien me envía un mensaje"
@@ -1959,7 +1858,6 @@ es:
       email_when_conversation_rejected: ".. .alguien rechaza mi oferta o solicitud"
       email_about_completed_transactions: "...alguien ha marcado mi oferta o demanda como satisfecha"
       email_about_new_payments: "...Recibí un nuevo pago."
-      email_about_payment_reminders: "Me olvidé de pagar"
       email_about_new_listings_by_followed_people: ~
       unsubscribe_succesful: "Suscripción cancelada exitosamente"
       unsubscribe_info_text: "Ya no recibirás más emails de este tipo. Revisa tu %{settings_link} para seleccionar otros emails que quieras o no quieras recibir, o vuelve a %{homepage_link}."
@@ -1974,6 +1872,8 @@ es:
       given_name: "Nombre:"
       first_name_with_initial: ~
       first_name_only: ~
+      display_name: ~
+      display_name_description: ~
       location_description: "Puedes dar tu ubicación exacta o sólo tu código postal. Por favor añade al menos tu código postal. También puedes elegir una localización desde el mapa."
       phone_number: "Número de teléfono:"
       profile_picture: "Foto de perfil"
@@ -2107,7 +2007,9 @@ es:
   transactions:
     initiate:
       booked_days: ~
+      booked_nights: ~
       price_per_day: ~
+      price_per_night: ~
       quantity: ~
       subtotal: ~
       shipping-price: ~
@@ -2120,15 +2022,54 @@ es:
     day: ~
     days: ~
   web:
+    listings:
+      errors:
+        availability:
+          something_went_wrong: ~
+          saving_failed: ~
+      pricing_units:
+        piece: ~
+        hour: ~
+        day: ~
+        night: ~
+        week: ~
+        month: ~
+      edit_availability_header: ~
+      save_and_close_availability_editing: ~
+      confirm_discarding_unsaved_availability_changes_explanation: ~
+      confirm_discarding_unsaved_availability_changes_question: ~
+      edit_listing_availability: ~
+    no_listings:
+      sorry: ~
+      try_other_search_terms: ~
+    listing_card:
+      add_picture: ~
+      no_picture: ~
+    search:
+      page: ~
+      page_of_pages: ~
     topbar:
       menu: ~
+      more: ~
       search_placeholder: ~
+      search_location_placeholder: ~
       user: ~
       inbox: ~
       profile: ~
       manage_listings: ~
       settings: ~
       logout: ~
+      login: ~
+      signup: ~
+      admin_dashboard: ~
+      language: ~
+    utils:
+      km: ~
+      mi: ~
+    branding:
+      powered_by: ~
+      create_own: ~
+      learn_more: ~
   will_paginate:
     previous_label: ~
     next_label: ~

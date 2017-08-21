@@ -4,10 +4,38 @@
     "multi_column"  => "multi-column",
   }
 
-  background_enabled     = !s["background_image"].nil?
-  background_image_style = background_enabled ? "url('#{s["background_image"]["src"]}')" : "none"
-  section_style_modifier = background_enabled ? "background" : "blank"
-  variation_modifier     = variation_modifiers[s["variation"]]
+  background_image_modifiers = {
+    "light" => "background-image--light",
+    "dark" => "background-image--dark",
+    "transparent" => "background"
+  }
+  background_image_modifiers.default = "background-image--dark"
+
+  background_image_enabled  = !s["background_image"].nil?
+  background_image_style    = background_image_enabled ? "background-image: url('#{s["background_image"]["src"]}');" : ""
+  background_color_enabled  = !s["background_color"].nil?
+  variation_modifier        = variation_modifiers[s["variation"]]
+  background_color_style    = background_color_enabled ? "background-color: rgb(#{s["background_color"].join(",")});" : "";
+
+  section_style_modifier =
+    if background_image_enabled
+      background_image_modifiers[s["background_image_variation"]]
+    elsif background_color_enabled
+      "background-color"
+    elsif second_wo_background
+      "zebra"
+    else
+      "blank"
+    end
+
+  button_modifier =
+    if background_image_enabled
+      ""
+    elsif background_color_enabled
+      "--inverted"
+    else
+      "--ghost"
+    end
 %>
 
 <% content_for :info_css do %>
@@ -20,6 +48,15 @@
         color: rgb(<%= s["button_color"]["value"].join(",") %>);
         border-color: rgb(<%= s["button_color"]["value"].join(",") %>);
       }
+
+      .<%= section_id %>__info__button--inverted {
+        color: rgb(<%= s["button_color"]["value"].join(",") %>);
+      }
+
+      .<%= section_id %>__info__button--inverted:hover {
+        color: #FFF;
+        background-color: rgb(<%= s["button_color_hover"]["value"].join(",") %>);
+      }
     <% end %>
 
     <% if s["button_color_hover"] %>
@@ -31,22 +68,45 @@
     <% end %>
 
     <% if s["variation"] == "multi_column" && s["icon_color"] %>
-      .<%= section_id %>__info__column-icon > svg > g {
+      .<%= section_id %>__info__column-icon > svg g,
+      .<%= section_id %>__info__column-icon > svg circle,
+      .<%= section_id %>__info__column-icon > svg path  {
         stroke: rgb(<%= s["icon_color"]["value"].join(",") %>);
+      }
+      .<%= section_id %>__info__column-icon > svg .icon-no-stroke {
+        stroke: none;
+      }
+      .<%= section_id %>__info__column-icon > svg .icon-custom-color-fill {
+        fill: rgb(<%= s["icon_color"]["value"].join(",") %>);
+      }
+    <% end %>
+
+    <% if s["paragraph_link_color"] %>
+      .info__paragraph--markdown a,
+      .info__column-paragraph--markdown a {
+        color: rgb(<%= s["paragraph_link_color"]["value"].join(",") %>);
+      }
+    <% end %>
+
+    <% if s["paragraph_link_color_hover"] %>
+      .info__paragraph--markdown a:hover,
+      .info__column-paragraph--markdown a:hover {
+        color: rgb(<%= s["paragraph_link_color_hover"]["value"].join(",") %>);
       }
     <% end %>
 <% end %>
 
-<section id="<%= section_id %>" class="info__section--<%= section_style_modifier %>" style="background-image: <%= background_image_style %>">
+<section id="<%= section_id %>" class="info__section--<%= section_style_modifier %>" style="<%= background_image_style %> <%= background_color_style %>">
   <div class="info__content--<%= variation_modifier %>">
     <h1 class="info__title--<%= variation_modifier %>"><%= s["title"] %></h1>
     <% case s["variation"] %>
     <% when "single_column" %>
 
-      <p class="info__paragraph"><%= s["paragraph"] %></p>
+      <div class="info__paragraph--markdown">
+        <%= render_markdown_array(s["paragraph"]) %>
+      </div>
 
       <% if s["button_title"] %>
-        <% button_modifier = background_enabled ? "" : "--ghost" %>
         <a class="info__button<%= button_modifier %> <%= section_id %>__info__button<%= button_modifier %>" href="<%= s["button_path"]["value"] %>"><%= s["button_title"] %></a>
       <% end %>
 
@@ -64,16 +124,21 @@
       <div class="info__columns">
         <% s["columns"].each do |c| %>
           <div class="info__column--<%= multi_column_modifier %>">
-            <% if c["icon"] %>
-              <div class="info__column-icon <%= section_id %>__info__column-icon">
-                <%= render partial: "icon", locals: { icon: c["icon"] } %>
+            <div class="info__column-text-content">
+              <% if c["icon"] %>
+                <div class="info__column-icon <%= section_id %>__info__column-icon">
+                  <%= render partial: "icon", locals: { icon: c["icon"] } %>
+                </div>
+              <% end %>
+              <h2 class="info__column-title"><%= c["title"] %></h2>
+
+              <div class="info__column-paragraph--markdown">
+                <%= render_markdown_array(c["paragraph"]) %>
               </div>
-            <% end %>
-            <h2 class="info__column-title"><%= c["title"] %></h2>
-            <p class="info__column-paragraph"><%= c["paragraph"] %></p>
+            </div>
 
             <% if c["button_title"] %>
-              <a class="info__button--ghost <%= section_id %>__info__button--ghost" href="<%= c['button_path']['value'] %>"><%= c["button_title"]%></a>
+              <a class="info__column-button--ghost <%= section_id %>__info__button--ghost" href="<%= c['button_path']['value'] %>"><%= c["button_title"]%></a>
             <% end %>
           </div>
         <% end %>

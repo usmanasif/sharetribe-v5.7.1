@@ -1,15 +1,15 @@
-require_relative '../api'
+require "spec_helper"
 
 describe PaypalService::API::BillingAgreements do
 
-  AccountStore = PaypalService::Store::PaypalAccount
+  let(:account_store) { PaypalService::Store::PaypalAccount }
 
   before(:each) do
     # Test version of merchant client
     PaypalService::API::Api.reset!
-    @events = PaypalService::API::Api.events
+    @events = PaypalService::API::Api.build_test_events
     @api_builder = PaypalService::API::Api.api_builder
-    @payments = PaypalService::API::Api.payments
+    @payments = PaypalService::API::Api.build_test_payments(events: @events)
     @billing_agreements = PaypalService::API::Api.billing_agreements
 
     @process = PaypalService::API::Process.new
@@ -29,7 +29,7 @@ describe PaypalService::API::BillingAgreements do
     @billing_agreement_id = "bagrid"
 
     # Normal personal account
-    AccountStore.create(opts:
+    account_store.create(opts:
       {
         active: true,
         person_id: @person_id,
@@ -44,7 +44,7 @@ describe PaypalService::API::BillingAgreements do
       })
 
     # Admin personal account (same Paypal account as Community account)
-    AccountStore.create(opts:
+    account_store.create(opts:
       {
         active: true,
         person_id: @admin_person_id,
@@ -59,7 +59,7 @@ describe PaypalService::API::BillingAgreements do
       })
 
     # Community account
-    AccountStore.create(opts:
+    account_store.create(opts:
       {
         active: true,
         community_id: @cid,
@@ -127,7 +127,7 @@ describe PaypalService::API::BillingAgreements do
       do_payment!(@admin_person_id)
       @payments.full_capture(@cid, @tx_id, { payment_total: @payment_total })
 
-      AccountStore.create(opts:
+      account_store.create(opts:
         {
           person_id: @payer_id_admin,
           community_id: @cid,
@@ -165,7 +165,7 @@ describe PaypalService::API::BillingAgreements do
       @payments.full_capture(@cid, @tx_id, { payment_total: @payment_total })
       SyncDelayedJobObserver.collect!
 
-      process_status = @billing_agreements.charge_commission(@cid, @person_id, @commission_info, async: true)[:data]
+      process_status = @billing_agreements.charge_commission(@cid, @person_id, @commission_info, force_sync: false)[:data]
       expect(process_status[:completed]).to eq(false)
 
       SyncDelayedJobObserver.process_queue!

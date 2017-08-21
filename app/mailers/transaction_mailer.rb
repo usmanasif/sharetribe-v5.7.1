@@ -15,37 +15,7 @@ class TransactionMailer < ActionMailer::Base
   default :from => APP_CONFIG.sharetribe_mail_from_address
   layout 'email'
 
-  include MoneyRails::ActionViewExtension # this is for humanized_money_with_symbol
-
   add_template_helper(EmailTemplateHelper)
-
-  def transaction_created(transaction)
-    community = transaction.community
-
-    recipient = transaction.author
-    sender = transaction.starter
-    sender_name = sender.name(community)
-
-    url_params = build_url_params(community, recipient)
-    reply_url = person_transaction_url(recipient, url_params.merge(:id => transaction.id))
-
-    prepare_template(community, recipient)
-
-    # TODO Now that we have splitted "new message", we could be more specific here, and say that this message
-    # is about a new transaction!
-    with_locale(recipient.locale, community.locales.map(&:to_sym), community.id) do
-      premailer_mail(
-        mail_params(recipient, community, t("emails.new_message.you_have_a_new_message", :sender_name => sender_name))) do |format|
-        format.html {
-          render locals: {
-                   recipient: recipient,
-                   reply_url: reply_url,
-                   sender_name: sender_name,
-                 }
-        }
-      end
-    end
-  end
 
   def transaction_preauthorized(transaction)
     @transaction = transaction
@@ -69,7 +39,7 @@ class TransactionMailer < ActionMailer::Base
         mail_params(
           @recipient,
           @community,
-          t("emails.transaction_preauthorized.subject", requester: transaction.starter.name(@community), listing_title: transaction.listing.title))) do |format|
+          t("emails.transaction_preauthorized.subject", requester: PersonViewUtils.person_display_name(transaction.starter, @community), listing_title: transaction.listing.title))) do |format|
         format.html {
           render locals: {
                    payment_expires_in_unit: expires_in[:unit],
@@ -96,74 +66,6 @@ class TransactionMailer < ActionMailer::Base
     end
   end
 
-  def braintree_new_payment(payment, community)
-    recipient = payment.recipient
-    prepare_template(community, payment.recipient, "email_about_new_payments")
-    with_locale(recipient.locale, community.locales.map(&:to_sym), community.id) do
-
-      service_fee = payment.total_commission
-      you_get = payment.seller_gets
-
-      transaction = payment.tx
-      unit_type = Maybe(transaction).select { |t| t.unit_type.present? }.map { |t| ListingViewUtils.translate_unit(t.unit_type, t.unit_tr_key) }.or_else(nil)
-      duration = payment.tx.booking.present? ? payment.tx.booking.duration : nil
-
-      premailer_mail(:to => payment.recipient.confirmed_notification_emails_to,
-                     :from => community_specific_sender(community),
-                     :subject => t("emails.new_payment.new_payment")) { |format|
-        format.html {
-          render "braintree_payment_receipt_to_seller", locals: {
-                   conversation_url: person_transaction_url(payment.recipient, @url_params.merge({:id => payment.tx.id.to_s})),
-                   listing_title: payment.tx.listing_title,
-                   price_per_unit_title: t("emails.new_payment.price_per_unit_type", unit_type: unit_type),
-                   listing_price: humanized_money_with_symbol(payment.tx.unit_price),
-                   listing_quantity: payment.tx.listing_quantity,
-                   duration: duration,
-                   payment_total: humanized_money_with_symbol(payment.total_sum),
-                   payment_service_fee: humanized_money_with_symbol(-service_fee),
-                   payment_seller_gets: humanized_money_with_symbol(you_get),
-                   payer_full_name: payment.payer.name(community),
-                   payer_given_name: payment.payer.given_name_or_username,
-                   automatic_confirmation_days: payment.tx.automatic_confirmation_after_days,
-                   show_money_will_be_transferred_note: true
-                 }
-        }
-      }
-    end
-  end
-
-  def braintree_receipt_to_payer(payment, community)
-    recipient = payment.payer
-    prepare_template(community, recipient, "email_about_new_payments")
-    with_locale(recipient.locale, community.locales.map(&:to_sym), community.id) do
-
-      unit_type = Maybe(payment.tx).select { |t| t.unit_type.present? }.map { |t| ListingViewUtils.translate_unit(t.unit_type, t.unit_tr_key) }.or_else(nil)
-      duration = payment.tx.booking.present? ? payment.tx.booking.duration : nil
-
-      premailer_mail(:to => payment.payer.confirmed_notification_emails_to,
-                     :from => community_specific_sender(community),
-                     :subject => t("emails.receipt_to_payer.receipt_of_payment")) { |format|
-        format.html {
-          render "payment_receipt_to_buyer", locals: {
-                   conversation_url: person_transaction_url(payment.payer, @url_params.merge({:id => payment.tx.id.to_s})),
-                   listing_title: payment.tx.listing_title,
-                   price_per_unit_title: t("emails.new_payment.price_per_unit_type", unit_type: unit_type),
-                   listing_price: humanized_money_with_symbol(payment.tx.unit_price),
-                   listing_quantity: payment.tx.listing_quantity,
-                   duration: duration,
-                   payment_total: humanized_money_with_symbol(payment.total_sum),
-                   subtotal: humanized_money_with_symbol(payment.total_sum),
-                   shipping_total: nil,
-                   recipient_full_name: payment.recipient.name(community),
-                   recipient_given_name: payment.recipient.given_name_or_username,
-                   automatic_confirmation_days: payment.tx.automatic_confirmation_after_days,
-                   show_money_will_be_transferred_note: true
-                 }
-        }
-      }
-    end
-  end
-
   # seller_model, buyer_model and community can be passed as params for testing purposes
   def paypal_new_payment(transaction, seller_model = nil, buyer_model = nil, community = nil)
     seller_model ||= Person.find(transaction[:listing_author_id])
@@ -182,6 +84,11 @@ class TransactionMailer < ActionMailer::Base
       unit_type = Maybe(transaction).select { |t| t[:unit_type].present? }.map { |t| ListingViewUtils.translate_unit(t[:unit_type], t[:unit_tr_key]) }.or_else(nil)
       quantity_selector_label = Maybe(transaction).select { |t| t[:unit_type].present? }.map { |t| ListingViewUtils.translate_quantity(t[:unit_type], t[:unit_selector_tr_key]) }.or_else(nil)
 
+      FeatureFlagHelper.init(community_id: community.id,
+                             user_id: seller_model.id,
+                             request: OpenStruct.new(session: {}, params: []), #fake request, will provide fake .session and .params
+                             is_admin: seller_model.is_admin?,
+                             is_marketplace_admin: seller_model.is_marketplace_admin?(community)) # TODO: remove when :currency_formatting flag is removed
       premailer_mail(:to => seller_model.confirmed_notification_emails_to,
                      :from => community_specific_sender(community),
                      :subject => t("emails.new_payment.new_payment")) do |format|
@@ -191,17 +98,17 @@ class TransactionMailer < ActionMailer::Base
                    listing_title: transaction[:listing_title],
                    price_per_unit_title: t("emails.new_payment.price_per_unit_type", unit_type: unit_type),
                    quantity_selector_label: quantity_selector_label,
-                   listing_price: humanized_money_with_symbol(transaction[:listing_price]),
+                   listing_price: MoneyViewUtils.to_humanized(transaction[:listing_price]),
                    listing_quantity: transaction[:listing_quantity],
                    duration: transaction[:booking].present? ? transaction[:booking][:duration] : nil,
-                   subtotal: humanized_money_with_symbol(transaction[:item_total]),
-                   payment_total: humanized_money_with_symbol(payment_total),
-                   shipping_total: humanized_money_with_symbol(transaction[:shipping_price]),
-                   payment_service_fee: humanized_money_with_symbol(-service_fee),
-                   paypal_gateway_fee: humanized_money_with_symbol(-gateway_fee),
-                   payment_seller_gets: humanized_money_with_symbol(you_get),
+                   subtotal: MoneyViewUtils.to_humanized(transaction[:item_total]),
+                   payment_total: MoneyViewUtils.to_humanized(payment_total),
+                   shipping_total: MoneyViewUtils.to_humanized(transaction[:shipping_price]),
+                   payment_service_fee: MoneyViewUtils.to_humanized(-service_fee),
+                   paypal_gateway_fee: MoneyViewUtils.to_humanized(-gateway_fee),
+                   payment_seller_gets: MoneyViewUtils.to_humanized(you_get),
                    payer_full_name: buyer_model.name(community),
-                   payer_given_name: buyer_model.given_name_or_username,
+                   payer_given_name: PersonViewUtils.person_display_name_for_type(buyer_model, "first_name_only"),
                  }
         }
       end
@@ -220,6 +127,11 @@ class TransactionMailer < ActionMailer::Base
       unit_type = Maybe(transaction).select { |t| t[:unit_type].present? }.map { |t| ListingViewUtils.translate_unit(t[:unit_type], t[:unit_tr_key]) }.or_else(nil)
       quantity_selector_label = Maybe(transaction).select { |t| t[:unit_type].present? }.map { |t| ListingViewUtils.translate_quantity(t[:unit_type], t[:unit_selector_tr_key]) }.or_else(nil)
 
+      FeatureFlagHelper.init(community_id: community.id,
+                             user_id: buyer_model.id,
+                             request: OpenStruct.new(session: {}, params: []), #fake request, will provide fake .session and .params
+                             is_admin: buyer_model.is_admin?,
+                             is_marketplace_admin: buyer_model.is_marketplace_admin?(community)) # TODO: remove when :currency_formatting flag is removed
       premailer_mail(:to => buyer_model.confirmed_notification_emails_to,
                      :from => community_specific_sender(community),
                      :subject => t("emails.receipt_to_payer.receipt_of_payment")) { |format|
@@ -229,14 +141,14 @@ class TransactionMailer < ActionMailer::Base
                    listing_title: transaction[:listing_title],
                    price_per_unit_title: t("emails.receipt_to_payer.price_per_unit_type", unit_type: unit_type),
                    quantity_selector_label: quantity_selector_label,
-                   listing_price: humanized_money_with_symbol(transaction[:listing_price]),
+                   listing_price: MoneyViewUtils.to_humanized(transaction[:listing_price]),
                    listing_quantity: transaction[:listing_quantity],
                    duration: transaction[:booking].present? ? transaction[:booking][:duration] : nil,
-                   subtotal: humanized_money_with_symbol(transaction[:item_total]),
-                   shipping_total: humanized_money_with_symbol(transaction[:shipping_price]),
-                   payment_total: humanized_money_with_symbol(transaction[:payment_total]),
+                   subtotal: MoneyViewUtils.to_humanized(transaction[:item_total]),
+                   shipping_total: MoneyViewUtils.to_humanized(transaction[:shipping_price]),
+                   payment_total: MoneyViewUtils.to_humanized(transaction[:payment_total]),
                    recipient_full_name: seller_model.name(community),
-                   recipient_given_name: seller_model.given_name_or_username,
+                   recipient_given_name: PersonViewUtils.person_display_name_for_type(seller_model, "first_name_only"),
                    automatic_confirmation_days: nil,
                    show_money_will_be_transferred_note: false
                  }

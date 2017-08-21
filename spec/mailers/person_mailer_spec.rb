@@ -23,7 +23,7 @@ describe PersonMailer, type: :mailer do
     email = MailCarrier.deliver_now(PersonMailer.new_message_notification(@message, @community))
     assert !ActionMailer::Base.deliveries.empty?
     assert_equal @test_person2.confirmed_notification_email_addresses, email.to
-    assert_equal "A new message in Sharetribe from #{@message.sender.name('first_name_with_initial')}", email.subject
+    assert_equal "A new message in Sharetribe from #{PersonViewUtils.person_display_name_for_type(@message.sender, 'first_name_with_initial')}", email.subject
   end
 
   it "should send email about a new comment to own listing" do
@@ -94,19 +94,6 @@ describe PersonMailer, type: :mailer do
 
   end
 
-  it "should send email about approved Braintree account" do
-    community = FactoryGirl.create(:community)
-    person = FactoryGirl.create(:person)
-    email = MailCarrier.deliver_now(PersonMailer.braintree_account_approved(person, community))
-
-    assert !ActionMailer::Base.deliveries.empty?
-    assert_equal person.confirmed_notification_email_addresses, email.to
-    assert_equal "You are ready to receive payments", email.subject
-    assert_equal "You are ready to receive payments", email.subject
-
-    expect(email.body.include?("Your payment information has been confirmed and you are now ready")).to be_truthy
-  end
-
   it "should send email about a new testimonial" do
     @test_person.update_attributes({ "given_name" => "Teppo", "family_name" => "Testaaja" })
 
@@ -137,19 +124,6 @@ describe PersonMailer, type: :mailer do
     assert_equal "Reminder: remember to give feedback to Teppo T", email.subject
   end
 
-  it "should remind to accept or reject" do
-    starter = FactoryGirl.build(:person, given_name: "Jack", family_name: "Dexter")
-    author = FactoryGirl.build(:person)
-    listing = FactoryGirl.build(:listing, :author => author, listing_shape_id: 123)
-    conversation = FactoryGirl.create(:transaction, starter: starter, listing: listing)
-
-    email = MailCarrier.deliver_now(PersonMailer.accept_reminder(conversation, "this_can_be_anything", @community))
-    assert !ActionMailer::Base.deliveries.empty?
-
-    assert_equal author.confirmed_notification_email_addresses, email.to
-    assert_equal "Remember to accept or reject a request from Jack D", email.subject
-  end
-
   it "should send email to admins of new feedback" do
     @feedback = FactoryGirl.create(:feedback)
     @community = FactoryGirl.create(:community)
@@ -172,7 +146,7 @@ describe PersonMailer, type: :mailer do
     @community = FactoryGirl.create(:community, :email_admins_about_new_members => 1)
     m = CommunityMembership.create(:person_id => @test_person.id, :community_id => @community.id, :status => "accepted")
     m.update_attribute(:admin, true)
-    email = MailCarrier.deliver_now(PersonMailer.new_member_notification(@test_person2, @community, @test_person2.email))
+    email = MailCarrier.deliver_now(PersonMailer.new_member_notification(@test_person2, @community, @community.admins.first))
     assert !ActionMailer::Base.deliveries.empty?
     assert_equal @test_person.confirmed_notification_email_addresses, email.to
     assert_equal "New member in #{@community.full_name('en')}", email.subject

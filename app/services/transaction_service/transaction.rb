@@ -1,26 +1,28 @@
 module TransactionService::Transaction
 
+  class IllegalTransactionStateException < Exception
+  end
+
   DataTypes = TransactionService::DataTypes::Transaction
+  ProcessStatus = TransactionService::DataTypes::ProcessStatus
 
   TxStore = TransactionService::Store::Transaction
+  ProcessTokenStore = TransactionService::Store::ProcessToken
+
+  DEPRECATED_GATEWAYS = [:braintree, :checkout]
 
   SETTINGS_ADAPTERS = {
     paypal: TransactionService::Gateway::PaypalSettingsAdapter.new,
-    braintree: TransactionService::Gateway::BraintreeSettingsAdapter.new,
-    checkout: TransactionService::Gateway::BraintreeSettingsAdapter.new, # Checkout handles configuration the same way as BT
     none: TransactionService::Gateway::FreeSettingsAdapter.new
   }
 
   GATEWAY_ADAPTERS = {
     paypal: TransactionService::Gateway::PaypalAdapter.new,
-    braintree: TransactionService::Gateway::BraintreeAdapter.new,
-    checkout: TransactionService::Gateway::CheckoutAdapter.new,
-    none: TransactionService::Gateway::FreeAdapter.new
+    none: TransactionService::Gateway::FreeAdapter.new,
   }
 
   TX_PROCESSES = {
     preauthorize: TransactionService::Process::Preauthorize.new,
-    postpay: TransactionService::Process::Postpay.new,
     none: TransactionService::Process::Free.new
   }
 
@@ -79,7 +81,7 @@ module TransactionService::Transaction
     Result::Success.new(result: set_adapter.configured?(community_id: community_id, author_id: author_id))
   end
 
-  def create(opts, paypal_async: false)
+  def create(opts, force_sync: true)
     opts_tx = opts[:transaction]
 
     set_adapter = settings_adapter(opts_tx[:payment_gateway])
@@ -92,11 +94,52 @@ module TransactionService::Transaction
     res = tx_process.create(tx: tx,
                             gateway_fields: opts[:gateway_fields],
                             gateway_adapter: gateway_adapter,
-                            prefer_async: paypal_async)
+                            force_sync: force_sync)
 
     res.maybe()
       .map { |gw_fields| Result::Success.new(DataTypes.create_transaction_response(query(tx[:id]), gw_fields)) }
       .or_else(res)
+  end
+
+  def finalize_create(community_id:, transaction_id:, force_sync: true)
+    tx = TxStore.get_in_community(community_id: community_id, transaction_id: transaction_id)
+
+    # Try to find existing process token
+    # This may happen if finalize_create action has been called already, for example
+    # as a reaction to payment event
+    proc_token = ProcessTokenStore.get_by_transaction(community_id: community_id,
+                                                      transaction_id: transaction_id,
+                                                      op_name: :do_finalize_create)
+
+    res =
+      if !force_sync && proc_token.present?
+        proc_status_response(proc_token)
+      elsif tx.nil?
+        # Transaction doesn't exist.
+        #
+        # This may happen if the finalize_create action has been called already, and it failed.
+        # If the finalization fails (e.g. booking fails), we void the payment and delete the
+        # transaction.
+        Result::Error.new("Can't find transaction, id: #{transaction_id}, community_id: #{community_id}", {code: :tx_not_existing})
+      else
+        tx_process = tx_process(tx[:payment_process])
+        gw = gateway_adapter(tx[:payment_gateway])
+
+        tx_process.finalize_create(
+          tx: tx,
+          gateway_adapter: gw,
+          force_sync: force_sync)
+      end
+
+    res.and_then { |tx_fields|
+      # Transaction may be nil, if it has been deleted due to voided payment
+      m_tx = Maybe(tx)
+
+      Result::Success.new(DataTypes.create_transaction_response(
+                            m_tx.map { |tx_val| query(tx_val[:id]) }.or_else(nil),
+                            {},
+                            tx_fields))
+    }
   end
 
   def reject(community_id:, transaction_id:, message: nil, sender_id: nil)
@@ -122,14 +165,6 @@ module TransactionService::Transaction
     res.maybe()
       .map { |gw_fields| Result::Success.new(DataTypes.create_transaction_response(query(tx[:id]), gw_fields)) }
       .or_else(res)
-  end
-
-  def invoice
-    raise NoMethodError.new("Not implemented")
-  end
-
-  def pay_invoice
-    raise NoMethodError.new("Not implemented")
   end
 
   def complete(community_id:, transaction_id:, message: nil, sender_id: nil)
@@ -180,13 +215,26 @@ module TransactionService::Transaction
     end
   end
 
-  def to_tx_response(tx)
-    gw = gateway_adapter(tx[:payment_gateway])
-    payment_details = gw.get_payment_details(tx: tx)
+  def payment_details(tx)
+    if DEPRECATED_GATEWAYS.include?(tx[:payment_gateway])
+      ActiveSupport::Deprecation.warn(
+        "Payment gateway adapter '#{tx[:payment_gateway]}' is deprecated.")
 
+      { payment_total: nil,
+        total_price: tx[:unit_price] * tx[:listing_quantity],
+        charged_commission: nil,
+        payment_gateway_fee: nil }
+    else
+      gw = gateway_adapter(tx[:payment_gateway])
+      gw.get_payment_details(tx: tx)
+    end
+  end
+
+  def to_tx_response(tx)
     item_total = tx[:unit_price] * tx[:listing_quantity]
     commission_total = calculate_commission(item_total, tx[:commission_from_seller], tx[:minimum_commission])
 
+    payment = payment_details(tx)
 
     DataTypes.create_transaction(
       {
@@ -194,13 +242,16 @@ module TransactionService::Transaction
         payment_process: tx[:payment_process],
         payment_gateway: tx[:payment_gateway],
         community_id: tx[:community_id],
+        community_uuid: tx[:community_uuid],
         starter_id: tx[:starter_id],
         listing_id: tx[:listing_id],
+        listing_uuid: tx[:listing_uuid],
         listing_title: tx[:listing_title],
         listing_price: tx[:unit_price],
         unit_type: tx[:unit_type],
         unit_tr_key: tx[:unit_tr_key],
         unit_selector_tr_key: tx[:unit_selector_tr_key],
+        availability: tx[:availability],
         item_total: item_total,
         shipping_price: tx[:shipping_price],
         listing_author_id: tx[:listing_author_id],
@@ -208,13 +259,13 @@ module TransactionService::Transaction
         automatic_confirmation_after_days: tx[:automatic_confirmation_after_days],
         last_transition_at: tx[:last_transition_at],
         current_state: tx[:current_state],
-        payment_total: payment_details[:payment_total],
+        payment_total: payment[:payment_total],
         minimum_commission: tx[:minimum_commission],
         commission_from_seller: tx[:commission_from_seller],
-        checkout_total: payment_details[:total_price],
+        checkout_total: payment[:total_price],
         commission_total: commission_total,
-        charged_commission: payment_details[:charged_commission],
-        payment_gateway_fee: payment_details[:payment_gateway_fee],
+        charged_commission: payment[:charged_commission],
+        payment_gateway_fee: payment[:payment_gateway_fee],
         shipping_address: tx[:shipping_address],
         booking: tx[:booking]})
   end
@@ -238,5 +289,13 @@ module TransactionService::Transaction
 
   def paypal_billing_agreement_api
     PaypalService::API::Api.billing_agreements
+  end
+
+  def proc_status_response(proc_token)
+    Result::Success.new(
+      ProcessStatus.create_process_status({
+                                            process_token: proc_token[:process_token],
+                                            completed: proc_token[:op_completed],
+                                            result: proc_token[:op_output]}))
   end
 end

@@ -19,6 +19,8 @@ module ListingIndexService::DataTypes
     [:latitude, :to_float, :optional],
     [:longitude, :to_float, :optional],
     [:distance_max, :to_float, :optional],
+    [:scale, :to_float, :optional],
+    [:offset, :to_float, :optional],
     [:sort, :symbol, :optional],
     [:distance_unit, :symbol, :optional],
     [:categories, :array, :optional],
@@ -43,10 +45,9 @@ module ListingIndexService::DataTypes
   Author = EntityUtils.define_builder(
     [:id, :string, :mandatory],
     [:username, :string, :mandatory],
-    [:first_name, :string, :optional], # For organization, first_name is optional
-    [:last_name, :string, :optional], # For organization, last_name is optional
-    [:organization_name, :string],
-    [:is_organization, :bool, default: false],
+    [:first_name, :string, :optional],
+    [:last_name, :string, :optional],
+    [:display_name, :string, :optional],
     [:avatar, entity: AvatarImage],
     [:is_deleted, :bool, default: false],
     [:num_of_reviews, :fixnum, default: 0]

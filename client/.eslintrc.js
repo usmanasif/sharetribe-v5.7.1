@@ -23,11 +23,14 @@ module.exports = {
   env: {
     browser: true,
     es6: true,
+    mocha: true,
+    node: true
   },
   globals: {
     // `process` global is added by Webpack plugin.
     // Tell the existence of `process` to ESLint
-    process: false
+    process: false,
+    storybookFacade: false,
   },
   rules: {
     // See http://eslint.org/docs/rules/ for documentation for
@@ -153,7 +156,15 @@ module.exports = {
       allowArrayStart: true,
     }],
     'new-cap': 0,
-    'babel/new-cap': 2,
+    'babel/new-cap': [2, {
+      "capIsNewExceptions": [
+        "Immutable.List",
+        "Immutable.Map",
+        "Immutable.Record",
+        "Immutable.Set",
+        "Immutable.Range"
+        ]
+    }],
     'new-parens': 2,
     'newline-per-chained-call': 2,
     'no-array-constructor': 2,
@@ -194,7 +205,7 @@ module.exports = {
     'arrow-spacing': 2,
     'generator-star-spacing': 0,
     'babel/generator-star-spacing': 2,
-    'no-confusing-arrow': 2,
+    'no-confusing-arrow': [2, { allowParens: true }],
     'no-duplicate-imports': 2,
     'no-useless-computed-key': 2,
     'no-useless-constructor': 2,
@@ -214,11 +225,11 @@ module.exports = {
     'react/no-danger': 2,
     'react/no-set-state': 2,
     'react/no-string-refs': 2,
+    'react/no-find-dom-node': 1,
     'react/prefer-es6-class': 2,
     'react/require-render-return': 2,
     'react/self-closing-comp': 2,
     'react/sort-comp': 2,
-    'react/wrap-multilines': 2,
 
     // eslint-plugin-babel rules
     // NOTE: Rules fixing built-in ESLint rules are next to the

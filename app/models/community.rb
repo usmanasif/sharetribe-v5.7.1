@@ -3,6 +3,7 @@
 # Table name: communities
 #
 #  id                                         :integer          not null, primary key
+#  uuid                                       :binary(16)       not null
 #  ident                                      :string(255)
 #  domain                                     :string(255)
 #  use_domain                                 :boolean          default(FALSE), not null
@@ -26,7 +27,6 @@
 #  event_feed_enabled                         :boolean          default(TRUE)
 #  slogan                                     :string(255)
 #  description                                :text(65535)
-#  category                                   :string(255)      default("other")
 #  country                                    :string(255)
 #  members_count                              :integer          default(0)
 #  user_limit                                 :integer
@@ -45,16 +45,15 @@
 #  small_cover_photo_updated_at               :datetime
 #  custom_color1                              :string(255)
 #  custom_color2                              :string(255)
+#  slogan_color                               :string(6)
+#  description_color                          :string(6)
 #  stylesheet_url                             :string(255)
 #  stylesheet_needs_recompile                 :boolean          default(FALSE)
 #  service_logo_style                         :string(255)      default("full-logo")
-#  available_currencies                       :text(65535)
+#  currency                                   :string(3)        not null
 #  facebook_connect_enabled                   :boolean          default(TRUE)
-#  vat                                        :integer
-#  commission_from_seller                     :integer
 #  minimum_price_cents                        :integer
-#  testimonials_in_use                        :boolean          default(TRUE)
-#  hide_expiration_date                       :boolean          default(FALSE)
+#  hide_expiration_date                       :boolean          default(TRUE)
 #  facebook_connect_id                        :string(255)
 #  facebook_connect_secret                    :string(255)
 #  google_analytics_key                       :string(255)
@@ -69,7 +68,6 @@
 #  wide_logo_content_type                     :string(255)
 #  wide_logo_file_size                        :integer
 #  wide_logo_updated_at                       :datetime
-#  only_organizations                         :boolean
 #  listing_comments_in_use                    :boolean          default(FALSE)
 #  show_listing_publishing_date               :boolean          default(FALSE)
 #  require_verification_to_post_listings      :boolean          default(FALSE)
@@ -90,20 +88,16 @@
 #  cover_photo_processing                     :boolean
 #  small_cover_photo_processing               :boolean
 #  favicon_processing                         :boolean
-#  dv_test_file_name                          :string(64)
-#  dv_test_file                               :string(64)
 #  deleted                                    :boolean
 #
 # Indexes
 #
 #  index_communities_on_domain  (domain)
 #  index_communities_on_ident   (ident)
+#  index_communities_on_uuid    (uuid) UNIQUE
 #
 
-class Community < ActiveRecord::Base
-
-  # TODO Rails 4, Remove
-  include ActiveModel::ForbiddenAttributesProtection
+class Community < ApplicationRecord
 
   require 'compass'
   require 'sass/plugin'
@@ -124,11 +118,9 @@ class Community < ActiveRecord::Base
 
   has_many :conversations
   has_many :transactions
-  has_many :payments
 
   has_many :listings
 
-  has_one :payment_gateway, :dependent => :destroy
   has_one :paypal_account # Admin paypal account
 
   has_many :custom_fields, :dependent => :destroy
@@ -137,7 +129,7 @@ class Community < ActiveRecord::Base
 
   after_create :initialize_settings
 
-  monetize :minimum_price_cents, :allow_nil => true, :with_model_currency => :default_currency
+  monetize :minimum_price_cents, :allow_nil => true, :with_model_currency => :currency
 
   validates_length_of :ident, :in => 2..50
   validates_format_of :ident, :with => /\A[A-Z0-9_\-\.]*\z/i
@@ -145,6 +137,8 @@ class Community < ActiveRecord::Base
   validates_length_of :slogan, :in => 2..100, :allow_nil => true
   validates_format_of :custom_color1, :with => /\A[A-F0-9_-]{6}\z/i, :allow_nil => true
   validates_format_of :custom_color2, :with => /\A[A-F0-9_-]{6}\z/i, :allow_nil => true
+  validates_format_of :slogan_color, :with => /\A[A-F0-9_-]{6}\z/i, :allow_nil => true
+  validates_format_of :description_color, :with => /\A[A-F0-9_-]{6}\z/i, :allow_nil => true
 
   VALID_BROWSE_TYPES = %w{grid map list}
   validates_inclusion_of :default_browse_view, :in => VALID_BROWSE_TYPES
@@ -156,9 +150,6 @@ class Community < ActiveRecord::Base
   # locales: which locales are in use, the first one is the default
 
   serialize :settings, Hash
-
-  DEFAULT_LOGO = ActionController::Base.helpers.asset_path("logos/mobile/default.png")
-  DEFAULT_WIDE_LOGO = ActionController::Base.helpers.asset_path("logos/full/default.png")
 
   has_attached_file :logo,
                     :styles => {
@@ -174,7 +165,7 @@ class Community < ActiveRecord::Base
                       # not work.
                       :apple_touch => "-background white -flatten"
                     },
-                    :default_url => DEFAULT_LOGO
+                    :keep_old_files => true
 
   validates_attachment_content_type :logo,
                                     :content_type => ["image/jpeg",
@@ -194,7 +185,7 @@ class Community < ActiveRecord::Base
                       # The size for paypal logo will be exactly 190x60. No cropping, instead the canvas is extended with white background
                       :paypal => "-background white -gravity center -extent 190x60"
                     },
-                    :default_url => DEFAULT_WIDE_LOGO
+                    :keep_old_files => true
 
   validates_attachment_content_type :wide_logo,
                                     :content_type => ["image/jpeg",
@@ -209,8 +200,8 @@ class Community < ActiveRecord::Base
                       :hd_header => "1920x450#",
                       :original => "3840x3840>"
                     },
-                    :default_url => ActionController::Base.helpers.asset_path("cover_photos/header/default.jpg"),
-                    :keep_old_files => true # Temporarily to make preprod work aside production
+                    :default_url => ->(_){ ActionController::Base.helpers.asset_path("cover_photos/header/default.jpg") },
+                    :keep_old_files => true
 
   validates_attachment_content_type :cover_photo,
                                     :content_type => ["image/jpeg",
@@ -225,8 +216,8 @@ class Community < ActiveRecord::Base
                       :hd_header => "1920x96#",
                       :original => "3840x3840>"
                     },
-                    :default_url => ActionController::Base.helpers.asset_path("cover_photos/header/default.jpg"),
-                    :keep_old_files => true # Temporarily to make preprod work aside production
+                    :default_url => ->(_) { ActionController::Base.helpers.asset_path("cover_photos/header/default.jpg") },
+                    :keep_old_files => true
 
   validates_attachment_content_type :small_cover_photo,
                                     :content_type => ["image/jpeg",
@@ -243,7 +234,7 @@ class Community < ActiveRecord::Base
                     :convert_options => {
                       :favicon => "-depth 32 -strip",
                     },
-                    :default_url => ActionController::Base.helpers.asset_path("favicon.ico")
+                    :default_url => ->(_) { ActionController::Base.helpers.asset_path("favicon.ico") }
 
   validates_attachment_content_type :favicon,
                                     :content_type => ["image/jpeg",
@@ -261,6 +252,25 @@ class Community < ActiveRecord::Base
 
   process_in_background :favicon
 
+  before_save :cache_previous_image_urls
+
+  def uuid_object
+    if self[:uuid].nil?
+      nil
+    else
+      UUIDUtils.parse_raw(self[:uuid])
+    end
+  end
+
+  def uuid_object=(uuid)
+    self.uuid = UUIDUtils.raw(uuid)
+  end
+
+  before_create :add_uuid
+  def add_uuid
+    self.uuid ||= UUIDUtils.create_raw
+  end
+
   validates_format_of :twitter_handle, with: /\A[A-Za-z0-9_]{1,15}\z/, allow_nil: true
 
   validates :facebook_connect_id, numericality: { only_integer: true }, allow_nil: true
@@ -270,8 +280,46 @@ class Community < ActiveRecord::Base
 
   attr_accessor :terms
 
-  def self.columns
-    super.reject { |c| ["only_public_listings"].include?(c.name) }
+  # Wrapper for the various attachment images url methods
+  # which returns url of old image, while new one is processing.
+  def stable_image_url(image_name, style = nil, options = {})
+    image = send(:"#{image_name}")
+    if image.processing?
+      old_name = Rails.cache.read("c_att/#{id}/#{image_name}")
+      return image.url(style, options) unless old_name
+
+      # Temporarily set processing to false and the file name to the
+      # old file name, so that we can call Paperclip's own url method.
+      new_name = image.original_filename
+      send(:"#{image_name}_processing=", false)
+      send(:"#{image_name}_file_name=", old_name)
+
+      url = image.url(style, options)
+
+      send(:"#{image_name}_file_name=", new_name)
+      send(:"#{image_name}_processing=", true)
+
+      url
+    else
+      image.url(style, options)
+    end
+  end
+
+  def cache_previous_image_urls
+    return unless has_changes_to_save?
+
+    changes_to_save.select { |attribute, values|
+      attachment_name = attribute.chomp("_file_name")
+      attribute.end_with?("_file_name") && !send(:"#{attachment_name}_processing") && values[0]
+    }.each { |attribute, values|
+      attachment_name = attribute.chomp("_file_name")
+      # Temporarily store previous attachment file name in cache
+      # so that we can still link to it, while new attachment is being processed.
+      # This should probably be switched to using new columns in model, so that
+      # old link doesn't break if processing fails and cache expires.
+      Rails.cache.write("c_att/#{id}/#{attachment_name}", values[0], expires_in: 5.minutes)
+    }
+    true
   end
 
   def name(locale)
@@ -338,11 +386,11 @@ class Community < ActiveRecord::Base
   end
 
   def allows_user_to_send_invitations?(user)
-    (users_can_invite_new_users && user.member_of?(self)) || user.has_admin_rights?
+    (users_can_invite_new_users && user.member_of?(self)) || user.has_admin_rights?(self)
   end
 
   def has_customizations?
-    custom_color1 || custom_color2 || cover_photo.present? || small_cover_photo.present? || wide_logo.present? || logo.present?
+    custom_color1 || custom_color2 || slogan_color || description_color || cover_photo.present? || small_cover_photo.present? || wide_logo.present? || logo.present?
   end
 
   def has_custom_stylesheet?
@@ -393,7 +441,7 @@ class Community < ActiveRecord::Base
   end
 
   def self.find_by_email_ending(email)
-    Community.all.each do |community|
+    Community.all.find_each do |community|
       return community if community.allowed_emails && community.email_allowed?(email)
     end
     return nil
@@ -424,7 +472,7 @@ class Community < ActiveRecord::Base
     end
 
     if options[:with_protocol]
-      dom = "#{(APP_CONFIG.always_use_ssl ? "https://" : "http://")}#{dom}"
+      dom = "#{(APP_CONFIG.always_use_ssl.to_s == "true" ? "https://" : "http://")}#{dom}"
     end
 
     return dom
@@ -478,12 +526,6 @@ class Community < ActiveRecord::Base
     where("allowed_emails LIKE ?", "%#{email_ending}%")
   end
 
-  # Check if communities with this category are email restricted
-  # TODO Is this still in use?
-  def self.email_restricted?(community_category)
-    ["company", "university"].include?(community_category)
-  end
-
   # Returns all the people who are admins in at least one tribe.
   def self.all_admins
     Person.joins(:community_memberships).where("community_memberships.admin = '1'").group("people.id")
@@ -523,25 +565,7 @@ class Community < ActiveRecord::Base
   #
   # There is a method `payment_type` is community service. Use that instead.
   def payments_in_use?
-    if MarketplaceService::Community::Query.payment_type(id) == :paypal
-      true
-    else
-      payment_gateway.present? && payment_gateway.configured?
-    end
-  end
-
-  # Testimonials can be used only if payments are used and `testimonials_in_use` value
-  # is true. `testimonials_in_use` doesn't have any effect, if there are no payments
-  def testimonials_in_use
-    read_attribute(:testimonials_in_use) && payments_in_use?
-  end
-
-  def default_currency
-    if available_currencies
-      available_currencies.gsub(" ","").split(",").first
-    else
-      MoneyRails.default_currency
-    end
+    MarketplaceService::Community::Query.payment_type(id) == :paypal
   end
 
   def self.all_with_custom_fb_login
@@ -552,20 +576,6 @@ class Community < ActiveRecord::Base
       # so return empty array, as it shouldn't matter in those cases
       return []
     end
-  end
-
-  def braintree_in_use?
-    payment_gateway.present? && payment_gateway.type == "BraintreePaymentGateway"
-  end
-
-  # Return either minimum price defined by this community or the absolute
-  # platform default minimum price.
-  def absolute_minimum_price(currency)
-    Money.new(minimum_price_cents || 100, currency || "EUR")
-  end
-
-  def invoice_form_type_for(listing)
-    payment_possible_for?(listing) && payments_in_use? ? payment_gateway.invoice_form_type : "no_form"
   end
 
   def email_notification_types
@@ -588,9 +598,16 @@ class Community < ActiveRecord::Base
     favicon.processing?
   end
 
+  def as_json(options)
+    attrs = super(options)
+    uuid = UUIDUtils.parse_raw(attrs["uuid"])
+    attrs.merge({"uuid" => uuid.to_s})
+  end
+
   private
 
   def initialize_settings
     update_attribute(:settings,{"locales"=>[APP_CONFIG.default_locale]}) if self.settings.blank?
+    true
   end
 end

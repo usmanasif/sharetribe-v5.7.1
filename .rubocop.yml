@@ -13,6 +13,9 @@ AllCops:
     - 'config/**/*'
     - 'node_modules/**/*'
     - 'client/node_modules/**/*'
+    - 'vendor/bundle/**/*'
+    - '.pryrc'
+    - 'Procfile.spec'
   TargetRubyVersion: 2.3
 
 Style/RegexpLiteral:

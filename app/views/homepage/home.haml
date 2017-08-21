@@ -1,108 +1,203 @@
-.container
-  .banner
-    .row
-      .col-md-6.col-sm-6.col-xs-12.slider
-        #carousel-example-generic.carousel.slide{"data-ride" => "carousel"}
-          / Indicators
-          %ol.carousel-indicators
-            %li.active{"data-slide-to" => "0", "data-target" => "#carousel-example-generic"}
-            %li{"data-slide-to" => "1", "data-target" => "#carousel-example-generic"}
-            %li{"data-slide-to" => "2", "data-target" => "#carousel-example-generic"}
-          / Wrapper for slides
-          .carousel-inner{:role => "listbox"}
-            -if @first_slider_images.present?
-              -@first_slider_images.each_with_index do |image , i|
-                -if i == 0
-                  .item.active
-                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
-                  .item
-                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-            -else
-              .item.active
-                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
-              .item
-                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
-          / Controls
-          %a.left.carousel-control{"data-slide" => "prev", :href => "#carousel-example-generic", :role => "button"}
-            %span.glyphicon.glyphicon-chevron-left{"aria-hidden" => "true"}
-            %span.sr-only Previous
-          %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic", :role => "button"}
-            %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
-            %span.sr-only Next
-      .col-md-6.col-sm-6.col-xs-12.slider
-        #carousel-example-generic1.carousel.slide{"data-ride" => "carousel"}
-          / Indicators
-          %ol.carousel-indicators
-            %li.active{"data-slide-to" => "0", "data-target" => "#carousel-example-generic1"}
-            %li{"data-slide-to" => "1", "data-target" => "#carousel-example-generic1"}
-            %li{"data-slide-to" => "2", "data-target" => "#carousel-example-generic1"}
-          / Wrapper for slides
-          .carousel-inner{:role => "listbox"}
-            -if @second_slider_images.present?
-              -@second_slider_images.each_with_index do |image , i|
-                -if i == 0
-                  .item.active
-                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
-                  .item
-                    %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-            -if !@second_slider_images.present?
-              .item.active
-                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
-              .item
-                %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
-          / Controls
-          %a.left.carousel-control{"data-slide" => "prev", :href => "#carousel-example-generic1", :role => "button"}
-            %span.glyphicon.glyphicon-chevron-left{"aria-hidden" => "true"}
-            %span.sr-only Previous
-          %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic1", :role => "button"}
-            %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
-            %span.sr-only Next
-  / Products
-  .container.featured-area
-    .col-md-12
-      .row
-        %h2 Today's Featured Collections
-        - @listings.try(:each) do |listing|
-          -if is_featured(listing.id)
-            - list = get_image_url(listing)
-            .col-md-6.col-sm-12.col-xs-12
-              .col-md-12.col-sm-12.col-xs-12
-                .row
-                  .col-md-9.col-sm-9.col-xs-9.padding-0
-                    %a{:href => listing_path(set_path(listing.id))}
-                      %img.img-responsive.img-featured{:alt => "", :src => list.first}/
-                  .col-md-3.col-sm-3.col-xs-3.padding-0
-                    %ul.featured-list
-                      - if list.second
-                        %li
-                          %a{:href => listing_path(set_path(listing.id)) }
-                            %img.img-responsive{:alt => "", :src => list.second}/
-                      -if list.third
-                        %li
-                          %a{:href => listing_path(set_path(listing.id))}
-                            %img.img-responsive{:alt => "", :src => list.third}/
-                      - if list.fourth
-                        %li
-                          %a{:href => listing_path(set_path(listing.id))}
-                            %img.img-responsive{:alt => "", :src => list.fourth}/    
-              .col-md-12.col-sm-12.col-xs-12
-                .row
-                  .padding-left-0.col-md-9.col-sm-9.col-xs-9
-                    %a.title{:href => listing_path(set_path(listing.id)) } #{listing.title}
-                    .featured-textarea
-                      %p #{ listing.description}
+/ %header#header
+/   .header-top
+/     .container
+/       .row
+/         .col-md-12.col-sm-12.col-xs-12
+/           %nav.cart-area.admin-menu-panel
+/             %ul
+/               - if @current_user
+/                 - conversations = @current_community.conversations.for_person(@current_user)
+/                 - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
+/                 %li
+/                   = link_to person_inbox_path(@current_user) do
+/                     / = icon_tag"mail", ["icon-with-text"])
+/                     - if unread_count > 0
+/                       .mobile-badge{:class => get_badge_class(unread_count)}
+/                         = unread_count
+/                 %li{:style => "margin-right: 262px;"}
+/                   .dropdown.login-admin-profile
+/                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+/                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+/                       %span.admin-text
+/                         = "Ali Ahmad Saleem"
+/                         /= @current_user.name(@current_community)
+/                         %i.icon-caret-down.icon-dropdown
+/                     %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+/                       - if @current_user
+/                         - Maybe(@current_user).each do |user|
+/                           - conversations = @current_community.conversations.for_person(user)
+/                           - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+/                           %li
+/                             = link_to person_inbox_path(@current_user) do
+/                               / = icon_tag"mail", ["icon-with-text"])
+/                               = t("layouts.conversations.messages")
+/                               - if unread_count > 0
+/                                 .mobile-badge{:class => get_badge_class(unread_count)}
+/                                 = unread_count
+/                           %li
+/                             = link_to person_path(user) do
+/                               / = icon_tag"user", ["icon-with-text"])
+/                               = t("header.profile")                        
+/                           %li
+/                             = link_to person_settings_path(user) do
+/                               / = icon_tag"settings", ["icon-with-text"])
+/                               = t("layouts.logged_in.settings")
+/                           / %li
+/                           /   = link_to logout_path do
+/                           /     / = icon_tag"logout", ["icon-with-text"])
+/                           /     = t("layouts.logged_in.logout")
 
-                  .padding-right-0.col-md-3.col-sm-3.col-xs-3
-                    %ul.details
-                      %li 
-                        - if listing.author
-                          %a{:href => person_path(listing.author.username)} #{listing.author.username}
-                      %li US #{listing.price}$
-                      %li
-                        %a{:href => listing_path(set_path(listing.id)) } Show now
+/               %li
+/                 .dropdown.login-menu 
+/                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+/                     Menu
+/                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+/                     %li
+/                       = link_to "/" do
+/                         / = icon_tag"home", ["icon-with-text"])
+/                         = t("header.home")
+/                     %li
+/                       = link_to about_infos_path do
+/                         / = icon_tag"information", ["icon-with-text"])
+/                         = t("header.about")
+/                     %li
+/                       = link_to new_user_feedback_path do
+/                         / = icon_tag"feedback", ["icon-with-text"])
+/                         = t("header.contact_us")
+/                     / %li
+/                     /   - with_invite_link do
+/                     /     = link_to new_invitation_path do
+/                     /       / = icon_tag"invite", ["icon-with-text"])
+/                     /       = t("header.invite")
+/                     %li
+/                       - Maybe(@current_community).menu_links.each do |menu_links|
+/                         - menu_links.each do |menu_link|
+/                           = link_to menu_link.url(I18n.locale), :target => "_blank" do
+/                             / = icon_tag"redirect", ["icon-with-text"])
+/                             = menu_link.title(I18n.locale)
+/                     %li
+/                       - if @current_user && @current_community && @current_user.has_admin_rights?
+/                         = link_to edit_details_admin_community_path(@current_community) do
+/                           / = icon_tag"admin", ["icon-with-text"])
+/                           = t("layouts.logged_in.admin")
+/               - Maybe(@current_user).each do |user|
+/                 %li
+/                   = link_to person_path(user, :show_closed => true) do
+/                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+/                       Manage Listings                      
+              
+/                 %li{:style => "margin-right: 20px;"}
+/                   = link_to new_listing_path do
+/                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+/                       Post a new listing
+
+
+
+/ .container
+/   .banner
+/     .row
+/       .col-md-6.col-sm-6.col-xs-12.slider
+/         #carousel-example-generic.carousel.slide{"data-ride" => "carousel"}
+/           / Indicators
+/           %ol.carousel-indicators
+/             %li.active{"data-slide-to" => "0", "data-target" => "#carousel-example-generic"}
+/             %li{"data-slide-to" => "1", "data-target" => "#carousel-example-generic"}
+/             %li{"data-slide-to" => "2", "data-target" => "#carousel-example-generic"}
+/           / Wrapper for slides
+/           .carousel-inner{:role => "listbox"}
+/             -if @first_slider_images.present?
+/               -@first_slider_images.each_with_index do |image , i|
+/                 -if i == 0
+/                   .item.active
+/                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+/                 -else  
+/                   .item
+/                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+/             -else
+/               .item.active
+/                 %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+/               .item
+/                 %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+/           / Controls
+/           %a.left.carousel-control{"data-slide" => "prev", :href => "#carousel-example-generic", :role => "button"}
+/             %span.glyphicon.glyphicon-chevron-left{"aria-hidden" => "true"}
+/             %span.sr-only Previous
+/           %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic", :role => "button"}
+/             %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
+/             %span.sr-only Next
+/       .col-md-6.col-sm-6.col-xs-12.slider
+/         #carousel-example-generic1.carousel.slide{"data-ride" => "carousel"}
+/           / Indicators
+/           %ol.carousel-indicators
+/             %li.active{"data-slide-to" => "0", "data-target" => "#carousel-example-generic1"}
+/             %li{"data-slide-to" => "1", "data-target" => "#carousel-example-generic1"}
+/             %li{"data-slide-to" => "2", "data-target" => "#carousel-example-generic1"}
+/           / Wrapper for slides
+/           .carousel-inner{:role => "listbox"}
+/             -if @second_slider_images.present?
+/               -@second_slider_images.each_with_index do |image , i|
+/                 -if i == 0
+/                   .item.active
+/                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+/                 -else  
+/                   .item
+/                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
+/             -if !@second_slider_images.present?
+/               .item.active
+/                 %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+/               .item
+/                 %img.img-responsive{:alt => "...", :src => asset_path('index/No_image_available.png')}
+/           / Controls
+/           %a.left.carousel-control{"data-slide" => "prev", :href => "#carousel-example-generic1", :role => "button"}
+/             %span.glyphicon.glyphicon-chevron-left{"aria-hidden" => "true"}
+/             %span.sr-only Previous
+/           %a.right.carousel-control{"data-slide" => "next", :href => "#carousel-example-generic1", :role => "button"}
+/             %span.glyphicon.glyphicon-chevron-right{"aria-hidden" => "true"}
+/             %span.sr-only Next
+/   / Products
+/   .container.featured-area
+/     .col-md-12
+/       .row
+/         %h2 Today's Featured Collections
+/         - @listings.try(:each) do |listing|
+/           -if is_featured(listing.id)
+/             - list = get_image_url(listing)
+/             .col-md-6.col-sm-12.col-xs-12
+/               .col-md-12.col-sm-12.col-xs-12
+/                 .row
+/                   .col-md-9.col-sm-9.col-xs-9.padding-0
+/                     %a{:href => listing_path(set_path(listing.id))}
+/                       %img.img-responsive.img-featured{:alt => "", :src => list.first}/
+/                   .col-md-3.col-sm-3.col-xs-3.padding-0
+/                     %ul.featured-list
+/                       - if list.second
+/                         %li
+/                           %a{:href => listing_path(set_path(listing.id)) }
+/                             %img.img-responsive{:alt => "", :src => list.second}/
+/                       -if list.third
+/                         %li
+/                           %a{:href => listing_path(set_path(listing.id))}
+/                             %img.img-responsive{:alt => "", :src => list.third}/
+/                       - if list.fourth
+/                         %li
+/                           %a{:href => listing_path(set_path(listing.id))}
+/                             %img.img-responsive{:alt => "", :src => list.fourth}/    
+/               .col-md-12.col-sm-12.col-xs-12
+/                 .row
+/                   .padding-left-0.col-md-9.col-sm-9.col-xs-9
+/                     %a.title{:href => listing_path(set_path(listing.id)) } #{listing.title}
+/                     .featured-textarea
+/                       %p #{ listing.description}
+
+/                   .padding-right-0.col-md-3.col-sm-3.col-xs-3
+/                     %ul.details
+/                       %li 
+/                         - if listing.author
+/                           %a{:href => person_path(listing.author.username)} #{listing.author.username}
+/                       %li US #{listing.price}$
+/                       %li
+/                         %a{:href => listing_path(set_path(listing.id)) } Show now
                         
-/ - @listings.each do |listing|
-/   = render :partial => "layouts/grid_item_listing_image", :locals => {:listing => listing, :modifier_class => ""}
-/   = listing.inspect
+/ / - @listings.each do |listing|
+/ /   = render :partial => "layouts/grid_item_listing_image", :locals => {:listing => listing, :modifier_class => ""}
+/ /   = listing.inspect

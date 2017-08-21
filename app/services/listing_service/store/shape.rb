@@ -13,7 +13,8 @@ module ListingService::Store::Shape
     [:shipping_enabled, :bool, :mandatory],
     [:units, :array, default: []], # Mandatory only if price_enabled
     [:sort_priority, :fixnum],
-    [:basename, :string, :mandatory]
+    [:basename, :string, :mandatory],
+    [:availability, :symbol, one_of: [:none, :booking], default: :none] # Possibly :stock in the future
   )
 
   Shape = EntityUtils.define_builder(
@@ -27,7 +28,8 @@ module ListingService::Store::Shape
     [:shipping_enabled, :bool, :mandatory],
     [:name, :string, :mandatory],
     [:sort_priority, :fixnum, default: 0],
-    [:category_ids, :array]
+    [:category_ids, :array],
+    [:availability, :to_symbol, one_of: [:none, :booking]]
   )
 
   UpdateShape = EntityUtils.define_builder(
@@ -37,7 +39,8 @@ module ListingService::Store::Shape
     [:transaction_process_id, :fixnum],
     [:units, :array],
     [:shipping_enabled, :bool],
-    [:sort_priority, :fixnum]
+    [:sort_priority, :fixnum],
+    [:availability, :symbol, one_of: [:none, :booking], default: :none] # Possibly :stock in the future
   )
 
   BuiltInUnit = EntityUtils.define_builder(
@@ -45,7 +48,7 @@ module ListingService::Store::Shape
     [:kind, :to_symbol, const_value: :time],
     [:name_tr_key],
     [:selector_tr_key],
-    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day]] # in the future include :hour, :week:, :night ,:month etc.
+    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day, :night]] # in the future include :hour, :week:,:month etc.
   )
 
   CustomUnit = EntityUtils.define_builder(
@@ -53,7 +56,7 @@ module ListingService::Store::Shape
     [:kind, :to_symbol, one_of: [:time, :quantity]],
     [:name_tr_key, :string, :mandatory],
     [:selector_tr_key, :string, :mandatory],
-    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day]] # in the future include :hour, :week:, :night ,:month etc.
+    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day, :night]] # in the future include :hour, :week:, :month etc.
   )
 
   DEFAULT_BASENAME = 'order_type'

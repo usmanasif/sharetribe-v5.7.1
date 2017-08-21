@@ -1,25 +1,14 @@
-module PaypalService::API
-  class Api
-    extend PaypalService::PaypalServiceInjector
+# rubocop:disable ConstantName
 
-    def self.payments
-      payments_api #PaypalServiceInjector provides readily configured payments api
-    end
+module PaypalService
+  module API
+    Api =
+      if APP_CONFIG.paypal_implementation&.to_s == "fake"
+        store = APP_CONFIG.fakepal_store || "tmp/fakepal.store"
 
-    def self.billing_agreements
-      billing_agreement_api #PaypalServiceInjector provides readily configured payments api
-    end
-
-    def self.minimum_commissions
-      minimum_commissions_api
-    end
-
-    def self.process
-      process_api
-    end
-
-    def self.accounts
-      accounts_api
-    end
+        FakeApiImplementation.new(FakePalPstore.new(store))
+      else
+        ApiImplementation
+      end
   end
 end

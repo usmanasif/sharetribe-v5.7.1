@@ -8,8 +8,8 @@ end
 
 World(AdminLookAndFeelSteps)
 
-When(/^I set the main color to "(.*?)"$/) do |color|
-  steps %Q{ And I fill in "community[custom_color1]" with "#{color}" }
+When(/^I set the new listing button color to "(.*?)"$/) do |color|
+  steps %Q{ And I fill in "community[custom_color2]" with "#{color}" }
 end
 
 Then(/^I should see that the background color of Post a new listing button is "(.*?)"$/) do |color|
@@ -42,25 +42,5 @@ When(/^I change the name display type to "(.*?)"$/) do |name_display_type|
   steps %Q{
     When I select "#{name_display_type}" from "community_name_display_type"
     And I press submit
-  }
-end
-
-Then(/^I should see that the favicon is "(.*?)"$/) do |filename|
-  expect(page).to have_xpath("/html/head/link[contains(@href, #{filename})]", :visible => false)
-end
-
-Then(/^I upload a new favicon$/) do
-  attach_image("favicontest.ico", "community[favicon]", ".edit_community")
-end
-
-Then(/^I should see that the favicon is the file I uploaded$/) do
-   steps %Q{
-     Then I should see that the favicon is "favicontest.ico"
-   }
-end
-
-Then(/^I should see that the favicon is the default$/) do
-  steps %Q{
-    Then I should see that the favicon is "favicon.ico"
   }
 end

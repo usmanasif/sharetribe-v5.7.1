@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 describe MarketplaceService::API::Marketplaces do
   include MarketplaceService::API::Marketplaces
 
@@ -30,13 +32,13 @@ describe MarketplaceService::API::Marketplaces do
 
     it "should set correct currency based on contry selection" do
       c = create(@community_params)
-      expect(c[:available_currencies]).to eql "EUR"
+      expect(c[:currency]).to eql "EUR"
 
       c = create(@community_params.merge({:marketplace_country => "US"}))
-      expect(c[:available_currencies]).to eql "USD"
+      expect(c[:currency]).to eql "USD"
 
       c = create(@community_params.merge({:marketplace_country => "GG"}))
-      expect(c[:available_currencies]).to eql "GBP"
+      expect(c[:currency]).to eql "GBP"
     end
 
     it "should set correct listing shape and category" do
@@ -44,19 +46,22 @@ describe MarketplaceService::API::Marketplaces do
       c = Community.find(community_hash[:id])
       s = listings_api.shapes.get(community_id: c.id).data.first
       expect(s[:units].empty?).to eql true
+      expect(s[:availability]).to eql :none
       expect(s[:price_enabled]).to eql true
       expect(s[:shipping_enabled]).to eql true
 
       community_hash = create(@community_params.merge({:marketplace_type => "rental"}))
       c = Community.find(community_hash[:id])
       s = listings_api.shapes.get(community_id: c.id).data.first
-      expect(s[:units][0][:type]).to eql :day
+      expect(s[:availability]).to eql :booking
+      expect(s[:units][0][:type]).to eql :night
       expect(s[:price_enabled]).to eql true
       expect(s[:shipping_enabled]).to eql false
 
       community_hash = create(@community_params.merge({:marketplace_type => "service"}))
       c = Community.find(community_hash[:id])
       s = listings_api.shapes.get(community_id: c.id).data.first
+      expect(s[:availability]).to eql :none
       expect(s[:units][0][:type]).to eql :day
       expect(s[:price_enabled]).to eql true
       expect(s[:shipping_enabled]).to eql false

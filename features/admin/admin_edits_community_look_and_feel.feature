@@ -27,18 +27,8 @@ Feature: Admin edits community look-and-feel
     And I refresh the page
     Then I should see my name displayed as "matti manager"
 
-  Scenario: Admin changes main color
-    Then I should see that the background color of Post a new listing button is "00A26C"
-    And I set the main color to "FF0099"
+  Scenario: Admin changes new listing button color
+    Then I should see that the background color of Post a new listing button is "2AB865"
+    And I set the new listing button color to "FF0099"
     And I press submit
-    And I should see "Stylesheet is recompiling. Please, reload the page after a while."
-    And the system processes jobs
-    And I refresh the page
     Then I should see that the background color of Post a new listing button is "FF0099"
-
-  @skip_phantomjs
-  Scenario: Admin uploads a favicon
-    Then I should see that the favicon is the default
-    And I upload a new favicon
-    And I press submit
-    Then I should see that the favicon is the file I uploaded

@@ -1,9 +1,9 @@
 class PaypalAccountsController < ApplicationController
-  before_filter do |controller|
+  before_action do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_view_your_settings")
   end
 
-  before_filter :ensure_paypal_enabled
+  before_action :ensure_paypal_enabled
 
   DataTypePermissions = PaypalService::DataTypes::Permissions
 
@@ -23,7 +23,7 @@ class PaypalAccountsController < ApplicationController
                                 new_user_feedback_path)).html_safe
     end
 
-    community_currency = @current_community.default_currency
+    community_currency = @current_community.currency
     payment_settings = payment_settings_api.get_active(community_id: @current_community.id).maybe.get
     community_country_code = LocalizationUtils.valid_country_code(@current_community.country)
 
@@ -40,8 +40,9 @@ class PaypalAccountsController < ApplicationController
       currency: community_currency,
       paypal_fees_url: PaypalCountryHelper.fee_link(community_country_code),
       create_url: PaypalCountryHelper.create_paypal_account_url(community_country_code),
+      upgrade_url: PaypalCountryHelper.upgrade_paypal_account_url(community_country_code),
       receive_funds_info_label_tr_key: PaypalCountryHelper.receive_funds_info_label_tr_key(community_country_code),
-      upgrade_url: "https://www.paypal.com/#{community_country_code}/upgrade"
+      receive_funds_info_tr_key: PaypalCountryHelper.receive_funds_info_tr_key(community_country_code)
     })
   end
 
@@ -223,7 +224,7 @@ class PaypalAccountsController < ApplicationController
   end
 
   def accounts_api
-    PaypalService::API::Api.accounts_api
+    PaypalService::API::Api.accounts
   end
 
 end

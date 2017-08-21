@@ -4,6 +4,7 @@
 # Table name: communities
 #
 #  id                                         :integer          not null, primary key
+#  uuid                                       :binary(16)       not null
 #  ident                                      :string(255)
 #  domain                                     :string(255)
 #  use_domain                                 :boolean          default(FALSE), not null
@@ -27,7 +28,6 @@
 #  event_feed_enabled                         :boolean          default(TRUE)
 #  slogan                                     :string(255)
 #  description                                :text(65535)
-#  category                                   :string(255)      default("other")
 #  country                                    :string(255)
 #  members_count                              :integer          default(0)
 #  user_limit                                 :integer
@@ -46,16 +46,15 @@
 #  small_cover_photo_updated_at               :datetime
 #  custom_color1                              :string(255)
 #  custom_color2                              :string(255)
+#  slogan_color                               :string(6)
+#  description_color                          :string(6)
 #  stylesheet_url                             :string(255)
 #  stylesheet_needs_recompile                 :boolean          default(FALSE)
 #  service_logo_style                         :string(255)      default("full-logo")
-#  available_currencies                       :text(65535)
+#  currency                                   :string(3)        not null
 #  facebook_connect_enabled                   :boolean          default(TRUE)
-#  vat                                        :integer
-#  commission_from_seller                     :integer
 #  minimum_price_cents                        :integer
-#  testimonials_in_use                        :boolean          default(TRUE)
-#  hide_expiration_date                       :boolean          default(FALSE)
+#  hide_expiration_date                       :boolean          default(TRUE)
 #  facebook_connect_id                        :string(255)
 #  facebook_connect_secret                    :string(255)
 #  google_analytics_key                       :string(255)
@@ -70,7 +69,6 @@
 #  wide_logo_content_type                     :string(255)
 #  wide_logo_file_size                        :integer
 #  wide_logo_updated_at                       :datetime
-#  only_organizations                         :boolean
 #  listing_comments_in_use                    :boolean          default(FALSE)
 #  show_listing_publishing_date               :boolean          default(FALSE)
 #  require_verification_to_post_listings      :boolean          default(FALSE)
@@ -91,14 +89,13 @@
 #  cover_photo_processing                     :boolean
 #  small_cover_photo_processing               :boolean
 #  favicon_processing                         :boolean
-#  dv_test_file_name                          :string(64)
-#  dv_test_file                               :string(64)
 #  deleted                                    :boolean
 #
 # Indexes
 #
 #  index_communities_on_domain  (domain)
 #  index_communities_on_ident   (ident)
+#  index_communities_on_uuid    (uuid) UNIQUE
 #
 
 require 'spec_helper'

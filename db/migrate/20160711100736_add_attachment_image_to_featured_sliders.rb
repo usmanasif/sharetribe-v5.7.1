@@ -1,8 +1,10 @@
-class AddAttachmentImageToFeaturedSliders < ActiveRecord::Migration
+class AddAttachmentImageToFeaturedSliders < ActiveRecord::Migration[5.1]
   def self.up
-    change_table :featured_sliders do |t|
-      t.attachment :image
-    end
+  	unless column_exists?(:featured_sliders, :image_file_name)
+	    change_table :featured_sliders do |t|
+	      t.attachment :image
+	    end
+  	end
   end
 
   def self.down

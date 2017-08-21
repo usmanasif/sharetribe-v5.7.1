@@ -30,6 +30,7 @@ Feature: User joins invite only community
     And I fill in "invitation_email" with "test@example.com"
     And I fill in "invitation_message" with "test"
     And I press "Send invitation"
+    And I dismiss the onboarding wizard
     Then I should see "Invitation sent successfully"
     When the system processes jobs
     And "test@example.com" should receive an email
@@ -59,5 +60,5 @@ Feature: User joins invite only community
     Then I should see "This field is required."
     When I fill in "invitation_email" with "test"
     And I press "Send invitation"
-    Then I should see "Check that the email addresses you added are valid."
+    Then I should see "Check that the email addresses you added are valid and don't contain any unusual characters."
 

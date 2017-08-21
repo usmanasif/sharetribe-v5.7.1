@@ -3,6 +3,7 @@
 # Table name: listings
 #
 #  id                              :integer          not null, primary key
+#  uuid                            :binary(16)       not null
 #  community_id                    :integer          not null
 #  author_id                       :string(255)
 #  category_old                    :string(255)
@@ -32,7 +33,6 @@
 #  transaction_process_id          :integer
 #  shape_name_tr_key               :string(255)
 #  action_button_tr_key            :string(255)
-#  organization_id                 :integer
 #  price_cents                     :integer
 #  currency                        :string(255)
 #  quantity                        :string(255)
@@ -46,6 +46,7 @@
 #  shipping_price_cents            :integer
 #  shipping_price_additional_cents :integer
 #  featured                        :boolean          default(FALSE)
+#  availability                    :string(32)       default("none")
 #
 # Indexes
 #
@@ -56,6 +57,7 @@
 #  index_listings_on_listing_shape_id  (listing_shape_id)
 #  index_listings_on_new_category_id   (category_id)
 #  index_listings_on_open              (open)
+#  index_listings_on_uuid              (uuid) UNIQUE
 #  person_listings                     (community_id,author_id)
 #  updates_email_listings              (community_id,open,updates_email_at)
 #

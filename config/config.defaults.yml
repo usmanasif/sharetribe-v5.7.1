@@ -31,10 +31,20 @@ default: &default_settings
 
   # You can use Amazong S3 to store listing and profile images
   # If you leave following empty, the images will be stored in local file system
+  # If you enable S3, you can use the user_asset_host option below to configure CDN in front
+  # of the S3 bucket.
   # NOTE: in Heroku you can't store files in local system, so S3 should be used
 
   # Default bucket
   s3_bucket_name: devsinc-bucket
+
+  # AWS S3 region
+  s3_region: us-east-1
+
+  # Cache-Control: max-age time in seconds for assets uploaded to S3.
+  # Default is one day. Normally, you can use the default. Links to images have
+  # modification timestamp appended as query parameter and that should be enough for cache invalidation.
+  s3_cache_max_age: 86400
 
   # Bucket for files users upload directly to S3. You can add an expiration policy to these files.
   s3_upload_bucket_name: devsinc-bucket-2
@@ -61,6 +71,21 @@ default: &default_settings
   #
   asset_host:
 
+  # Your user-uploaded assets CDN distribution host name, including the desired protocol (http or https).
+  #
+  # Host for linking to user-uploaded images and compiled custom stylesheets, instead of linking to the S3
+  # bucket (if configured) or straight to Sharetribe domain (i.e. the "domain" setting above).
+  #
+  # When "user_asset_host" is left blank and S3 is NOT in use, then assets are linked via Sharetribe's installation
+  # domain or using the "asset_host" (if configured). If S3 is enabled and "user_asset_host" is left blank,
+  # asset links point to the S3 bucket URL.
+  #
+  # Examples values:
+  #
+  # - https://yourdistribution.cloudfront.com
+  #
+  user_asset_host:
+
   # AWS keys
   aws_access_key_id: AKIAID4OD4SWXJNSH54Q
   aws_secret_access_key: 5hONl4WkBaXxuziFItkFWdyFS9V6R3hiDMBNIC6b
@@ -76,9 +101,6 @@ default: &default_settings
   # complaints and bounces to this SNS topic. Leave blank is SES not
   # used.
   aws_ses_sns_topic:
-
-  # after preauthorization there is 5 day period before expiration
-  braintree_expiration_period: 5
 
   # Paypal credentials for the platform owner.
   paypal_username: xxxxxxxxxxxxx
@@ -98,13 +120,18 @@ default: &default_settings
   paypal_ipn_domain:
   paypal_ipn_protocol: https
 
+  # PayPal implementation, either "real" or "fake"
+  paypal_implementation: real
+
+  # If "fake" implementation is used, specify the file where PayPal information
+  # is saved
+  # Examples: 'tmp/dev_fakepal.store'
+  #           'tmp/test_fakepal.store'
+  fakepal_store:
+
   # If you want to force all use to be SSL secured (https://) you can set this to true
   # Note that you can set this value separately to each enironment below (e.g. if your developing)
   always_use_ssl: false
-
-  # Sharetribe can use an Aalto Social Interface server to store userinformation
-  # This version of Sharetribe no longer support ASI so keep the setting below as false
-  use_asi: false
 
   # The default locale (language) of the user interface
   # if locales are listed in the community specific settings in db. The first in that list is used as default for that community.
@@ -119,7 +146,8 @@ default: &default_settings
   # You can use Airbrake to track errors if you want.
   # You need to register an account and get an API key from airbrake.io
   use_airbrake: false
-  airbrake_api_key: 'your_own_api_key_here'
+  airbrake_project_id: 'your_own_project_id_here'
+  airbrake_project_key: 'your_own_project_key_here'
 
   # Mail delivery method for mails sent by Sharetribe
   # possible values for delivery method are: sendmail or smtp
@@ -163,6 +191,10 @@ default: &default_settings
   use_kissmetrics: false
   kissmetrics_url: '//doug1izaerwt3.cloudfront.net/INSERT_YOUR_API_KEY_HERE.1.js'
 
+  # API key for sending events to Amplitude analytics. If api key is
+  # not set amplitude is not used.
+  amplitude_api_key:
+
   # Funneld can be used to track social media activity on the site.
   use_funneld: false
   funneld_key: "enter_your_key_here"
@@ -176,12 +208,6 @@ default: &default_settings
   # CAS is a centralized authentication system, it is completely optional
   # If not needed leave to false
   use_CAS: false
-
-  # Bit.ly url shortener
-  # At some places urls can be made shorter if you add your bit.ly login and apikey here:
-  # if you leave these empty, urls will be kept long
-  bitly_username:
-  bitly_key:
 
   # If you want to force Sharetribe to show mobile view even when accessed with normal desktop browser, set this to true
   # Useful only for mobile development
@@ -233,9 +259,6 @@ default: &default_settings
   # don't need to change those
   # ----------------------------------------------------------------
 
-  # If there's a tax related to payment service charge (e.g. VAT) mark the percentage here
-  service_fee_tax_percentage: 24
-
   # Max filesize for uploaded image (bytes)
   max_image_filesize: 104857600
 
@@ -253,12 +276,6 @@ default: &default_settings
   knowledge_base_url: http://www.example.com/knowledgebase
   display_knowledge_base_articles: false
 
-  # UserVoice Widget
-  # If you want to display a UserVoice widget in the Admin control panel, enter
-  # the URL here. (looks like '//widget.uservoice.com/some_code_here.js')
-  # This is completely optional and probably not needed in most cases.
-  uservoice_widget_url:
-
   # External plan service connection
   # The connection details hosted Sharetribe uses to connect to external subscription management system.
   external_plan_service_in_use: false
@@ -269,6 +286,22 @@ default: &default_settings
   external_search_in_use: false
   external_search_url:
   external_search_apikey:
+
+  # Combined keyword & location search distance score tweaking
+  external_search_scale_multiplier: 0.75
+  external_search_offset_multiplier: 0.5
+  external_search_distance_limit_min: 5
+  external_search_scale_min: 5
+  external_search_offset_min: 0
+
+  # Harmony service API connection
+  harmony_api_in_use: false
+  harmony_api_url: http://localhost:8085
+  harmony_api_token_secret: secret_key1
+
+  # Discovery service API connection
+  discovery_api_url:
+  discovery_api_key:
 
   # Perform Thinking Sphinx incremental indexing delayed jobs
   use_thinking_sphinx_indexing: true
@@ -303,14 +336,100 @@ default: &default_settings
   # development and false for other environments.
   use_js_routes_middleware: false
 
-  # Custom landing page asset host, e.g. https://s3.amazonaws.com/my-bucket/sites
-  clp_asset_host:
+  # Default Google Maps API key for communities that don't specify one
+  # Default is not to use Google Maps API key
+  google_maps_key:
+
+  # Path or URL for landing page assets.
+  #
+  # Because a directory is expected, it's recommended to include trailing slash.
+  #
+  # You can add %{sitename} in the URL and it will be replaced with the sitename,
+  # that is saved in the landing page structure JSON.
+  #
+  # Example values:
+  #
+  # - landing_page/
+  # - https://s3.amazonaws.com/my-bucket/sites/%{sitename}/
+  #
+  clp_asset_url: "landing_page/"
+
+  #####################
+  # Custom landing page
+  #####################
+
+  # This will enabled a static landing page
+  #
+  # The hosted version stores the landing page data in the database but for single
+  # marketplace OS installations the database doesn't bring any benifits. That's why
+  # the static version is used instead of database in OS installations.
+  clp_static_enabled: false
+
+  # Landing page is cached heavily.
+  #
+  # By default, the cache is expired after `clp_cache_time`. If you want to manually
+  # expire cache, for example after a new landing page version is deployed, you can
+  # increase this version number
+  clp_static_released_version: 1
 
   # Default caching time for custom landing pages in seconds
   clp_cache_time: 900
 
-  # Root url for hosted proximanovasoft font files
+  # Display mention of custom landing page in admin panel
+  show_landing_page_admin: false
+  custom_landing_page_marketing_site_url: "https://www.example.com/landingpage/"
+
+  #######
+  # Fonts
+  #######
+
+  # Path or URL for Proxima Nova Soft font files
+  #
+  # Because a directory is expected, it's recommended to include trailing slash.
+  #
+  # Example values:
+  #
+  # - empty: don't use Proximan Nova Soft font
+  # - landing_page/
+  # - https://s3.amazonaws.com/my-bucket/fonts/
+  #
   font_proximanovasoft_url:
+
+  ##########################################
+  # Admin Intercom (sharetribe.com internal)
+  ##########################################
+
+  # Enable/disable Intercom Respond for Admin UI
+  admin_intercom_respond_enabled: false
+
+  # Admin Intercom App Id
+  admin_intercom_app_id: ""
+
+  # Admin Intercom secure mode secret
+  admin_intercom_secure_mode_secret: ""
+
+  admin_intercom_access_token: ""
+
+  admin_intercom_admin_id: ""
+
+  #########
+  # Sitemap
+  #########
+
+  # Maximum number of links in sitemap.xml.
+  #
+  # The default number is 500. Increasing the limit may affect performance.
+  #
+  # The hard coded max limit is 50000.
+  #
+  max_sitemap_links: 500
+
+  # Turn `enable_sitemap` to `false` to disable the sitemap
+  enable_sitemap: true
+
+  # Sitemap cache time in seconds
+  # Default 24 hours
+  sitemap_cache_time: 86400
 
 production: &production_settings
   <<: *default_settings
@@ -341,6 +460,9 @@ development:
   use_i18n_js_middleware: true
 
   use_js_routes_middleware: true
+
+  paypal_implementation: real
+  fakepal_store: 'tmp/dev_fakepal.store'
 
 test:
   <<: *default_settings
@@ -384,17 +506,9 @@ test:
   # easier to run tests without SSL
   always_use_ssl: false
 
-  # Braintree credentials to be used in tests. In production, each
-  # community have their own credentials.
-  # Ask for shared Braintree credentials if you don't want to create
-  # new Braintree account
-  braintree_environment: sandbox
-  braintree_test_merchant_id: xxxxxxxxxxxxxxxx
-  braintree_test_master_merchant_id: xxxxxxxxxxxxxxxx
-  braintree_test_public_key: xxxxxxxxxxxxxxxx
-  braintree_test_private_key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  braintree_client_side_encryption_key: MIIBCgKCAQEArIfLwPsGtsJ5ELsvaFrdww/vEcBBiS3ViPoMg0mmV67nM3RqkFuWu7JQ1bln12PVQgyU7Bn6O7OLUjAdaO35kunmRfwLNb/SStyGfd5JIFOFP2Pu4CRnKr2tTR+OkitqXTwoa9den8RmMFJlQyadozcpWvAIGtAa21r0RWNaSoHS9gkbmhiEa/94gvxVuPlEQTrlKWHp3pnOuTwST/xEcDI73q7Ug4nVhFgtqqU0Kck6HOBnF5Gby+tIfI5blih64sxPGKVGuExopcWNos4lV7x7fKxYT07vOCeRUIFUSYhfxRs8hZ/tLfXxzNsInOnaddFJpM8Mda8jKWs+aFhPiwIDAQAB
-
   secret_key_base: "8fb582997a5e3ba2efb57c020dd01aa81647674dbb1aee6efcf30d75ec442e3a48832379e1ebaae2801782075efbf02ebed797a1df3f2b3ad87ec3faf37ccc64"
 
   log_level: DEBUG
+
+  paypal_implementation: fake
+  fakepal_store: 'tmp/test_fakepal.store'

@@ -3,7 +3,7 @@
 - content_for :extra_javascript do
   :javascript
     $(document).ready(function() {
-      window.ST.initializeSenderEmailForm(#{Maybe(user_defined_address).map { |a| HashUtils.camelize_keys(a) }.or_else(nil).to_json}, "#{status_check_url}", "#{resend_url}");
+      window.ST.initializeSenderEmailForm(#{Maybe(user_defined_address).map { |a| HashUtils.camelize_keys(a) }.or_else(nil).to_json.html_safe}, "#{status_check_url}", "#{resend_url}");
     });
 
 - content_for :title_header do
@@ -33,7 +33,7 @@
       %p= t("admin.communities.outgoing_email.info")
 
       %p
-        = link_to(t("admin.communities.outgoing_email.read_more"), "#{knowledge_base_url}/articles/686493")
+        = link_to(t("admin.communities.outgoing_email.read_more"), "#{knowledge_base_url}/configuration-and-how-to/how-to-define-your-own-address-as-the-sender-of-all-outgoing-emails")
 
   - content_for(:sender_address_preview) do
     - if sender_address[:type] == :default
@@ -130,11 +130,20 @@
           %label.sender-address-label= t("admin.communities.outgoing_email.sender_email_label")
           %input.js-sender-email-input{name: "email", type: :text, placeholder: t("admin.communities.outgoing_email.sender_email_placeholder"), disabled: disabled_attr, class: disabled_class}
 
-      .row.js-sender-address-preview-container.sender-address-preview-container.hidden
-        .col-12
-          .sender-address-preview
-            = t("admin.communities.outgoing_email.this_is_how_it_will_look")
-            %span.js-sender-address-preview-values
+      .js-sender-address-preview-container.sender-address-preview-container.hidden
+        .row
+          .col-12
+            .sender-address-preview
+              = t("admin.communities.outgoing_email.this_is_how_it_will_look")
+              %span.js-sender-address-preview-values
+        .row.js-sender-address-preview-container.sender-address-preview-container.hidden
+          .col-12
+            .alert-box-warning
+              %p
+                %span.alert-box-icon<>
+                  = icon_tag("alert", ["icon-fix"])
+                %span
+                  = t("admin.communities.outgoing_email.amazon_ses_notification", email_sender: "Amazon Web Services", email_subject: "Amazon SES Address Verification Request")
       .row
         %button{disabled: disabled_attr, class: disabled_class}= t("admin.communities.outgoing_email.send_verification_button")
 
@@ -151,7 +160,7 @@
       .text-part= t(".send_test_message")
   %p ***
   .welcome-email-editor-background
-    %p= t("emails.common.hey", :name => @recipient.given_name_or_username)
+    %p= t("emails.common.hey", :name => PersonViewUtils.person_display_name_for_type(@recipient, "first_name_only"))
     #welcome_email_content{:data => {:mercury => "full"}}
       - if @community_customization && @community_customization.welcome_email_content
         = @community_customization.welcome_email_content.html_safe

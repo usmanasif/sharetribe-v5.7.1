@@ -57,6 +57,10 @@ FactoryGirl.define do
     SecureRandom.urlsafe_base64
   end
 
+  sequence :uuid do
+    UUIDUtils.create_raw
+  end
+
   sequence :username do |n|
     "kassi_tester#{n}"
   end
@@ -91,7 +95,6 @@ FactoryGirl.define do
     phone_number "0000-123456"
     username
     password "testi"
-    is_organization false
 
     has_many :emails do |person|
       FactoryGirl.build(:email, person: person)
@@ -109,6 +112,7 @@ FactoryGirl.define do
     privacy "public"
     listing_shape_id 123
     price Money.new(20, "USD")
+    uuid
   end
 
   factory :transaction do
@@ -121,6 +125,10 @@ FactoryGirl.define do
     commission_from_seller 0
     automatic_confirmation_after_days 14
     listing_quantity 1
+    listing_uuid { listing.uuid } # raw UUID
+    community_uuid { community.uuid } # raw UUID
+    starter_uuid { starter.uuid } # raw UUID
+    listing_author_uuid { listing.author.uuid } # raw UUID
   end
 
   factory :conversation do
@@ -180,17 +188,21 @@ FactoryGirl.define do
     ident
     slogan "Test slogan"
     description "Test description"
-    category "other"
+    currency "EUR"
 
     has_many(:community_customizations) do |community|
       FactoryGirl.build(:community_customization, community: community)
     end
+
+    uuid
   end
 
   factory :community_customization do
     build_association(:community)
     name "Sharetribe"
     locale "en"
+    slogan "Test slogan"
+    description "Test description"
   end
 
   factory :community_membership do
@@ -199,6 +211,14 @@ FactoryGirl.define do
     admin false
     consent "test_consent0.1"
     status "accepted"
+  end
+
+  factory :marketplace_configurations do
+    community_id 1
+    main_search "keyword"
+    distance_unit "metric"
+    limit_search_distance 0
+    limit_priority_links nil
   end
 
   factory :invitation do
@@ -325,75 +345,6 @@ FactoryGirl.define do
   factory :transaction_transition do
     to_state "not_started"
     build_association(:transaction, as: :tx)
-  end
-
-  factory :payment do
-    build_association(:community)
-    build_association(:transaction, as: :tx)
-
-    factory :braintree_payment, class: 'BraintreePayment' do
-      build_association(:payer)
-      build_association(:recipient)
-      status "pending"
-      payment_gateway { FactoryGirl.build(:braintree_payment_gateway) }
-      currency "USD"
-      sum_cents 500
-    end
-
-    factory :checkout_payment, class: 'CheckoutPayment' do
-      build_association(:payer)
-      build_association(:recipient)
-      status "pending"
-      payment_gateway { FactoryGirl.build(:checkout_payment_gateway) }
-      currency "EUR"
-
-      has_many :rows do
-        FactoryGirl.build(:payment_row)
-      end
-    end
-  end
-
-  factory :payment_row do
-    currency "EUR"
-    sum_cents 2000
-  end
-
-  factory :checkout_account do
-    build_association(:person)
-    merchant_id "12345678-9"
-    merchant_key "abcdef12345"
-  end
-
-  factory :braintree_account do
-    build_association(:person)
-    first_name "Joe"
-    last_name "Bloggs"
-    email "joe@14ladders.com"
-    phone "5551112222"
-    address_street_address "123 Credibility St."
-    address_postal_code "60606"
-    address_locality "Chicago"
-    address_region "IL"
-    date_of_birth "1980-10-09"
-    routing_number "1234567890"
-    hidden_account_number "*********98"
-    status "active"
-    build_association(:community)
-  end
-
-  factory :payment_gateway do
-    factory :braintree_payment_gateway, class: 'BraintreePaymentGateway' do
-      braintree_merchant_id { APP_CONFIG.braintree_test_merchant_id }
-      braintree_master_merchant_id { APP_CONFIG.braintree_test_master_merchant_id }
-      braintree_public_key { APP_CONFIG.braintree_test_public_key }
-      braintree_private_key { APP_CONFIG.braintree_test_private_key }
-      braintree_client_side_encryption_key { APP_CONFIG.braintree_client_side_encryption_key }
-      braintree_environment { APP_CONFIG.braintree_environment }
-    end
-
-    factory :checkout_payment_gateway, class: 'Checkout' do
-      checkout_environment "stub"
-    end
   end
 
   factory :menu_link do

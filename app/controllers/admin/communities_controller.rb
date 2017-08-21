@@ -1,25 +1,11 @@
-class Admin::CommunitiesController < ApplicationController
+class Admin::CommunitiesController < Admin::AdminBaseController
   include CommunitiesHelper
 
-  before_filter :ensure_is_admin
-  before_filter :ensure_is_superadmin, :only => [:payment_gateways, :update_payment_gateway, :create_payment_gateway]
-  before_filter :ensure_white_label_plan, only: [:create_sender_address]
-
-  def getting_started
-    @selected_left_navi_link = "getting_started"
-    @community = @current_community
-
-    if(feature_enabled?(:onboarding_redesign_v1))
-      redirect_to admin_getting_started_guide_path
-    else
-      render locals: {paypal_enabled: PaypalHelper.paypal_active?(@current_community.id)}
-    end
-  end
+  before_action :ensure_white_label_plan, only: [:create_sender_address]
 
   def edit_look_and_feel
     @selected_left_navi_link = "tribe_look_and_feel"
     @community = @current_community
-    flash.now[:notice] = t("layouts.notifications.stylesheet_needs_recompiling") if @community.stylesheet_needs_recompile?
 
     onboarding_popup_locals = OnboardingViewUtils.popup_locals(
       flash[:show_onboarding_popup],
@@ -33,7 +19,8 @@ class Admin::CommunitiesController < ApplicationController
     @selected_left_navi_link = "tribe_featured_slider"
     @community = @current_community
     @slider_images = get_slider_images
-    @states = [["Slider 1",1],["Slider 2", 2] ,["Inactive",0],["Delete", -1]]
+    puts '~'*50, @slider_images , '~'*50
+    @states = [ ["Slider 1",1], ["Slider 2", 2], ["Slider 3", 3] ,["Inactive",0],["Delete", -1] ]
     render 'edit_featured_slider'
   end
 
@@ -47,10 +34,11 @@ class Admin::CommunitiesController < ApplicationController
     @selected_left_navi_link = "tribe_featured_slider"
     @community = @current_community
     slider_image_params = params.require(:community).permit(:image)
+    puts "~"*50, slider_image_params.inspect , "~"*50 
     slider_image = FeaturedSlider.new(slider_image_params)
     slider_image.image_for = 0
     slider_image.save
-    edit_featured_slider
+    edit_featured_slider()
   end
 
   def modify_slider
@@ -97,7 +85,7 @@ class Admin::CommunitiesController < ApplicationController
              can_set_sender_address: can_set_sender_address(@current_plan),
              knowledge_base_url: APP_CONFIG.knowledge_base_url,
              ses_in_use: ses_in_use,
-             show_branding_info: !PlanService::API::Api.plans.get_current(community_id: @current_community.id).data[:features][:whitelabel],
+             show_branding_info: !@current_plan[:features][:whitelabel],
              link_to_sharetribe: "https://www.sharetribe.com/?utm_source=#{@current_community.ident}.sharetribe.com&utm_medium=referral&utm_campaign=nowl-admin-panel"
            }
   end
@@ -121,7 +109,7 @@ class Admin::CommunitiesController < ApplicationController
         when Some(:invalid_email)
           t("admin.communities.outgoing_email.invalid_email_error", email: res.data[:email])
         when Some(:invalid_domain)
-          kb_link = view_context.link_to(t("admin.communities.outgoing_email.invalid_email_domain_read_more_link"), "#{APP_CONFIG.knowledge_base_url}/articles/686493", class: "flash-error-link")
+          kb_link = view_context.link_to(t("admin.communities.outgoing_email.invalid_email_domain_read_more_link"), "#{APP_CONFIG.knowledge_base_url}/configuration-and-how-to/how-to-define-your-own-address-as-the-sender-of-all-outgoing-emails", class: "flash-error-link") # rubocop:disable Metrics/LineLength
           t("admin.communities.outgoing_email.invalid_email_domain", email: res.data[:email], domain: res.data[:domain], invalid_email_domain_read_more_link: kb_link).html_safe
         else
           t("admin.communities.outgoing_email.unknown_error")
@@ -171,63 +159,98 @@ class Admin::CommunitiesController < ApplicationController
       knowledge_base_url: APP_CONFIG.knowledge_base_url}
   end
 
-  def menu_links
-    @selected_left_navi_link = "menu_links"
-    @community = @current_community
+  def new_layout
+    @selected_left_navi_link = "new_layout"
+
+    features = NewLayoutViewUtils.features(@current_community.id,
+                                           @current_user.id,
+                                           @current_community.private,
+                                           CustomLandingPage::LandingPageStore.enabled?(@current_community.id))
+
+    render :new_layout, locals: { community: @current_community,
+                                  feature_rels: NewLayoutViewUtils::FEATURE_RELS,
+                                  features: features }
   end
 
-  def update_menu_links
+  def update_new_layout
+    h_params = params.to_unsafe_hash
     @community = @current_community
+    enabled_for_user = Maybe(h_params[:enabled_for_user]).map { |f| NewLayoutViewUtils.enabled_features(f) }.or_else([])
+    disabled_for_user = NewLayoutViewUtils.resolve_disabled(enabled_for_user)
+
+    enabled_for_community = Maybe(h_params[:enabled_for_community]).map { |f| NewLayoutViewUtils.enabled_features(f) }.or_else([])
+    disabled_for_community = NewLayoutViewUtils.resolve_disabled(enabled_for_community)
+
+    response = update_feature_flags(community_id: @current_community.id, person_id: @current_user.id,
+                                    user_enabled: enabled_for_user, user_disabled: disabled_for_user,
+                                    community_enabled: enabled_for_community, community_disabled: disabled_for_community)
+
+    if Maybe(response)[:success].or_else(false)
+      flash[:notice] = t("layouts.notifications.community_updated")
+    else
+      flash[:error] = t("layouts.notifications.community_update_failed")
+    end
+    redirect_to admin_new_layout_path
+  end
+
+
+  def topbar
+    @selected_left_navi_link = "topbar"
+
+    if FeatureFlagHelper.feature_enabled?(:topbar_v1) || CustomLandingPage::LandingPageStore.enabled?(@current_community.id)
+      limit_priority_links = MarketplaceService::API::Api.configurations.get(community_id: @current_community.id).data[:limit_priority_links]
+      all = view_context.t("admin.communities.menu_links.all")
+      limit_priority_links_options = (0..5).to_a.map {|o| [o, o]}.concat([[all, -1]])
+      limit_priority_links_selected = Maybe(limit_priority_links).or_else(-1)
+    end
+
+    # Limits are by default nil
+    render :topbar, locals: {
+             community: @current_community,
+             limit_priority_links: limit_priority_links,
+             limit_priority_links_options: limit_priority_links_options,
+             limit_priority_links_selected: limit_priority_links_selected
+           }
+  end
+
+  def update_topbar
+    @community = @current_community
+    h_params = params.to_unsafe_hash
 
     menu_links_params = Maybe(params)[:menu_links].permit!.or_else({menu_link_attributes: {}})
 
+    if FeatureFlagHelper.feature_enabled?(:topbar_v1) || CustomLandingPage::LandingPageStore.enabled?(@current_community.id)
+      limit_priority_links = params[:limit_priority_links].to_i
+      MarketplaceService::API::Api.configurations.update({
+        community_id: @current_community.id,
+        configurations: {
+          limit_priority_links: limit_priority_links
+        }
+      })
+    end
+    translations = h_params[:post_new_listing_button].map{ |k, v| {locale: k, translation: v}}
+
+    if translations.any?{ |t| t[:translation].blank? }
+      flash[:error] = t("admin.communities.topbar.invalid_post_listing_button_label")
+      redirect_to admin_topbar_edit_path and return
+    end
+
+    translations_group = [{
+      translation_key: "homepage.index.post_new_listing",
+      translations: translations
+    }]
+    TranslationService::API::Api.translations.create(@community.id, translations_group)
+
     update(@community,
             menu_links_params,
-            menu_links_admin_community_path(@community),
-            :menu_links)
+            admin_topbar_edit_path,
+            :topbar)
   end
 
-  # This is currently only for superadmins, quick and hack solution
-  def payment_gateways
-    # Redirect if payment gateway in use but it's not braintree
-    if((@current_community.payment_gateway) && (!@current_community.braintree_in_use?))
-      redirect_to admin_details_edit_path
-    else
-      @selected_left_navi_link = "payment_gateways"
-      @community = @current_community
-      @payment_gateway = Maybe(@current_community).payment_gateway.or_else { BraintreePaymentGateway.new }
-      render :braintree_payment_gateway
-    end
-  end
+  def landing_page
+    @selected_left_navi_link = "landing_page"
 
-  def update_payment_gateway
-    # Redirect if payment gateway in use but it's not braintree
-    redirect_to admin_details_edit_path if @current_community.payment_gateway && !@current_community.braintree_in_use?
-
-    braintree_params = params.require(:payment_gateway).permit(
-                                                                :braintree_environment,
-                                                                :braintree_public_key,
-                                                                :braintree_private_key,
-                                                                :braintree_merchant_id,
-                                                                :braintree_master_merchant_id,
-                                                                :braintree_client_side_encryption_key
-                                                              )
-    community_params = params.require(:community).permit(:commission_from_seller)
-
-    unless @current_community.update_attributes(community_params)
-      flash.now[:error] = t("layouts.notifications.community_update_failed")
-      return render :payment_gateways
-    end
-
-    update(@current_community.payment_gateway,
-      braintree_params,
-      payment_gateways_admin_community_path(@current_community),
-      :payment_gateways)
-  end
-
-  def create_payment_gateway
-    @current_community.payment_gateway = BraintreePaymentGateway.create(params[:payment_gateway].merge(community: @current_community))
-    update_payment_gateway
+    render :landing_page, locals: { community: @current_community }
   end
 
   def test_welcome_email
@@ -240,10 +263,17 @@ class Admin::CommunitiesController < ApplicationController
     @selected_left_navi_link = "admin_settings"
 
     # When feature flag is removed, make this pretty
-    if(location_search_available)
+    if(FeatureFlagHelper.location_search_available)
       marketplace_configurations = MarketplaceService::API::Api.configurations.get(community_id: @current_community.id).data
 
-      main_search_select_options = [:keyword, :location]
+      keyword_and_location =
+        if FeatureFlagService::API::Api.features.get_for_community(community_id: @current_community.id).data[:features].include?(:topbar_v1)
+          [:keyword_and_location]
+        else
+          []
+        end
+
+      main_search_select_options = [:keyword, :location].concat(keyword_and_location)
         .map { |type|
           [SettingsViewUtils.search_type_translation(type), type]
         }
@@ -254,18 +284,17 @@ class Admin::CommunitiesController < ApplicationController
       ]
 
       render :settings, locals: {
-        supports_escrow: escrow_payments?(@current_community),
         delete_redirect_url: delete_redirect_url(APP_CONFIG),
         delete_confirmation: @current_community.ident,
         can_delete_marketplace: can_delete_marketplace?(@current_community.id),
         main_search: marketplace_configurations[:main_search],
         main_search_select_options: main_search_select_options,
         distance_unit: marketplace_configurations[:distance_unit],
-        distance_unit_select_options: distance_unit_select_options
+        distance_unit_select_options: distance_unit_select_options,
+        limit_distance: marketplace_configurations[:limit_search_distance]
       }
     else
       render :settings, locals: {
-        supports_escrow: escrow_payments?(@current_community),
         delete_redirect_url: delete_redirect_url(APP_CONFIG),
         delete_confirmation: @current_community.ident,
         can_delete_marketplace: can_delete_marketplace?(@current_community.id)
@@ -279,29 +308,28 @@ class Admin::CommunitiesController < ApplicationController
 
     params[:community][:custom_color1] = nil if params[:community][:custom_color1] == ""
     params[:community][:custom_color2] = nil if params[:community][:custom_color2] == ""
+    params[:community][:description_color] = nil if params[:community][:description_color] == ""
+    params[:community][:slogan_color] = nil if params[:community][:slogan_color] == ""
 
     permitted_params = [
       :wide_logo, :logo,:cover_photo, :small_cover_photo, :favicon, :custom_color1,
-      :custom_color2, :default_browse_view, :name_display_type
+      :custom_color2, :slogan_color, :description_color, :default_browse_view, :name_display_type
     ]
     permitted_params << :custom_head_script
     community_params = params.require(:community).permit(*permitted_params)
 
     update(@current_community,
-           community_params.merge(stylesheet_needs_recompile: regenerate_css?(params, @current_community)),
+           community_params,
            admin_look_and_feel_edit_path,
            :edit_look_and_feel) { |community|
-      Delayed::Job.enqueue(CompileCustomStylesheetJob.new(community.id), priority: 3)
-
+      flash[:notice] = t("layouts.notifications.images_are_processing") if images_changed?(params)
       # Onboarding wizard step recording
       state_changed = Admin::OnboardingWizard.new(community.id)
         .update_from_event(:community_updated, community)
       if state_changed
         report_to_gtm({event: "km_record", km_event: "Onboarding cover photo uploaded"})
 
-        with_feature(:onboarding_redesign_v1) do
-          flash[:show_onboarding_popup] = true
-        end
+        flash[:show_onboarding_popup] = true
       end
     }
   end
@@ -349,24 +377,24 @@ class Admin::CommunitiesController < ApplicationController
       :require_verification_to_post_listings,
       :show_category_in_listing_list,
       :show_listing_publishing_date,
-      :hide_expiration_date,
       :listing_comments_in_use,
       :automatic_confirmation_after_days,
       :automatic_newsletters,
       :default_min_days_between_community_updates,
       :email_admins_about_new_members
     ]
-    permitted_params << :testimonials_in_use if @current_community.payment_gateway
-
     settings_params = params.require(:community).permit(*permitted_params)
 
     maybe_update_payment_settings(@current_community.id, params[:community][:automatic_confirmation_after_days])
 
-    if(location_search_available)
-       MarketplaceService::API::Api.configurations.update({
+    if(FeatureFlagHelper.location_search_available)
+      MarketplaceService::API::Api.configurations.update({
         community_id: @current_community.id,
-        main_search: params[:main_search],
-        distance_unit: params[:distance_unit]
+        configurations: {
+          main_search: params[:main_search],
+          distance_unit: params[:distance_unit],
+          limit_search_distance: params[:limit_distance].present?
+        }
       })
     end
 
@@ -404,9 +432,7 @@ class Admin::CommunitiesController < ApplicationController
     }
   end
 
-  def regenerate_css?(params, community)
-    params[:community][:custom_color1] != community.custom_color1 ||
-    params[:community][:custom_color2] != community.custom_color2 ||
+  def images_changed?(params)
     !params[:community][:cover_photo].nil? ||
     !params[:community][:small_cover_photo].nil? ||
     !params[:community][:wide_logo].nil? ||
@@ -446,10 +472,6 @@ class Admin::CommunitiesController < ApplicationController
     TransactionService::API::Api.settings
   end
 
-  def escrow_payments?(community)
-    MarketplaceService::Community::Query.payment_type(community.id) == :braintree
-  end
-
   def delete_redirect_url(configs)
     Maybe(configs).community_not_found_redirect.or_else(nil)
   end
@@ -477,4 +499,21 @@ class Admin::CommunitiesController < ApplicationController
     end
   end
 
+  def update_feature_flags(community_id:, person_id:, user_enabled:, user_disabled:, community_enabled:, community_disabled:)
+    updates = []
+    updates << ->() {
+      FeatureFlagService::API::Api.features.enable(community_id: community_id, person_id: person_id, features: user_enabled)
+    } unless user_enabled.blank?
+    updates << ->(*) {
+      FeatureFlagService::API::Api.features.disable(community_id: @current_community.id, person_id: @current_user.id, features: user_disabled)
+    } unless user_disabled.blank?
+    updates << ->(*) {
+      FeatureFlagService::API::Api.features.enable(community_id: @current_community.id, features: community_enabled)
+    } unless community_enabled.blank?
+    updates << ->(*) {
+      FeatureFlagService::API::Api.features.disable(community_id: @current_community.id, features: community_disabled)
+    } unless community_disabled.blank?
+
+    Result.all(*updates)
+  end
 end

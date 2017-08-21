@@ -1,20 +1,20 @@
 class CommunityMembershipsController < ApplicationController
 
-  before_filter do |controller|
+  before_action do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_view_this_page")
   end
 
-  skip_filter :cannot_access_if_banned
-  skip_filter :cannot_access_without_confirmation
-  skip_filter :ensure_consent_given
-  skip_filter :ensure_user_belongs_to_community
+  skip_before_action :cannot_access_if_banned
+  skip_before_action :cannot_access_without_confirmation
+  skip_before_action :ensure_consent_given
+  skip_before_action :ensure_user_belongs_to_community
 
-  before_filter :ensure_membership_found
-  before_filter :ensure_membership_is_not_accepted
-  before_filter only: [:pending_consent, :give_consent] {
+  before_action :ensure_membership_found
+  before_action :ensure_membership_is_not_accepted
+  before_action only: [:pending_consent, :give_consent] {
     ensure_membership_status("pending_consent")
   }
-  before_filter only: [:confirmation_pending] {
+  before_action only: [:confirmation_pending] {
     ensure_membership_status("pending_email_confirmation")
   }
 
@@ -71,8 +71,16 @@ class CommunityMembershipsController < ApplicationController
       Delayed::Job.enqueue(CommunityJoinedJob.new(@current_user.id, @current_community.id))
       Delayed::Job.enqueue(SendWelcomeEmail.new(@current_user.id, @current_community.id), priority: 5)
 
+      Analytics.record_event(flash, "GaveConsent")
+
       flash[:notice] = t("layouts.notifications.you_are_now_member")
-      redirect_to search_path
+
+      if session[:return_to]
+        redirect_to session[:return_to]
+        session[:return_to] = nil
+      else
+        redirect_to search_path
+      end
 
     }.on_error { |msg, data|
 
@@ -110,6 +118,7 @@ class CommunityMembershipsController < ApplicationController
   end
 
   def confirmation_pending
+    render :confirmation_pending, locals: {support_email: APP_CONFIG.support_email}
   end
 
   # Ajax end-points for front-end validation

@@ -1,4 +1,5 @@
-Kassi::Application.routes.draw do
+# coding: utf-8
+Rails.application.routes.draw do
 
   namespace :mercury do
     resources :images
@@ -10,6 +11,20 @@ Kassi::Application.routes.draw do
   # first created -> highest priority.
 
   get "/robots.txt" => RobotsGenerator
+
+  # URLs for sitemaps
+  #
+  # From Rails guide: By default dynamic segments don’t accept dots –
+  # this is because the dot is used as a separator for formatted
+  # routes. If you need to use a dot within a dynamic segment add a
+  # constraint which overrides this – for example :id => /[^\/]+/
+  # allows anything except a slash.
+  #
+  # That's why there's the constraints in generate URL to accept host
+  # parameter with dots
+  #
+  get "/sitemap.xml.gz"                        => "sitemap#sitemap", format: :xml
+  get "/sitemap/:sitemap_host/generate.xml.gz" => "sitemap#generate", format: :xml, :constraints => { sitemap_host: /[.\-\w]+/ }
 
   # A route for DV test file
   # A CA will check if there is a file in this route
@@ -25,8 +40,6 @@ Kassi::Application.routes.draw do
   end
 
   # Some non-RESTful mappings
-  get '/webhooks/braintree' => 'braintree_webhooks#challenge'
-  post '/webhooks/braintree' => 'braintree_webhooks#hooks'
   post '/webhooks/paypal_ipn' => 'paypal_ipn#ipn_hook', as: :paypal_ipn_hook
   post '/webhooks/plans' => 'plans#create'
   get '/webhooks/trials' => 'plans#get_trials'
@@ -36,12 +49,6 @@ Kassi::Application.routes.draw do
   get "/people/:person_id/inbox/:id", :to => redirect("/fi/people/%{person_id}/messages/%{id}")
   get "/listings/new/:type" => "listings#new", :as => :new_request_without_locale # needed for some emails, where locale part is already set
   get "/change_locale" => "i18n#change_locale", :as => :change_locale
-
-
-  # Prettier link for admin panel
-  namespace :admin do
-    get '' => "communities#getting_started"
-  end
 
   # Internal API
   namespace :int_api do
@@ -53,15 +60,24 @@ Kassi::Application.routes.draw do
     get "/current/user" => "marketplaces#get_current_user"
   end
 
+  # Harmony Proxy
+  # This endpoint proxies the requests to Harmony and does authorization
+  match '/harmony_proxy/*harmony_path' => 'harmony_proxy#proxy', via: :all
+
+  # UI API, i.e. internal endpoints for dynamic UI that doesn't belong to under any specific controller
+  get "/ui_api/topbar_props" => "topbar_api#props"
+
   # Keep before /:locale/ routes, because there is locale 'vi', which matches '_lp_preview'
   # and regexp anchors are not allowed in routing requirements.
   get '/_lp_preview' => 'landing_page#preview'
 
-  locale_matcher = Regexp.new(Sharetribe::AVAILABLE_LOCALES.map { |l| l[:ident] }.concat(Sharetribe::REMOVED_LOCALES.to_a).join("|"))
+  locale_regex_string = Sharetribe::AVAILABLE_LOCALES.map { |l| l[:ident] }.concat(Sharetribe::REMOVED_LOCALES.to_a).join("|")
+  locale_matcher = Regexp.new(locale_regex_string)
+  locale_matcher_anchored = Regexp.new("^(#{locale_regex_string})$")
 
   # Conditional routes for custom landing pages
   get '/:locale/' => 'landing_page#index', as: :landing_page_with_locale, constraints: ->(request) {
-    locale_matcher.match(request.params["locale"]) &&
+    locale_matcher_anchored.match(request.params["locale"]) &&
       CustomLandingPage::LandingPageStore.enabled?(request.env[:current_marketplace]&.id)
   }
   get '/' => 'landing_page#index', as: :landing_page_without_locale, constraints: ->(request) {
@@ -70,24 +86,25 @@ Kassi::Application.routes.draw do
 
   # Conditional routes for search view if landing page is enabled
   get '/:locale/s' => 'homepage#index', as: :search_with_locale, constraints: ->(request) {
-    locale_matcher.match(request.params["locale"]) &&
+    locale_matcher_anchored.match(request.params["locale"]) &&
       CustomLandingPage::LandingPageStore.enabled?(request.env[:current_marketplace]&.id)
   }
   get '/s' => 'homepage#index', as: :search_without_locale, constraints: ->(request) {
     CustomLandingPage::LandingPageStore.enabled?(request.env[:current_marketplace]&.id)
   }
 
-
   # Default routes for homepage, these are matched if custom landing page is not in use
   # Inside this constraits are the routes that are used when request has subdomain other than www
 
   #get '/:locale/' => 'homepage#index', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
-  get '/:locale/' => 'homepage#home', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
-  get '/' => 'homepage#home', as: :homepage_without_locale
-  root :to => 'homepage#home'
+  #get '/:locale/' => 'homepage#index', :constraints => { :locale => locale_matcher }, as: :homepage_with_locale
+  get '/' => 'xquic_homepage#home', as: :homepage_without_locale
+  #root :to => 'landing_page#index'
 
   get '/:locale/s', to: redirect('/%{locale}', status: 307), constraints: { locale: locale_matcher }
   get '/s', to: redirect('/', status: 307)
+
+
 
   # error handling: 3$: http://blog.plataformatec.com.br/2012/01/my-five-favorite-hidden-features-in-rails-3-2/
   get '/500' => 'errors#server_error'
@@ -106,22 +123,25 @@ Kassi::Application.routes.draw do
 
     put '/mercury_update' => "mercury_update#update", :as => :mercury_update
 
-    get "/transactions/op_status/:process_token" => "transactions#op_status", :as => :transaction_op_status
+    get "/transactions/op_status/:process_token" => "transactions#paypal_op_status", as: :paypal_op_status
+    get "/transactions/transaction_op_status/:process_token" => "transactions#transaction_op_status", :as => :transaction_op_status
+    get "/transactions/created/:transaction_id" => "transactions#created", as: :transaction_created
+    get "/transactions/finalize_processed/:process_token" => "transactions#finalize_processed", as: :transaction_finalize_processed
 
     # All new transactions (in the future)
     get "/transactions/new" => "transactions#new", as: :new_transaction
 
     # preauthorize flow
-    get "/listings/:listing_id/preauthorize" => "preauthorize_transactions#preauthorize", :as => :preauthorize_payment
-    post "/listings/:listing_id/preauthorized" => "preauthorize_transactions#preauthorized", :as => :preauthorized_payment
-    get "/listings/:listing_id/book" => "preauthorize_transactions#book", :as => :book
-    post "/listings/:listing_id/booked" => "preauthorize_transactions#booked", :as => :booked
-    get "/listings/:listing_id/initiate" => "preauthorize_transactions#initiate", :as => :initiate_order
-    post "/listings/:listing_id/initiated" => "preauthorize_transactions#initiated", :as => :initiated_order
 
-    # post pay flow
-    get "/listings/:listing_id/post_pay" => "post_pay_transactions#new", :as => :post_pay_listing
-    post "/listings/:listing_id/create_transaction" => "post_pay_transactions#create", :as => :create_transaction
+    # Deprecated route (26-08-2016)
+    get "/listings/:listing_id/book", :to => redirect { |params, request|
+      "/#{params[:locale]}/listings/#{params[:listing_id]}/initiate?#{request.query_string}"
+    }
+    # Deprecated route (26-08-2016)
+    post "/listings/:listing_id/booked"    => "preauthorize_transactions#initiated", as: :booked # POST request, no redirect
+
+    get "/listings/:listing_id/initiate"   => "preauthorize_transactions#initiate", :as => :initiate_order
+    post "/listings/:listing_id/initiated" => "preauthorize_transactions#initiated", :as => :initiated_order
 
     # free flow
     post "/listings/:listing_id/create_contact" => "free_transactions#create_contact", :as => :create_contact
@@ -133,9 +153,6 @@ Kassi::Application.routes.draw do
     get "/login" => redirect( 'http://still-ridge-7153.herokuapp.com/')
     #get "/listing_bubble/:id" => "listings#listing_bubble", :as => :listing_bubble
     get "/listing_bubble_multiple/:ids" => "listings#listing_bubble_multiple", :as => :listing_bubble_multiple
-    get '/:person_id/settings/payments/braintree/new' => 'braintree_accounts#new', :as => :new_braintree_settings_payment
-    get '/:person_id/settings/payments/braintree/show' => 'braintree_accounts#show', :as => :show_braintree_settings_payment
-    post '/:person_id/settings/payments/braintree/create' => 'braintree_accounts#create', :as => :create_braintree_settings_payment
     get '/:person_id/settings/payments/paypal_account' => 'paypal_accounts#index', :as => :paypal_account_settings_payment
 
     # community membership related actions
@@ -158,6 +175,7 @@ Kassi::Application.routes.draw do
     end
 
     namespace :admin do
+      get '' => "getting_started_guide#index"
 
       # Payments
       get  "/paypal_preferences"                      => "paypal_preferences#index"
@@ -185,29 +203,48 @@ Kassi::Application.routes.draw do
       patch "/details"            => "community_customizations#update_details", as: :details
  
       # featured slider
-      get :edit_featured_slider , to: 'communities#edit_featured_slider'
-      put :edit_featured_slider, to: 'communities#update_featured_slider'
-      put :modify_slider , to: 'communities#modify_slider'
+      get "featured_slider/edit" , to: 'communities#edit_featured_slider'
+      put "featured_slider/update" , to: 'communities#update_featured_slider'
+      put "modify_slider" , to: 'communities#modify_slider'
+      
+      get   "/new_layout"         => "communities#new_layout",                  as: :new_layout
+      patch "/new_layout"         => "communities#update_new_layout",           as: :update_new_layout
+
+      # Topbar menu
+      get   "/topbar/edit"        => "communities#topbar",                      as: :topbar_edit
+      patch "/topbar"             => "communities#update_topbar",               as: :topbar
+
+      # Landing page menu
+      get   "/landing_page"         => "communities#landing_page",                  as: :landing_page
 
       resources :communities do
         member do
-          get :getting_started, to: 'communities#getting_started'
           get :edit_welcome_email
           post :create_sender_address
           get :check_email_status
           post :resend_verification_email
           get :edit_text_instructions
           get :test_welcome_email
-          get :payment_gateways
-          put :payment_gateways, to: 'communities#update_payment_gateway'
-          post :payment_gateways, to: 'communities#create_payment_gateway'
           get :social_media
           get :analytics
           put :social_media, to: 'communities#update_social_media'
           put :analytics, to: 'communities#update_analytics'
-          get :menu_links
-          put :menu_links, to: 'communities#update_menu_links'
           delete :delete_marketplace
+
+          # DEPRECATED (2016-08-26)
+          # These routes are not in use anymore, don't use them
+          # See new "Topbar menu" routes above, outside of communities resource
+          get :topbar, to: redirect("/admin/topbar/edit")
+          put :topbar, to: "communities#update_topbar" # PUT request, no redirect
+          # also redirect old menu link requests to topbar
+          get :menu_links, to: redirect("/admin/topbar/edit")
+          put :menu_links, to: "communities#update_topbar" # PUT request, no redirect
+
+          # DEPRECATED (2016-07-07)
+          # These routes are not in use anymore, don't use them
+          # See new "Guide" routes above, outside of communities resource
+          get :getting_started, to: redirect('/admin/getting_started_guide')
+
           # DEPRECATED (2016-03-22)
           # These routes are not in use anymore, don't use them
           # See new routes above, outside of communities resource
@@ -262,6 +299,8 @@ Kassi::Application.routes.draw do
           post :order
           put :update_price
           put :update_location
+          get :edit_expiration
+          put :update_expiration
         end
       end
       resources :categories do
@@ -311,6 +350,7 @@ Kassi::Application.routes.draw do
         collection do
           post :add_from_file
           put :add_from_url
+          put :reorder
         end
       end
     end
@@ -399,9 +439,6 @@ Kassi::Application.routes.draw do
             get :received, to: 'inboxes#show'
           end
           member do
-            get :accept, to: 'accept_conversations#accept'
-            get :reject, to: 'accept_conversations#reject'
-            put :acceptance, to: 'accept_conversations#acceptance'
             get :confirm, to: 'confirm_conversations#confirm'
             get :cancel, to: 'confirm_conversations#cancel'
             put :confirmation, to: 'confirm_conversations#confirmation' #TODO these should be under transaction
@@ -415,12 +452,6 @@ Kassi::Application.routes.draw do
               put :skip
             end
           end
-          resources :payments do
-            member do
-              get :done
-            end
-          end
-          resources :braintree_payments
         end
         resource :paypal_account, only: [:index] do
           member do
@@ -432,12 +463,10 @@ Kassi::Application.routes.draw do
           end
         end
         resources :transactions, only: [:show, :new, :create]
-        resource :checkout_account, only: [:new, :show, :create]
         resource :settings do
           member do
             get :account
             get :notifications
-            get :payments
             get :unsubscribe
           end
         end

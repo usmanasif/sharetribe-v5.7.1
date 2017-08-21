@@ -3,11 +3,7 @@
 %tr
   %td{:align => "left", :style => "padding-bottom: 15px;"}
     %font{body_font}
-      = t("emails.common.hey", :name => @resource.given_name_or_username)
-
--# This part can be enabled if need to send mails in some communities where staring to use mail confirmation now
--# %p
--#   = t("emails.confirmation_instructions.turning_on_confirmations_in_this_community")
+      = t("emails.common.hey", :name => PersonViewUtils.person_display_name_for_type(@resource, "first_name_only"))
 
 %tr
   %td{:align => "left"}

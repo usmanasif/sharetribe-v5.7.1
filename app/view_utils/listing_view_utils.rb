@@ -6,7 +6,7 @@ module ListingViewUtils
     [:name_tr_key, :string, :optional],
     [:kind, :mandatory, :to_symbol],
     [:selector_tr_key, :string, :optional],
-    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day]] # in the future include :hour, :week:, :night ,:month etc.
+    [:quantity_selector, :to_symbol, one_of: ["".to_sym, :none, :number, :day, :night]] # in the future include :hour, :week:, :month etc.
   )
 
   module_function
@@ -30,20 +30,22 @@ module ListingViewUtils
       }
   end
 
-  def translate_unit(type, tr_key)
+  def translate_unit(type, tr_key, locale: nil)
+    l = (locale || I18n.locale).to_sym
+
     case type
     when :hour
-      I18n.translate("listings.unit_types.hour")
+      I18n.translate("listings.unit_types.hour", locale: l)
     when :day
-      I18n.translate("listings.unit_types.day")
+      I18n.translate("listings.unit_types.day", locale: l)
     when :night
-      I18n.translate("listings.unit_types.night")
+      I18n.translate("listings.unit_types.night", locale: l)
     when :week
-      I18n.translate("listings.unit_types.week")
+      I18n.translate("listings.unit_types.week", locale: l)
     when :month
-      I18n.translate("listings.unit_types.month")
+      I18n.translate("listings.unit_types.month", locale: l)
     when :custom
-      I18n.translate(tr_key)
+      I18n.translate(tr_key, locale: l)
     else
       raise ArgumentError.new("No translation for unit type: #{type}, translation_key: #{tr_key}")
     end
@@ -77,11 +79,13 @@ module ListingViewUtils
 
   def shipping_info(shipping_type, shipping_price, shipping_price_additional)
     if shipping_type == :shipping && shipping_price_additional.present?
-      I18n.translate("listings.show.shipping_price_additional", price: humanized_money_with_symbol(shipping_price), shipping_price_additional: humanized_money_with_symbol(shipping_price_additional))
+      I18n.translate("listings.show.shipping_price_additional",
+                     price: MoneyViewUtils.to_humanized(shipping_price),
+                     shipping_price_additional: MoneyViewUtils.to_humanized(shipping_price_additional))
     elsif shipping_type == :shipping
-      I18n.translate("listings.show.shipping", price: humanized_money_with_symbol(shipping_price))
+      I18n.translate("listings.show.shipping", price: MoneyViewUtils.to_humanized(shipping_price))
     elsif shipping_type == :pickup
-      I18n.translate("listings.show.pickup", price: humanized_money_with_symbol(shipping_price))
+      I18n.translate("listings.show.pickup", price: MoneyViewUtils.to_humanized(shipping_price))
     else
       raise ArgumentError.new("Delivery type not supported")
     end

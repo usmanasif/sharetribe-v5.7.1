@@ -1,4 +1,10 @@
 en:
+  number:
+    currency:
+      format:
+        separator: "."
+        delimiter: ","
+        format: "%u%n"
   admin:
     categories:
       edit:
@@ -54,6 +60,7 @@ en:
         community_details: "Basic details"
         community_look_and_feel: Design
         edit_community: "Basic details"
+        community_featured_slider: "Featured Slider"
         enabled_languages: "Enabled languages"
         enabled_languages_description: "The set of languages available for users. The first one is used as default."
         default_language: "Default language"
@@ -69,7 +76,7 @@ en:
         private_community_homepage_content: "Private marketplace homepage content"
         edit_private_community_homepage_content_description: "This content is shown on the homepage of private marketplaces to users who are not logged in. Here you can describe your marketplace and the process to join it. You can also add images, videos and HTML content here. %{see_how_it_looks_like}."
         update_information: "Save settings"
-        invite_people: "Invite new users"
+        invite_people: "Invite new users to %{service_name}"
         edit_signup_info: "Signup info"
         edit_signup_info_description: "This is an info text that can be shown to users in the signup page. There you can give the users instructions for signing up, information like where to get an invite, etc. By default there are no instructions."
         edit_info: "Edit information"
@@ -87,23 +94,29 @@ en:
         transaction_agreement_description: "This is the content of the actual agreement that the user needs to accept. The agreement content is displayed when the user clicks the \"%{read_more}\" link next to the agreement label."
       edit_look_and_feel:
         edit_community_look_and_feel: "Edit marketplace \"%{community_name}\" look and feel"
-        community_logo: "Desktop logo"
+        community_logo: Logo
         community_logo_icon: "Logo for social networks and mobile devices"
         community_cover_photo: "Cover photo"
         small_community_cover_photo: "Small cover photo"
         favicon: Favicon
         favicon_info_text: "Favicon will replace the default Sharetribe logo. The dimensions should be 32x32 pixels and the uploaded image will be resized to these dimensions."
         community_custom_color1: "Main color"
-        community_custom_color2: "%{post_new_listing} button color"
-        logo_instructions_text_with_dimensions: "Desktop logo size should be %{width}x%{height}px. It will be shown to users with bigger screens."
+        community_slogan_color: "Marketplace slogan color"
+        community_slogan_color_instructions_text: "You can change the color of the slogan on the homepage by entering a hex color value. The slogan is shown to users that are not logged in. %{colorpicker} can help you choose the color and give you the hex color code. You can then copy the code here. %{see_how_it_looks_like}."
+        community_description_color: "Marketplace description color"
+        community_description_color_instructions_text: "You can change the color of the description on the homepage by entering a hex color value. The description is shown to users that are not logged in. %{colorpicker} can help you choose the color and give you the hex color code. You can then copy the code here. %{see_how_it_looks_like}."
+        new_listing_button_custom_color: "Post a new listing button color"
+        logo_instructions_text_with_dimensions: "The logo size should be %{width}x%{height}px. It will be shown to users with bigger screens."
+        logo_instructions_text_with_dimensions_no_placing: "The logo size should be %{width}x%{height}px."
         logo_icon_instructions_text_with_dimensions: "This square logo will be shown when people share your site in Facebook, when they view your site on a mobile device or when they bookmark your site to the home screen of their mobile device. The dimensions should be (at least) %{width}x%{height}px."
+        logo_icon_instructions_text_with_dimensions_no_placing: "This square logo will be shown when people share your site in Facebook or when they bookmark your site to the home screen of their mobile device. The dimensions should be (at least) %{width}x%{height}px."
         cover_photo_visibility: "Cover photo is shown in the homepage for users who are not logged in."
         cover_photo_instructions_text_with_dimensions: "The photo will be resized to %{width}x%{height} pixel size and taller images will be cut in the middle. %{see_how_it_looks_like}."
         small_cover_photo_visibility: "Small cover photo is shown in all pages except in the homepage for users who are not logged in."
         small_cover_photo_instructions_text_with_dimensions: "The photo will be resized to %{width}x%{height} pixel size and taller images will be cut in the middle."
         main_content_width: "When choosing cover photos please note that the page main content is %{main_width} pixels wide at most. Remember to also check how your cover photo looks on the smaller screens (e.g. by using a more narrow browser window)."
-        custom_color1_instructions_text: "You can change the main color of the user interface by entering a hex color value. <a href=\"http://www.colorpicker.com/?colorcode=D96E21\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> can help you choose the color and copy the code here."
-        custom_color2_instructions_text: "You can change the color of the %{post_new_listing} button by entering a hex color value. <a href=\"http://www.colorpicker.com/?colorcode=00a26c\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> can help you choose the color and copy the code here."
+        custom_color1_instructions_text: "You can change the main color of the user interface by entering a hex color value. <a href=\"http://www.colorpicker.com/?colorcode=D96E21\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> can help you choose the color and give you the hex color code. You can then copy the code here."
+        new_listing_button_instructions_text: "You can change the color of the Post a new listing button by entering a hex color value. %{link_to_colorpicker} can help you choose the color and give you the hex color code. You can then copy the code here."
         default_browse_view: "Default browse view"
         default_browse_view_instructions_text: "Default browse view is used on the homepage to set how the listings are displayed by default."
         grid: Grid
@@ -131,12 +144,13 @@ en:
         sender_address: "Sender address: %{sender_address}"
         sender_address_default: "Sender address: not set (using default address %{sender_address})"
         need_to_change: "If you need to change the email address, please %{contact_support_link}."
-        contact_support_link_text: "contact our support"
+        contact_support_link_text: "contact Sharetribe support"
         set_sender_address: "Set sender address"
         sender_name_label: Name
         sender_name_placeholder: "Sender name"
         sender_email_label: "Email address"
         sender_email_placeholder: sender-email@example.com
+        amazon_ses_notification: "You will receive an email from %{email_sender} to confirm your e-mail address. The email subject is '%{email_subject}'. Follow the instructions to verify your email."
         this_is_how_it_will_look: "This is how it will look:"
         send_verification_button: "Send verification email"
         successfully_saved: "Sender address saved successfully. The verification email will be sent soon."
@@ -149,46 +163,14 @@ en:
         resend_link: Resend
         invalid_email_error: "Invalid email format for '%{email}'"
         invalid_email_domain: "The '%{email}' email address is using an unsupported email provider: '%{domain}'. %{invalid_email_domain_read_more_link}"
-        invalid_email_domain_read_more_link: "Read the knowledge base article for more information."
+        invalid_email_domain_read_more_link: "Read the Help Center article for more information."
         unknown_error: "Something went wrong"
         white_label_offer: "Set your own email address as the sender and remove all Sharetribe branding from outgoing email messages by %{upgrade_pro_plan_link}."
-        upgrade_plan_link: "upgrading to our Pro plan or higher"
+        upgrade_plan_link: "upgrading to the Pro plan or higher"
         verification_sent_from: "The verification email was sent from %{verification_sender_name}."
         follow_the_instructions: "Please follow the instructions in the email to verify your address."
       getting_started:
         getting_started: "Getting started guide"
-        welcome_to_your_marketplace: "Welcome to your marketplace, %{name}!"
-        intro: "This is a quick guide for configuring and managing your marketplace site. You can view the live site %{live_site_link}."
-        live_site_link_text: here
-        look_and_feel: "Before you launch your site to the public, you probably want to configure some things. For instance, you might want to %{logo_link} and change the cover photo and colors to match the look and feel of your brand."
-        logo_link_text: "add your logo"
-        custom_domain: "You might also want to add a custom web address (an example: www.yourmarketplace.com). Setting it up requires some manual work on our side, and we also need to buy an SSL certificate for the domain to keep your site secure. For these reasons custom domains are not available in free trials right now, so you need to subscribe to our Pro plan or higher to have one. If you would like to have a custom domain, please %{contact_support_link}."
-        categories_and_custom_fields: "The next thing is to decide what kind of content people can post to your site. You can %{categories_link}, %{custom_fields_link} that the actual listing form contains, and decide %{filters_link} are in use when people browse the listings."
-        categories_link_text: "add categories and subcategories"
-        custom_fields_link_text: "configure form fields"
-        filters_link_text: "what kind of filters"
-        order_types: "You can also configure how the order process works in your marketplace. Are your users selling, renting, or giving things away for free? Are they offering rentals hourly, daily or weekly? These things can be configured from the %{order_types_link}."
-        order_types_link_text: "order type view"
-        payments: "If you want people to be able to pay for their purchases through your marketplace, so that you can charge a fee from each transaction, you should %{payments_link}."
-        payments_link_text: "configure a payment method"
-        info_texts: "Don't forget to customize info pages and other texts where you can tell your users about your marketplace. Good places to check are your %{about_page_link}, your %{terms_of_use_link} (you should add your own terms of use here, either by modifying the current template or creating a completely new document), your %{privacy_policy_link}, and the %{welcome_email_link} that is sent to each new user. There are also some %{instruction_texts_link} you can configure."
-        about_page_link_text: "about page"
-        terms_of_use_link_text: "terms of use"
-        privacy_policy_link_text: "privacy policy"
-        welcome_email_link_text: "welcome email"
-        instruction_texts_link_text: "other instruction texts"
-        social_media: "Using social media is a good way to build the community. You can %{facebook_link} to make it easier for people to log in to your marketplace, and %{twitter_link} to get viral visibility when people tweet about products on your marketplace."
-        facebook_link_text: "connect your custom Facebook app"
-        twitter_link_text: "add your Twitter account"
-        analytics: "It's also a good idea to %{analytics_link}. This way it's easy for you to see what's happening in your marketplace, how many visitors you have, and so on."
-        analytics_link_text: "connect a Google Analytics account"
-        settings: "There are a bunch of other settings that you can play around with. For instance, you can require everyone to have an invite from other users before they can join and make your marketplace private, so only the users who are logged in, can see the content. %{settings_link}."
-        settings_link_text: "View your marketplace settings here"
-        final_words: "That's about it! If everything's ready, you can start %{invite_link} to your marketplace. You can see all the users who have joined %{view_users_link}, and all the transactions they have completed %{view_transactions_link}. You can also easily manage listings: simply go to the listing page and you'll see the admin links for editing and closing there. If you need any help, you can %{contact_support_link} - we are here for you!"
-        invite_link_text: "inviting users"
-        view_users_link_text: here
-        view_transactions_link_text: here
-        contact_support_link_text: "contact our support"
       available_languages:
         en: English
         en-AU: "English (Australia)"
@@ -214,24 +196,24 @@ en:
       settings:
         settings: Settings
         general: General
-        users_can_review_each_other_after_transaction: "Users can review each other after an order"
         access: "Access preferences"
-        join_with_invite_only: "Users can only join this marketplace with an invite from another user"
-        users_can_invite_new_users: "All users can invite new users to this marketplace"
-        private: "This marketplace is private (only registered users can see the content)"
-        require_verification_to_post_listings: "Only users verified by admin can post new listings"
+        join_with_invite_only: "Allow users to join only with an invite from another user"
+        users_can_invite_new_users: "Allow all users to invite new users"
+        private: "Allow only registered users to see listings and user profiles (make marketplace private)"
+        require_verification_to_post_listings: "Allow only users verified by admin to post new listings"
         search_preferences: "Search preferences"
         default_search_type: "Search type: %{select_search_type}"
         keyword_search: "Keyword search"
+        keyword_and_location_search: "Keyword and location search"
         location_search: "Location search"
         select_distance_unit: "Show distance in %{distance_units_selector}"
         km: km
         miles: miles
+        show_only_nearby: "Show only nearby listings with location search"
         listing_preferences: "Listing preferences"
         transaction_preferences: "Order preferences"
         show_listing_publishing_date: "Display publishing date of the listing on the listing page"
         show_category_in_listing_list: "Display listing type in list view"
-        hide_expiration_date: "Do not require listings to have an expiration date"
         listing_comments_in_use: "Allow users to post comments to listings (viewable to all other users)"
         email_preferences: "Email preferences"
         automatic_newsletters: "Send automatic daily / weekly newsletters to all users (unless they opt out)"
@@ -239,7 +221,6 @@ en:
         google_analytics_key: "Google Analytics tracking ID"
         twitter_handle: "Twitter handle (used with tweet button in listing page)"
         update_settings: "Save settings"
-        automatically_confirmed: "Order will be automatically marked as completed %{days_dropdown} days after the payment has been made. If escrow system is in use, the money will be released to the provider at this point."
         automatically_confirmed_no_escrow: "Order will be automatically marked as completed %{days_dropdown} days after the payment has been made"
         automatic_newsletter_frequency: "Send automatic newsletter: %{frequency_dropdown}"
         newsletter_daily: Daily
@@ -257,6 +238,7 @@ en:
         manage_members: "Manage users"
         email: Email
         name: Name
+        display_name: "Display name"
         join_date: Joined
         admin: Admin
         posting_allowed: "Posting allowed"
@@ -267,6 +249,13 @@ en:
         save_user_status_error: "Saving failed. Please refresh the page and try again."
         ban_user_confirmation: "This removes the user from the marketplace and prevents them from accessing the site again with this account. Are you sure you want to proceed?"
         ban_me_error: "You cannot ban yourself."
+      new_layout:
+        new_layout: "New layout"
+        description_roadmap_new: "When new layout components are made available for your marketplace, you can choose whether you want to start using the new component or continue using the old one. You can toggle the selection at any point from this page. It's recommended to always be using the new version, as the old components might be phased out at some point. In case a component you're currently using is going to be phased out, you will be contacted in advance."
+        enabled_for_you: "Enabled for you"
+        enabled_for_all: "Enabled for all"
+        new_topbar: "New top bar (visible on every page)"
+        searchpage: "New search page (requires the new top bar)"
       social_media:
         social_media: "Social media"
         twitter_handle: "Twitter handle"
@@ -301,6 +290,14 @@ en:
         language: Language
         url: URL
         empty: "You don't have any additional menu links"
+        max_number_of_links: "Maximum number of links displayed in the top bar: %{select_max_number}"
+        all: All
+        max_number_of_links_info: "Link to %{about_page} is always displayed as the first menu link"
+        about_page: "about page"
+      topbar:
+        topbar: "Top bar"
+        new_listing_button_label: "Post a new listing button text"
+        invalid_post_listing_button_label: "Please provide a valid text for \"Post a new listing\" button"
       transactions:
         export_all_as_csv: "Export all as CSV"
         transactions: "View transactions"
@@ -325,29 +322,23 @@ en:
           initiated: "Waiting PayPal payment"
           pending_ext: "Waiting PayPal payment"
         not_available: "Not available"
-      braintree_payment_gateway:
-        braintree_payment_gateway: "Braintree Payment API keys"
-        environment: Environment
-        private_key: "Private Key"
-        public_key: "Public Key"
-        client_side_encryption_key: "Client-Side Encryption (CSE) Key"
-        merchant_id: "Merchant ID"
-        master_merchant_id: "Master Merchant ID"
-        commission_from_seller: "Commission percentage from seller"
       paypal_account:
-        paypal_admin_account: Payments
+        paypal_admin_account: "Payment system"
     custom_fields:
       edit:
         edit_listing_field: "Edit listing field '%{field_name}'"
       edit_price:
         description: "The minimum and maximum price only affect the filter. They do not set a limit for listing prices."
-        edit_price_field: "Edit price field"
+        edit_price_field: "Edit listing field 'Price'"
         show_price_filter_homepage: "Show price filter on homepage"
         price_min: "Filter minimum price"
         price_max: "Filter maximum price"
       edit_location:
-        edit_location_field: "Edit location field"
+        edit_location_field: "Edit listing field 'Location'"
         this_field_is_required: "This field is required"
+      edit_expiration:
+        edit_expiration_field: "Edit listing field 'Expiration date'"
+        enable: "Enable expiration date"
       form:
         field_required:
           this_field_is_required: "Make it mandatory to fill in this field when creating a new listing"
@@ -403,13 +394,19 @@ en:
       users_and_transactions: "Users & transactions"
       configure: Configuration
       emails_title: Emails
-      support: Support
       subscription: Subscription
       preview: "Preview site"
     listing_shapes:
+      availability_title: Availability
+      read_more: "Read more about automatic availability management."
+      read_more_availability_management: "Read more about availability management."
+      allow_providers_to_manage_availability: "Allow providers to manage their availability from a calendar"
+      per_day_availability: "\"Per day\" availability"
+      per_night_availability: "\"Per night\" availability"
+      pricing_units_disabled_info: "Pricing units cannot be used when availability calendar is enabled."
       index:
         listing_shapes: "Order types"
-        description: "Order types determine how the order process works in your site. You can decide whether your users are renting or selling, or perhaps just posting announcements and communicating via free messages."
+        description: "Order types determine how the order process works in your site. You can decide whether your users are renting or selling, or perhaps just posting announcements and communicating via direct messages."
         read_more_about_order_types: "Read more about order types"
         add_new_shape: "Add new order type: "
         select_template: "Select template..."
@@ -492,16 +489,18 @@ en:
           quantity_label: "Quantity (per piece, per kg, per person, per 2 hour tour...)"
           time_label: "Time (per 30 minutes, per 2 weeks, per year...)"
     paypal_accounts:
-      marketplace_paypal_integration: "Payment preferences"
-      preferences_updated: "Payment preferences updated"
-      marketplace_currency_used: "This marketplace uses %{currency} as its currency. To change the currency, %{contact_support_link}."
-      contact_support_link_text: "contact Sharetribe support"
-      integration_info_text: "Sharetribe payments are powered by PayPal. To allow your users to pay using your marketplace, you must connect your PayPal account. Once you have connected your PayPal account, you can choose a minimum transaction size and a possible commission fee."
+      marketplace_paypal_integration: "Payment system preferences"
+      preferences_updated: "Payment system preferences updated"
+      contact_support_link_text: "contact support"
+      integration_info_text: "The payment system of your marketplace is powered by PayPal. To allow your users to pay using your marketplace, you must connect your PayPal account. Once you have connected your PayPal account, you can choose a minimum transaction size and a possible commission fee."
       link_paypal_personal_account_label: "Are you providing products or services yourself?"
       link_paypal_personal_account: "If so, you will also need to connect your PayPal account to %{personal_payment_preferences_link}."
       personal_payment_preferences_link_text: "your personal marketplace account"
-      read_more_about_paypal: "Read more about Sharetribe's payment system"
-      set_minimum_price_and_fee: "Set a minimum price & transaction fee"
+      read_more_about_paypal: "Read more about the payment system"
+      edit_payment_settings: "Edit payment settings"
+      supported_currencies_information_text: "Sharetribe's online payment system supports 24 currencies. If your currency is not on the list, please %{contact_support_link}. If you change the marketplace currency, existing listings will retain their old currency. You need to edit those listings individually to convert them to the new currency."
+      currency_change_warning_text: "Heads up: if you move forward with this currency change, don't forget to ask your sellers to manually edit their existing listings to get the currency update."
+      marketplace_currency_label: "Marketplace currency:"
       minimum_listing_price_label: "Minimum transaction size:"
       transaction_fee_label: "Transaction fee:"
       minimum_transaction_fee_label: "Minimum transaction fee:"
@@ -585,8 +584,6 @@ en:
     accept:
       details: "Order details"
       order_by: "Order by %{orderer_link}"
-      respond_to_offer: "Respond to an offer"
-      respond_to_request: "Respond to a request"
       accept_offer: "Accept the offer"
       accept_request: "Accept the request"
       reject_offer: "Not this time"
@@ -595,9 +592,6 @@ en:
       update_later: "Leave the listing open"
       optional_message: "Optional message"
       price_to_pay: "Total price to be paid"
-      you_need_to_fill_payout_details_before_accepting: "You need to fill in payout details before you can accept the request and receive the payment. Go to %{payment_settings_link} to fill in the details."
-      payment_settings_link: "payment settings"
-      minimum_price_error_message: "The price cannot be lower than %{amount}."
       accept: Accept
       decline: Decline
       quantity_label: "Quantity:"
@@ -639,7 +633,7 @@ en:
       canceled_offer: "Offer canceled."
       message_from: "Message from %{person}"
       about_listing: "About listing %{listing_title}"
-      free_message: "Free message"
+      free_message: "Direct message"
       message_content_not_available: "Message content not available"
     message:
       accepted_request: "accepted the request"
@@ -678,11 +672,10 @@ en:
       last_message_at: "(latest message %{time})"
       price: "Price: %{price}"
       sum: "Total: %{sum}"
-      price_excludes_vat: "(excludes VAT)"
       total: "Total: %{total}"
     status:
       payment_errored: "Payment failed. Please try again."
-      payment_errored_starter: "Payment failed. Please try again. If the problem continues, please contact our support."
+      payment_errored_starter: "Payment failed. Please try again. If the problem continues, please contact Sharetribe support."
       payment_errored_author: "Payment failed. Please contact %{starter_name} and ask him to try the payment again."
       cancel_payed_transaction: Cancel
       feedback_given: "Feedback given"
@@ -737,54 +730,11 @@ en:
       reject_preauthorized_request: "Not this time"
       confirm: "Mark completed"
       cancel: Dispute
-  braintree_accounts:
-    new:
-      add_payout_details: "Add your payout details"
-      first_name: "First name"
-      last_name: "Last name"
-      email: "Email address"
-      phone: "Phone number"
-      address_street_address: "Street address"
-      address_postal_code: "Zip/Postal code"
-      address_locality: City
-      address_region: State
-      date_of_birth: "Date of birth"
-      ssn: SSN
-      routing_number: "Routing number"
-      account_number: "Account number"
-      save: Save
-    show:
-      payout_details: "Your payout details"
-      first_name: "First name"
-      last_name: "Last name"
-      email: "Email address"
-      phone: "Phone number"
-      address_street_address: "Street address"
-      address_postal_code: "Zip/Postal code"
-      address_locality: City
-      address_region: State
-      date_of_birth: "Date of birth"
-      ssn: SSN
-      routing_number: "Routing number"
-      account_number: "Account number"
-  braintree_payments:
-    edit:
-      new_credit_card_payment: "New credit card payment"
-      payment_receiver: "Payment receiver"
-      cardholder_name: "Cardholder name"
-      credit_card_number: "Credit card number"
-      cvv: CVV
-      credit_card_expiration_date: "Credit card expiration date"
-      confirm_payment: "Confirm payment"
-      exp: "Exp:"
   feedback:
     feedback_subject: "New feedback from %{service_name}"
     feedback_body: "%{author_name_and_email} has sent the following feedback from %{service_name}"
     unlogged_user: "Unlogged user"
     anonymous_user: "Anonymous user"
-  preauthorize_payments:
-    edit:
-      confirm_payment: "Confirm payment"
   community_memberships:
     access_denied:
       access_denied: "Access denied"
@@ -819,23 +769,12 @@ en:
       powered_by: "%{service_name} is powered by the %{sharetribe_link} marketplace platform."
       create_own: "Want to create your own online marketplace website like %{service_name}? %{learn_more}."
       learn_more: "Learn more"
-    braintree_account_approved:
-      account_ready: "You are ready to receive payments"
-      message: "Your payment information has been confirmed and you are now ready to receive payments in %{service_name}."
     confirm_reminder:
       you_have_not_yet_confirmed_or_canceled_request: "You have not yet confirmed or canceled the order %{request_link}. If the order has been completed, you should confirm that. After that you can give feedback to %{other_party_given_name}."
-      you_have_not_yet_confirmed_or_canceled_request_escrow_automatic_confirmation: "You have not yet confirmed or canceled the request %{request_link}. We will transfer the money to %{other_party_given_name} only when a) you have marked the request completed or b) %{days_to_automatic_confirmation} days have passed since you paid. After marking the request as completed you can give feedback to %{other_party_given_name}."
       remember_to_confirm_request: "Remember to confirm or cancel a request"
       if_will_not_happen_you_should_cancel: "If you think this order will not be completed for one reason or another, you can %{cancel_it_link}."
-      if_will_not_happen_you_should_cancel_escrow: "If you think this order will not be completed for one reason or another, you can %{cancel_it_link}. This will notify the admin who will then contact you for a refund."
-      if_will_not_happen_you_should_cancel_escrow_automatic_confirmation: "If you think this order will not be completed for one reason or another, you have %{days_to_cancel} days to %{cancel_it_link}. This will notify the admin who will then contact you for a refund."
       cancel_it_link_text: "cancel it"
       automatic_confirmation: "If you don't confirm or cancel the order within %{days_to_automatic_confirmation} days after the request was accepted, we will mark it automatically as completed."
-    payment_reminder:
-      remember_to_pay: "Remember to pay for %{listing_title}"
-      you_have_not_yet_paid: "You have not yet paid for %{listing_title} that %{other_party_name} has accepted to offer you."
-      if_will_not_happen_you_should_cancel: "If you think this order will not be completed for one reason or another, you can also still %{cancel_it_link}."
-      cancel_it_link_text: "cancel it"
     payment_settings_reminder:
       remember_to_add_payment_details: "Remember to add your payment details to receive payments"
       you_have_added_listing_with_payment: "You have added a listing %{listing_link} with payment. However, you haven't yet added your payment details. In order to receive the payment you have to add your payment information."
@@ -859,18 +798,11 @@ en:
       giving_feedback_is_good_idea: "You can now give feedback to %{other_party_given_name}. Giving feedback is always a good idea. If everything went well, you should let others know that %{other_party_given_name} can be trusted. If there were any problems, it's good to mention those as well."
       give_feedback_to: "Give feedback to %{other_party_given_name}"
       show_thread: "Show conversation"
-    escrow_canceled:
-      subject: "Payment canceled"
-      has_marked_request_as_canceled: "%{other_party_full_name} has marked the request about '%{request}' canceled. You will not receive money from this transaction."
-      if_this_was_error: "If you think this was an error, %{please_contant_admin_link}."
-      please_contant_admin_link: "please contact the administrator"
     confirmation_instructions:
       confirmation_instructions_signature: "Best regards,<br/>The %{service_name} Team"
-      welcome_to_kassi: "Welcome to %{service_name}!"
-      need_to_confirm: "You need to confirm your email address."
-      confirmation_link_text: "Confirm my email"
-      or_paste_link: "Alternatively you can copy the following link to your browser's address bar:"
-      turning_on_confirmations_in_this_community: "We are starting to use email confirmations in this %{service_name} marketplace."
+      need_to_confirm: "To join %{service_name}, confirm your email address by clicking the button below."
+      confirmation_link_text: "Confirm my address"
+      or_paste_link: "Alternatively, you can copy the following link to your browser's address bar:"
     common:
       hey: "Hello %{name},"
       kassi_team: "The %{service_name} Team"
@@ -923,15 +855,14 @@ en:
       price_payer_paid: "Price %{payer_full_name} paid:"
       service_fee: "%{service_name} service fee:"
       you_will_get: "Total:"
-      money_will_be_transferred: "The money will be transferred to your account when a) %{payer_name} has marked the request completed or b) %{automatic_confirmation_days} days have passed since %{payer_name} paid."
     receipt_to_payer:
       receipt_of_payment: "Receipt of payment"
       you_have_made_new_payment: "You have paid <b>%{payment_sum}</b> for <b>%{listing_title}</b> to %{recipient_full_name}. Here is a receipt of the payment."
       product: Product
       price_per_unit_type: "Price per %{unit_type}"
-      duration: "Duration:"
-      quantity: "Quantity:"
-      subtotal: "Subtotal:"
+      duration: Duration
+      quantity: Quantity
+      subtotal: Subtotal
       total: Total
       price: Price
       service_fee: "Service fee"
@@ -952,7 +883,6 @@ en:
       title_link_text: "%{community_name}"
       intro_paragraph: "Here are some of the things that happened on %{community_link} during the past %{time_since_last_update}."
       intro_paragraph_link_text: "%{community_name}"
-      post_a_new_listing: "Post a new listing!"
       reduce_email_footer_text: "Too much email? %{settings_link} or %{unsubscribe_link}."
       settings_link_text: "Edit your email settings here"
       unsubscribe_link_text: unsubscribe
@@ -968,9 +898,11 @@ en:
       remember_to_give_feedback_to: "Reminder: remember to give feedback to %{name}"
       you_have_not_given_feedback_yet: "You have not yet given feedback to %{name} about event '%{event}'. Remember to give feedback on how %{given_name} performed in the event."
     transaction_preauthorized:
-      subject: "%{requester} has requested and authorized payment for %{listing_title}"
-      transaction_requested_by_user: "%{requester} has requested and authorized payment for \"%{listing_title}\""
+      subject: "%{requester} is interested and has authorized payment for %{listing_title} published in %{service_name}"
+      transaction_requested_by_user: "Great news! %{requester} is interested in \"%{listing_title}\" and has authorized payment for this listing."
       you_have_time_to_accept: "You need to accept or reject the request within %{payment_expires_in}. If you accept within this timeframe, the payment will go through. If you don't accept, the request will be automatically rejected and you will not get paid."
+      if_you_do_accept: "If you accept the request within this timeframe, you will receive the money immediately to your account."
+      if_you_do_not_accept: "If you reject the request or don't accept it within this timeframe, the transaction will be automatically cancelled, %{requester} will not be charged and you will not get paid."
       click_here_to_reply: "Click here to respond to the request"
     transaction_preauthorized_reminder:
       subject: "Remember to accept the request from %{requester} about listing %{listing_title}"
@@ -983,29 +915,20 @@ en:
       love_marketplace_crew: "Love,<br /><i>%{service_name} crew</i>"
       welcome_email_footer_text: "What kind of emails do you want to receive from %{service_name}? %{settings_link}"
       settings_link_text: "Check your settings"
-      welcome_email_subject_for_marketplace_creator: "Welcome to Sharetribe"
-      welcome_to_marketplace_creator: "Welcome to Sharetribe, %{name}!"
-      congrats_for_creating_your_marketplace: "Congrats for creating your marketplace! That was easy, wasn't it?"
-      here_is_your_account_information: "Here is your account information."
-      your_email_address: "The email address you used to log in:"
-      your_marketplace_address: "Your marketplace address:"
-      your_marketplace_admin_area: "Your marketplace admin area:"
-      just_follow_details: "Just follow these links and you’ll get more details on how to start building your marketplace!"
-      we_will_guide_you_along_the_way: "We will guide you along the way."
-      are_you_new_to_online_marketplaces: "Need assistance with your marketplace? No worries, we're here to help you out! We will be sending you a series of emails that will help you get the most out of Sharetribe and to build a successful marketplace business. We will be sending Part 1 to you soon."
-      have_questions: "Have questions?"
-      our_happiness_team_is_here_to_help: "Our happiness team is here for you! Either %{knowledge_base_link} or contact our support through %{admin_panel_link}."
-      love: "Love,"
-      sharetribe_crew: "The Sharetribe crew"
-      knowledge_base_link_text: "check out our knowledge base"
-      contact_support_link_text: "contact our support"
-      admin_panel_link_text: "admin panel"
     new_listing_by_followed_person:
       subject: "%{author_name} has posted a new listing in %{service_name}"
       has_posted_a_new_listing: "%{author_name} has posted a new listing:"
       you_are_receiving_this_because: "You received this notification because you follow %{author_name}."
       view_listing: "View listing"
+    new_member_notification:
+      new_member_has_joined: "A new member has joined %{community}. They may still have to confirm their email address."
+      this_is_automatic_message: "This is an automatic message sent to administrators of %{community}."
+      person_name: "Name:"
+      person_email: "Email:"
   error_messages:
+    booking:
+      booking_failed_payment_voided: "Booking failed due to an unexpected error. Please try again later. You haven't been charged."
+      double_booking_payment_voided: "Unfortunately the dates you chose are no longer available. Please choose different dates. You haven’t been charged."
     onboarding:
       server_rendering: "Getting started guide failed to load. We have been informed about the situation and we are fixing it."
     listings:
@@ -1020,6 +943,7 @@ en:
     transaction_agreement:
       required_error: "You need to accept the agreement"
     paypal:
+      transaction_cannot_complete: "Transaction cannot complete. This is most likely caused by the credit card failing bank authorization. Please, try purchasing again with an alternative payment method."
       buyer_cannot_pay_error: "The payment has been declined by PayPal. Please contact their Customer Service for more information: %{customer_service_link}"
       pending_review_error: "The payment was submitted but was flagged by PayPal as 'requiring a review'. When PayPal completes the review, the payment will be automatically authorized."
       seller_express_checkout_disabled: "PayPal Express Checkout has been disabled for the listing author's PayPal account. Please contact the author and let them know that there's an issue with their PayPal account, and advise them to contact PayPal Customer Service."
@@ -1050,8 +974,8 @@ en:
       javascript_is_disabled_in_your_browser: "Javascript is disabled in your browser"
       kassi_does_not_currently_work_without_javascript: "%{service_name} does not work properly without javascript. Try to enable javascript from your browser's preferences and then reload this page again."
       contact_us: "contact us"
-      send_feedback: "Send feedback"
-      your_feedback_to_admins: "Your feedback to admins"
+      send_feedback: "Send message"
+      your_feedback_to_admins: "Your message to %{service_name} team"
     send: Send
     your_email_address: "Your email address"
   errors:
@@ -1185,7 +1109,7 @@ en:
       this_article_link: "this article"
       invitation_emails_field_placeholder: "friend1@example.com, friend2@example.com, ..."
       invitation_message_field_placeholder: "I joined this amazing marketplace. You should too!"
-      errors_in_emails: "Check that the email addresses you added are valid. If you added multiple addresses, make sure they are separated with comma."
+      errors_in_emails: "Check that the email addresses you added are valid and don't contain any unusual characters. If you added multiple addresses, make sure they are separated with comma."
     list_item:
       review: review
       reviews: reviews
@@ -1227,6 +1151,9 @@ en:
       search: Search
       signup: "Sign up"
       search_placeholder: "What are you looking for?"
+      search_location_placeholder: Location
+    listings:
+      no_listing_image: "No picture"
   layouts:
     admin:
       admin: "%{service_name} admin panel"
@@ -1237,17 +1164,17 @@ en:
     no_tribe:
       inbox: Inbox
       settings: Settings
-      feedback: "Contact us"
+      feedback: "Contact %{service_name} team"
     application:
       join_this_community: "Join marketplace"
       read_more: "Read more"
-      feedback: "What would you like to tell us?"
-      default_feedback: "Did you encounter a problem with %{service_name}? Have a suggestion for improving the service? Noticed some suspicious content? Or just have something you want to discuss with us? Let us know!"
+      feedback: "Your message to %{service_name} team"
+      dont_use_to_contact_support: "We noticed you're an admin of %{service_name}. This form is what your users use to contact you. You cannot use this form to contact Sharetribe support. You can do that via the support widget in the bottom right corner of the admin panel instead."
       feedback_forum: "feedback forum"
       feedback_handle: Feedback
       give_feedback: "Contact us"
       or_check_our: "...or check our"
-      send_feedback_to_admin: "Send feedback"
+      send_feedback_to_admin: "Send message"
       to_see_what_others_have_suggested: "to see what other users have suggested, and vote for the ideas there."
       your_email_address: "Your email address (to contact you)"
       connect: "Sign up"
@@ -1317,7 +1244,7 @@ en:
       error_with_session: "Error with session."
       feedback_considered_spam: "Feedback not saved, due to its formatting. Try again or use the feedback forum."
       feedback_not_saved: "Feedback could not be sent."
-      feedback_saved: "Thanks a lot for your feedback! We'll get back to you as soon as possible."
+      feedback_saved: "Thanks a lot for your message! We'll get back to you as soon as possible."
       feedback_sent_to: "Feedback sent to %{target_person}."
       feedback_skipped: "Feedback skipped"
       invitation_cannot_be_sent: "Invitation could not be sent"
@@ -1342,6 +1269,8 @@ en:
       offer_rejected: "Offer rejected"
       offer_canceled: "Offer canceled"
       listing_updated_successfully: "Listing updated successfully"
+      listing_updated_availability_management_enabled: "Listing updated successfully. Availability management enabled."
+      listing_updated_availability_management_disabled: "Listing updated successfully. Availability management disabled."
       only_kassi_administrators_can_access_this_area: "Only %{service_name} administrators can access this area"
       only_listing_author_can_close_a_listing: "Only listing author can close a listing"
       only_listing_author_can_edit_a_listing: "Only listing author can edit a listing"
@@ -1398,21 +1327,17 @@ en:
       you_must_log_in_to_view_your_settings: "You must log in to %{service_name} to view your settings."
       you_must_log_in_to_add_news_item: "You must log in to %{service_name} to add a new article."
       you_must_log_in_to_change_profile_settings: "You must log in to %{service_name} to change profile settings"
-      you_must_log_in_to_change_payment_settings: "You must log in to %{service_name} to change payment settings"
       you_must_log_in_to_accept_or_reject: "You must log in to accept or reject the transaction"
       you_must_log_in_to_confirm_or_cancel: "You must log in to cancel or confirm the transaction"
       you_need_to_confirm_your_account_first: "You need to confirm your email."
       you_must_fill_all_the_fields: "You must fill all the fields"
       you_unfollowed_listing: "You are no longer following this listing"
       joining_community_failed: "Joining failed"
-      can_not_login_with_private_user: "You cannot log in with your personal account. Log in with an organization account or create a new account."
       can_not_delete_email: "You cannot remove the email address"
       user_does_not_have_email_to_delete: "You don't have the email address you're trying to remove"
       email_deleted: "Email removed"
-      payment_details_add_successful: "Successfully added payment details"
-      payment_details_add_error: "Could not add payment details"
       listing_author_payment_details_missing: "Please contact the author by pressing the 'Contact' button below. They need to update their payment details to receive payments."
-      stylesheet_needs_recompiling: "Stylesheet is recompiling. Please, reload the page after a while."
+      images_are_processing: "We are processing your images. Give us a minute or two and they'll be visible."
       maintenance_mode:
         zero: "The website will now go offline for maintenance"
         one: "The website will be offline for maintenance in %{count} minute"
@@ -1456,6 +1381,9 @@ en:
       open_in_google_maps: "Open in Google Maps"
     error:
       something_went_wrong: "Something went wrong, error code: %{error_code}"
+      something_went_wrong_plain: "Something went wrong"
+      create_failed_to_connect_to_booking_service: "Listing creation failed: Failed to connect to the booking service. Please try again."
+      update_failed_to_connect_to_booking_service: "Listing update failed: Failed to connect to the booking service. Please try again."
     follow_links:
       follow: "Get emails about new comments"
       unfollow: "Don't get emails about new comments"
@@ -1516,10 +1444,8 @@ en:
         long_time: "week, month, ..."
         after_service_fee_you_will_get: "After %{service_name} and payment processor fees you will get %{sum_with_currency}"
         no_service_fee_you_will_get_paypal_text: "%{paypal_fee_info_link} will be deducted from the price."
-        after_service_fee_you_will_get_paypal_text: "%{service_name} fee (%{sum_with_currency}) and %{paypal_fee_info_link} will be deducted from the price."
+        after_service_fee_you_will_get_paypal_text: "Once someone makes an order, %{service_name} fee (%{sum_with_currency}) and %{paypal_fee_info_link} will be deducted from the price."
         paypal_fee_info_link_text: "PayPal's payment processing fee"
-        after_service_fee_you_will_get_vat: "After %{service_name} and payment processor fees you will get approx. %{sum_with_currency} (VAT 0%)"
-        price_excludes_vat: "The price doesn't include VAT."
         delivery: "Delivery method"
         shipping: Shipping
         shipping_price: "Shipping fee"
@@ -1581,7 +1507,6 @@ en:
       request_type: "Request type"
       requests: Requests
       rideshare: Rideshare
-      search_verb: Search
       you_have_something_others_do_not: "Have something to offer?"
       feed_title: "%{listing_type} in %{service_name} %{optional_category}"
     left_panel_link:
@@ -1605,8 +1530,8 @@ en:
       booking_to: To
       how_paypal_works: "How PayPal Works"
       payment_help: "Payment help"
+      unable_load_availability: "Could not load availability information. Please try again later."
     new:
-      post_a_new_listing: "Post a new listing"
       listing: listing
       selected_category: "Category: %{category}"
       selected_subcategory: "Subcategory: %{subcategory}"
@@ -1641,7 +1566,7 @@ en:
       inquiry: Announcement
       item_offer_trade: "Swap offer"
       item_request_trade: "Swap request"
-      no_description: "This listing doesn't have description"
+      no_description: "This listing doesn't have a description"
       no_image: "No image"
       no_reviews: "No reviews received"
       offer: Offer
@@ -1658,7 +1583,6 @@ en:
       times: times
       times_viewed: Viewed
       processing_uploaded_image: "(Processing uploaded image...)"
-      price_excludes_vat: "(excludes VAT)"
       listing_created_at: "Listing created"
       price:
         per_quantity_unit: "per %{quantity_unit}"
@@ -1681,6 +1605,8 @@ en:
       verification_required: "Verification required"
   listing_conversations:
     preauthorize:
+      dates_not_available: "Selected dates are not available"
+      error_in_checking_availability: "Could not check availability for the selected dates"
       details: Details
       by: "%{listing} by %{author}"
       payment: Payment
@@ -1688,6 +1614,9 @@ en:
       you_will_be_charged: "You will be charged only if %{author} accepts the transaction. %{author} needs to accept the transaction within %{expiration_period} days. If %{author} declines or does not respond, no charge is made."
       day: day
       days: days
+      night: night
+      nights: nights
+      invalid_parameters: "Invalid values for new transaction"
     transaction_agreement_checkbox:
       read_more: View.
   mapview:
@@ -1709,7 +1638,6 @@ en:
       request_type: "Request type"
       requests: Requests
       rideshare: Rideshare
-      search_verb: Search
       you_have_something_others_do_not: "Have something to offer?"
     please_comment: Comment
   mercury:
@@ -1717,26 +1645,6 @@ en:
   okl:
     member_id: "Member id"
     member_id_or_email: "Member id or email"
-  payments:
-    new:
-      new_payment: "New payment"
-      continue: Continue
-      payment_receiver: "Payment receiver:"
-      sum: "Payment sum:"
-    form:
-      total: Total
-      service_charge: "Service charge"
-      product: "Product:"
-      price: "Sum:"
-      price_for: "Price for %{payer_given_name}:"
-      continue_to_pay: "Continue to pay"
-      invoice: Invoice
-      service_fee: "%{service_name} service fee:"
-      you_will_get: "You will get:"
-    braintree:
-      terms:
-        braintree_terms_also_included: "NOTE: Braintree is used as a payment gateway service and by using this website you also accept %{terms_link_text}, in addition to the terms below."
-        terms_link_text: "Braintree terms of use"
   paypal_accounts:
     payout_info_title: "Receiving funds"
     paypal_account_email_connected: "<del>Connect PayPal account</del> Completed!"
@@ -1747,8 +1655,9 @@ en:
     connected_account: "PayPal account '%{email}' connected successfully."
     paypal_receive_funds_info_label_australia_only: "Your PayPal account needs to be able to accept payments. This might require a Premier or Business account."
     paypal_receive_funds_info_label: "Your PayPal account needs to be able to accept payments. This might require a Business account."
-    paypal_receive_funds_info: "If you see an error when trying to connect your account to %{service_name}, upgrade your PayPal account by %{upgrade_paypal_account_link}. It's free and easy. If you're an individual, PayPal recommends using your name as the Business name."
-    upgrade_paypal_account_link_text: "logging in and clicking the upgrade link"
+    paypal_receive_funds_info_australia_only: "If you see an error when trying to connect your account to %{service_name}, either %{upgrade_paypal_account_link}, or (if you are an individual), create a new Premier account. Both account types are completely free."
+    paypal_receive_funds_info: "If you see an error when trying to connect your account to %{service_name}, %{upgrade_paypal_account_link}. It's free and easy. If you're an individual, PayPal recommends using your name as the Business name."
+    upgrade_paypal_account_link_text: "log in and upgrade your PayPal account to a business account"
     admin_account_not_connected: "Using %{service_name}'s payment system in order to receive payments is not possible since payments have not been set up. Please %{contact_admin_link} for details."
     contact_admin_link_text: "contact the marketplace administrator"
     you_are_ready_to_accept_payments: "You are ready to accept payments!"
@@ -1835,7 +1744,6 @@ en:
       invitation_code: "Invitation code"
       not_required: ", not required"
       notification_is_mandatory: "You must pick at least one email address for receiving notifications. If you don't want to receive any emails from %{service_name}, check your email notification settings."
-      organization_name: "Organization name"
       password_again: "Confirm password"
       show_my_name_to_others: "Show my real name to other %{service_name} users"
       sign_up: "Create a new %{service_name} account"
@@ -1897,16 +1805,6 @@ en:
       following: Following
       follow: Follow
       unfollow: Unfollow
-  search:
-    show:
-      all_results: "All results"
-      loading_more_search_results: "Loading more search results"
-      offers: Offers
-      requests: Requests
-      search: Search
-      search_results: "Search results"
-      search_returned_no_results: "Your search returned no results."
-      search_verb: Search
   sessions:
     new:
       create_new_account: "Create a new account"
@@ -1936,9 +1834,12 @@ en:
       change_email: Change
       confirm_your_email: "Please confirm your email address"
       account_confirmation_instructions: "You will soon receive an email with a link to confirm your email address. Don't forget to check your spam folder! After confirming your address, you can join %{service_name}."
-      account_confirmation_instructions_title_admin: "Welcome to your marketplace!"
-      your_marketplace_has_now_been_created: "Your marketplace has now been created. That was easy, wasn't it? There's just one more step before you can access your site: we need to confirm your email address."
-      account_confirmation_instructions_admin: "You will soon receive an email with a link to confirm your email address. Don't forget to check your spam folder! Once you open the link, you can start setting up your marketplace."
+      account_confirmation_instructions_title_admin: "Confirm your email address"
+      before_full_access_you_need_to_confirm_email: "Before we can give you full access to your marketplace, there's just one more thing we need to do: confirm your email address."
+      before_confirmation_only_access_admin_dashboard: "Before confirmation you can only access the %{admin_dashboard_link}."
+      admin_dashboard_link_text: "admin dashboard"
+      account_confirmation_instructions_admin: "You should have received an email at %{email_address} with a confirmation link. If you don't see it, check your spam folder or click the button below to resend the email. Once it arrives, open the included link to confirm your address, after which you'll get full access to your marketplace. If you need any help, don't hesitate to %{support_link}."
+      contact_support_link_text: "contact Sharetribe support"
   settings:
     account:
       change: Change
@@ -1974,7 +1875,6 @@ en:
       i_want_to_get_email_notification_when: "I want to get an email notification when..."
       newsletters: "Emails from administrators"
       community_updates: Newsletters
-      email_about_accept_reminders: "...I have forgotten to accept an offer or a request"
       email_about_confirm_reminders: "...I have forgotten to confirm an order as completed"
       email_about_new_comments_to_own_listing: "...someone comments on my offer or request"
       email_about_new_messages: "...someone sends me a message"
@@ -1987,7 +1887,6 @@ en:
       email_when_conversation_rejected: "...someone rejects my offer or request"
       email_about_completed_transactions: "...someone marks my order as completed"
       email_about_new_payments: "...I receive a new payment"
-      email_about_payment_reminders: "...I have forgotten to pay"
       email_about_new_listings_by_followed_people: "...someone I follow posts a new listing"
       unsubscribe_succesful: "Unsubscribe succesful"
       unsubscribe_info_text: "You will no longer receive these emails. Check your %{settings_link} to choose what kind of emails you want to receive from %{service_name}, or return to the %{homepage_link}."
@@ -2002,7 +1901,9 @@ en:
       given_name: "First name"
       first_name_with_initial: "(only first letter shown to other users)"
       first_name_only: "(not shown to other users)"
-      location_description: "You can give either your exact location or, for example, only your zip code. Please add at least your zip code. You can also select a location from the map below."
+      display_name: "Display name"
+      display_name_description: "If you represent an organisation, you can use its name as your display name. Display name is shown to other users instead of your first and last name."
+      location_description: "You can provide either your street address or only a city or zip/postal code. It’s good to also add your country when adding your location. Examples: \"10117 Berlin, Germany\" or \"2000 Sand Hill Road, CA, USA\"."
       phone_number: "Phone number"
       profile_picture: "Profile picture"
       postal_code: "Postal code"
@@ -2014,7 +1915,7 @@ en:
       visible_to_registered_users: "(visible to users that have logged in)"
       default_in_listing: "(used only as a default when creating a new listing)"
       invisible: "(not shown to other users)"
-      image_is_processing: "Your profile picture is being prepared. Please, reload the page after a while."
+      image_is_processing: "Hang on tight. We are processing your profile picture. It will be ready in a minute or two."
     save_information: "Save information"
   shipping_address:
     shipping_address: "Shipping address"
@@ -2148,7 +2049,15 @@ en:
   transactions:
     initiate:
       booked_days: "Booked days:"
+      booked_nights: "Booked nights:"
+      booked_days_label:
+        one: "Booked day:"
+        other: "Booked days:"
+      booked_nights_label:
+        one: "Booked night:"
+        other: "Booked nights:"
       price_per_day: "Price per day:"
+      price_per_night: "Price per night:"
       quantity: "Quantity:"
       subtotal: "Subtotal:"
       shipping-price: "Shipping:"
@@ -2161,15 +2070,54 @@ en:
     day: day
     days: days
   web:
+    listings:
+      errors:
+        availability:
+          something_went_wrong: "We're not able to display availability information. Try to reload the page."
+          saving_failed: "We're not able to save availability changes. Try to reload the page."
+      pricing_units:
+        piece: piece
+        hour: hour
+        day: day
+        night: night
+        week: week
+        month: month
+      edit_availability_header: Availability
+      save_and_close_availability_editing: "Save and close"
+      confirm_discarding_unsaved_availability_changes_explanation: "You have unsaved changes to your availability information. If you proceed, these changes will be lost."
+      confirm_discarding_unsaved_availability_changes_question: "Are you sure you want to discard your changes?"
+      edit_listing_availability: "Edit listing availability"
+    no_listings:
+      sorry: "Sorry, no listings could be found for your search criteria."
+      try_other_search_terms: "Maybe try other search terms?"
+    listing_card:
+      add_picture: "Add picture"
+      no_picture: "No picture"
+    search:
+      page: Page
+      page_of_pages: "of %{total_number_of_pages}"
     topbar:
       menu: Menu
+      more: More
       search_placeholder: Search...
+      search_location_placeholder: Location
       user: User
       inbox: Inbox
       profile: Profile
       manage_listings: "Manage listings"
       settings: Settings
       logout: "Log out"
+      login: "Log in"
+      signup: "Sign up"
+      admin_dashboard: "Admin dashboard"
+      language: Language
+    utils:
+      km: km
+      mi: mi
+    branding:
+      powered_by: "%{service_name} is powered by the %{sharetribe_link} marketplace platform."
+      create_own: "Want to create your own online marketplace website like %{service_name}? %{learn_more}."
+      learn_more: "Learn more"
   will_paginate:
     models:
       person:

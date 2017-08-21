@@ -60,10 +60,6 @@ module NavigationHelpers
       "#{person_path(@logged_in_user, :locale => "en")}/settings"
     when /the profile settings page/
       "#{person_path(@logged_in_user, :locale => "en")}/settings"
-    when /the new Checkout account page/
-      "#{person_path(@logged_in_user, :locale => "en")}/checkout_account/new"
-    when /the new Braintree account page/
-      "#{person_path(@logged_in_user, :locale => "en")}/settings/payments/braintree/new"
     when /the account settings page/
       "#{person_path(@logged_in_user, :locale => "en")}/settings/account"
     when /the about page$/
@@ -84,12 +80,12 @@ module NavigationHelpers
       social_media_admin_community_path(:id => @current_community.id)
     when /the analytics admin page/
       analytics_admin_community_path(:id => @current_community.id)
-    when /the menu links admin page/
-      menu_links_admin_community_path(:id => @current_community.id)
+    when /the top bar admin page/
+      admin_topbar_edit_path
     when /the transactions admin page/
       admin_community_transactions_path(:community_id => @current_community.id)
-    when /the getting started page for admins/
-      getting_started_admin_community_path(:id => @current_community.id)
+    when /the getting started guide for admins/
+      admin_getting_started_guide_path
     else
       begin
         page_name =~ /the (.*) page/

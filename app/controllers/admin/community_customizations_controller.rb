@@ -1,5 +1,4 @@
-class Admin::CommunityCustomizationsController < ApplicationController
-  before_filter :ensure_is_admin
+class Admin::CommunityCustomizationsController < Admin::AdminBaseController
 
   def edit_details
     @selected_left_navi_link = "tribe_details"
@@ -37,8 +36,7 @@ class Admin::CommunityCustomizationsController < ApplicationController
         :transaction_agreement_label,
         :transaction_agreement_content
       ]
-      params.require(:community_customizations).require(locale).permit(*permitted_params)
-      locale_params = params[:community_customizations][locale]
+      locale_params = params.require(:community_customizations).require(locale).permit(*permitted_params)
       customizations = find_or_initialize_customizations_for_locale(locale)
       update_results.push(customizations.update_attributes(locale_params))
       customizations
@@ -66,9 +64,7 @@ class Admin::CommunityCustomizationsController < ApplicationController
       if state_changed
         report_to_gtm({event: "km_record", km_event: "Onboarding slogan/description created"})
 
-        with_feature(:onboarding_redesign_v1) do
-          flash[:show_onboarding_popup] = true
-        end
+        flash[:show_onboarding_popup] = true
       end
 
       flash[:notice] = t("layouts.notifications.community_updated")

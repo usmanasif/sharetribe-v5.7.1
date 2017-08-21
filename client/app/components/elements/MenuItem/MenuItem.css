@@ -4,6 +4,10 @@
   list-style: none;
   border-bottom: 1px solid var(--MenuItem_borderColor);
 
+  @media (--medium-viewport) {
+    font-size: var(--MenuItem_fontSize);
+  }
+
   &:last-child {
     border-bottom: 0;
   }
@@ -29,4 +33,5 @@
   left: -1px;
   width: 0.5em; /* topbar can't trust root font-size due to old design */
   height: 100%;
+  border-radius: inherit;
 }

@@ -1,8 +1,7 @@
 require 'csv'
 
-class Admin::CommunityTransactionsController < ApplicationController
+class Admin::CommunityTransactionsController < Admin::AdminBaseController
   TransactionQuery = MarketplaceService::Transaction::Query
-  before_filter :ensure_is_admin
 
   def index
     @selected_left_navi_link = "transactions"
@@ -65,7 +64,7 @@ class Admin::CommunityTransactionsController < ApplicationController
           }
         })
       end
-      with_feature(:export_transactions_as_csv) do
+      FeatureFlagHelper.with_feature(:export_transactions_as_csv) do
         format.csv do
           marketplace_name = if @current_community.use_domain
             @current_community.domain

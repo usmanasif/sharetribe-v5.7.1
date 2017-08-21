@@ -16,30 +16,33 @@
 #  width              :integer
 #  height             :integer
 #  author_id          :string(255)
+#  position           :integer          default(0)
 #
 # Indexes
 #
 #  index_listing_images_on_listing_id  (listing_id)
 #
 
-class ListingImage < ActiveRecord::Base
-
-  # TODO Rails 4, Remove
-  include ActiveModel::ForbiddenAttributesProtection
+class ListingImage < ApplicationRecord
 
   belongs_to :listing, touch: true
   belongs_to :author, :class_name => "Person"
 
   # see paperclip (for image_processing column)
-  has_attached_file :image, :styles => {
-        :small_3x2 => "240x160#",
-        :medium => "360x270#",
-        :thumb => "120x120#",
-        :original => "#{APP_CONFIG.original_image_width}x#{APP_CONFIG.original_image_height}>",
-        :big => Proc.new { |instance| instance.crop_big },
-        :email => "150x100#"}
+  has_attached_file :image,
+    :styles => {
+      :small_3x2 => "240x160#",
+      :medium => "360x270#",
+      :thumb => "120x120#",
+      :original => "#{APP_CONFIG.original_image_width}x#{APP_CONFIG.original_image_height}>",
+      :big => Proc.new { |instance| instance.crop_big },
+      :email => "150x100#",
+      :square => "408x408#",
+      :square_2x => "816x816#"}
 
-  before_save :set_dimensions!
+  before_post_process :set_dimensions
+
+  before_create :set_position
 
   process_in_background :image, :processing_image_url => "/assets/listing_image/processing.png", :priority => 1
   validates_attachment_size :image, :less_than => APP_CONFIG.max_image_filesize.to_i, :unless => Proc.new {|model| model.image.nil? }
@@ -58,6 +61,10 @@ class ListingImage < ActiveRecord::Base
       {width: 120, height: 120}
     when :email
       {width: 150, height: 100}
+    when :square
+      {width: 408, height: 408}
+    when :square_2x
+      {width: 816, height: 816}
     when :original, :big
       raise NotImplementedError.new("This feature is not implemented yet for style: #{style}")
     else
@@ -65,10 +72,12 @@ class ListingImage < ActiveRecord::Base
     end
   end
 
-  def set_dimensions!
+  def set_dimensions
     # Silently return, if there's no `width` and `height`
     # Prevents old migrations from crashing
-    return unless self.respond_to?(:width) && self.respond_to?(:height)
+    return true unless self.respond_to?(:width) && self.respond_to?(:height)
+
+    return true if self.width.present? && self.height.present?
 
     geometry = extract_dimensions
 
@@ -76,6 +85,8 @@ class ListingImage < ActiveRecord::Base
       self.width = geometry.width.to_i
       self.height = geometry.height.to_i
     end
+
+    return true
   end
 
   def crop_big
@@ -88,7 +99,7 @@ class ListingImage < ActiveRecord::Base
   # @note Do this after resize operations to account for auto-orientation.
   # https://github.com/thoughtbot/paperclip/wiki/Extracting-image-dimensions
   def extract_dimensions
-    return unless image_ready?
+    return unless image_downloaded
     tempfile = image.queued_for_write[:original]
 
     # Works with uploaded files and existing files
@@ -181,5 +192,9 @@ class ListingImage < ActiveRecord::Base
     else
       default_style
     end
+  end
+
+  def set_position
+    self.position = ListingImage.where(listing_id: listing_id).maximum(:position).to_i + 1
   end
 end

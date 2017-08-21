@@ -78,6 +78,9 @@ function timed_input_on_route(){
 }
 
 function googlemapMarkerInit(canvas,n_prefix,n_textfield,draggable,community_location_lat,community_location_lon,address) {
+  if (!window.google) {
+    return;
+  }
   prefix = n_prefix;
   textfield = n_textfield;
 
@@ -221,7 +224,9 @@ function invalid_locations(_prefix) {
   if (!_prefix)
     _prefix = prefix;
   var latitude = document.getElementById(_prefix+ "_latitude");
-  latitude.value = null;
+  if (latitude) {
+    latitude.value = null;
+  }
 }
 
 function update_model_location(place,_prefix){
@@ -548,6 +553,7 @@ function addListingMarkers(listings, viewport) {
                   label.set('text', "");
                   label.set('color', "#FFF");
         marker.set("label", label);
+
         markers.push(marker);
         markerContents.push(entry["id"]);
         markersArr.push(marker);
@@ -596,7 +602,7 @@ function addListingMarkers(listings, viewport) {
     map.setCenter(cen);
   } else {
     var listingsBounds = (latitudes.length && longitudes.length) ?
-      {sw: [_.min(latitudes), _.min(longitudes)], ne: [_.max(latitudes), _.max(longitudes)]} : nil;
+      {sw: [_.min(latitudes), _.min(longitudes)], ne: [_.max(latitudes), _.max(longitudes)]} : null;
     setBounds(listingsBounds);
   }
 

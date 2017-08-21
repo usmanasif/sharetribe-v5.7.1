@@ -1,16 +1,16 @@
 class AcceptPreauthorizedConversationsController < ApplicationController
 
-  before_filter do |controller|
+  before_action do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_accept_or_reject")
   end
 
-  before_filter :fetch_conversation
-  before_filter :fetch_listing
+  before_action :fetch_conversation
+  before_action :fetch_listing
 
-  before_filter :ensure_is_author
+  before_action :ensure_is_author
 
   # Skip auth token check as current jQuery doesn't provide it automatically
-  skip_before_filter :verify_authenticity_token
+  skip_before_action :verify_authenticity_token
 
   def accept
     tx_id = params[:id]
@@ -23,8 +23,6 @@ class AcceptPreauthorizedConversationsController < ApplicationController
 
     payment_type = tx[:payment_gateway]
     case payment_type
-    when :braintree
-      render_braintree_form("accept")
     when :paypal
       render_paypal_form("accept")
     else
@@ -43,8 +41,6 @@ class AcceptPreauthorizedConversationsController < ApplicationController
 
     payment_type = tx[:payment_gateway]
     case payment_type
-    when :braintree
-      render_braintree_form("reject")
     when :paypal
       render_paypal_form("reject")
     else
@@ -69,6 +65,14 @@ class AcceptPreauthorizedConversationsController < ApplicationController
 
     if res[:success]
       flash[:notice] = success_msg(res[:flow])
+
+      Analytics.record_event(
+        flash,
+        status == :paid ? "PreauthorizedTransactionAccepted" : "PreauthorizedTransactionRejected",
+        { listing_id: tx[:listing_id],
+          listing_uuid: tx[:listing_uuid].to_s,
+          transaction_id: tx[:id] })
+
       redirect_to person_transaction_path(person_id: sender_id, id: tx_id)
     else
       flash[:error] = error_msg(res[:flow])
@@ -166,27 +170,4 @@ class AcceptPreauthorizedConversationsController < ApplicationController
     }
   end
 
-  def render_braintree_form(preselected_action)
-    result = TransactionService::Transaction.get(community_id: @current_community.id, transaction_id: @listing_conversation.id)
-    transaction = result[:data]
-
-    render action: :accept, locals: {
-      payment_gateway: :braintree,
-      listing: @listing,
-      listing_quantity: transaction[:listing_quantity],
-      booking: transaction[:booking],
-      orderer: @listing_conversation.starter,
-      sum: transaction[:item_total],
-      fee: transaction[:commission_total],
-      shipping_price: nil,
-      shipping_address: nil,
-      seller_gets: transaction[:checkout_total] - transaction[:commission_total],
-      form: @listing_conversation,
-      form_action: acceptance_preauthorized_person_message_path(
-        person_id: @current_user.id,
-        id: @listing_conversation.id
-      ),
-      preselected_action: preselected_action
-    }
-  end
 end

@@ -34,6 +34,8 @@ module MarketplaceService::API
       "doc",
       "docs",
       "support",
+      "support-team",
+      "help",
       "legal",
       "org",
       "net",
@@ -45,6 +47,7 @@ module MarketplaceService::API
       "local",
       "marketplace-academy",
       "academy-proxy",
+      "academy",
       "proxy",
       "preproduction",
       "staging",
@@ -93,6 +96,7 @@ module MarketplaceService::API
       marketplace_name = p[:marketplace_name].or_else("Trial Marketplace")
       payment_process = p[:payment_process].or_else(:preauthorize)
       distance_unit = p[:marketplace_country].map { |country| (country == "US") ? :imperial : :metric }.or_else(:metric)
+      limit_search_distance = false
 
       community = CommunityModel.create(Helper.community_params(p, marketplace_name, locale))
 
@@ -103,7 +107,8 @@ module MarketplaceService::API
       Helper.create_configurations!({
         community_id: community.id,
         main_search: :keyword,
-        distance_unit: distance_unit
+        distance_unit: distance_unit,
+        limit_search_distance: limit_search_distance
       })
 
       from_model(community)
@@ -113,6 +118,14 @@ module MarketplaceService::API
       default_locale = community.locales[0]
       community_name = community.name(default_locale)
       locales.each { |locale| Helper.first_or_create_community_customization!(community, community_name, locale) }
+
+      # Replace removed locale with default for users of marketplace
+      removed_locales = community.locales - locales
+      if removed_locales.present?
+        UserService::API::Users.replace_with_default_locale(community_id: community.id,
+                                                            locales: removed_locales,
+                                                            default_locale: locales.first)
+      end
 
       settings = community.settings || {}
       settings["locales"] = locales
@@ -151,7 +164,7 @@ module MarketplaceService::API
           consent: "SHARETRIBE1.0",
           ident: ident,
           settings: {"locales" => [locale]},
-          available_currencies: available_currencies_based_on(params[:marketplace_country].or_else("us")),
+          currency: country_currency(params[:marketplace_country].or_else("us")),
           country: params[:marketplace_country].upcase.or_else(nil)
         }
       end
@@ -242,7 +255,7 @@ module MarketplaceService::API
         return current_ident
       end
 
-      def available_currencies_based_on(country_code)
+      def country_currency(country_code)
         Maybe(MarketplaceService::AvailableCurrencies::COUNTRY_CURRENCIES[country_code.upcase]).or_else("USD")
       end
 

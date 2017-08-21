@@ -1,4 +1,10 @@
 ka:
+  number:
+    currency:
+      format:
+        separator: ~
+        delimiter: ~
+        format: ~
   admin:
     categories:
       edit:
@@ -89,16 +95,22 @@ ka:
         favicon: Favicon
         favicon_info_text: "Favicon ჩაანაცვლებს Sharetribe-ს მოყოლილ ლოგოს. გაფართოება უნდა იყოს 32x32 პიქსელი და ატვირთული სურათის ზომები შეიცვლება ამ გაფართოებაზე."
         community_custom_color1: "მთავარი ფერი"
-        community_custom_color2: "%{post_new_listing} ღილაკის ფერი"
+        community_slogan_color: ~
+        community_slogan_color_instructions_text: ~
+        community_description_color: ~
+        community_description_color_instructions_text: ~
+        new_listing_button_custom_color: "დაპოსტე ახალი ჩამონათვალის ღილაკის ფერი"
         logo_instructions_text_with_dimensions: "დესკტოპის ლოგოს ზომა უნდა იყოს %{width}x%{height} პიქსელი."
+        logo_instructions_text_with_dimensions_no_placing: "ლოგოს ზომა უნდა იყოს%{height}%{width}პიქსელი"
         logo_icon_instructions_text_with_dimensions: "ეს ლოგო ნაჩვენები იქნება მაშინ, როცა ხალხი გააზიარებს თქვენს გვერდს Facebook-ზე, მაშინ როცა ნახავენ თქვენ საიტს მობილური მოწყობილობით ან როცა ჩაინიშნავენ მთავარ გვერდზე თავიანთ მობილურ მოწყობილობაში. გაფართოება უნდა იყოს (მინიმუმ) %{width}x%{height} პიკსელი."
+        logo_icon_instructions_text_with_dimensions_no_placing: "ეს ლოგო ნაჩვენები იქნება მაშინ, როცა ხალხი გააზიარებს თქვენს გვერდს Facebook-ზე, მაშინ როცა ნახავენ თქვენ საიტს მობილური მოწყობილობით ან როცა ჩაინიშნავენ მთავარ გვერდზე თავიანთ მობილურ მოწყობილობაში. გაფართოება უნდა იყოს (მინიმუმ) %{width}x%{height} პიკსელი."
         cover_photo_visibility: "გარეკანის ფოტო ჩანს მთავარ გვერდზე იმ მომხარებლებისთვის, ვინც სისტემაში არ არიან შესულები"
         cover_photo_instructions_text_with_dimensions: "ფოტოს შეეცვლება ზომები %{width}x%{height} პიქსელის ზომაზე ხოლო მაღალი სურათები გაიჭრება შუაზე. %{see_how_it_looks_like}"
         small_cover_photo_visibility: "პატარა გარეკანის სურათი ნაჩვენები იქნება ყველა გვერდზე გარდა მთავარი გვერდისა იმ მომხმარებლებისთვის ვინც არ არიან სისტემაში შესულები."
         small_cover_photo_instructions_text_with_dimensions: "ფოტოს შეეცვლება ზომები %{width}x%{height} პიქსელის ზომაზე ხოლო მაღალი სურათები გაიჭრება შუაზე."
         main_content_width: "გარეკანის ფოტოს არჩევისას დაიმახსოვრე, რომ გვერდის მთავარი შიგთავსი იყოს %{main_width} პიქსელის ყველაზე ფართო. არ დაგავიწყდეს ასევე იმის შემოწმება, თუ როგორ გამოიყურება გარეკანის სურათი პატარა ეკრანებზე (მაგ. უფრო ვიწრო ბრაუზერის გამოყენებისას)."
         custom_color1_instructions_text: "თქვენ შეგიძლიათ შეცვალოთ მომხმარებლის ინტერფეისის მთავარი ფერი hex ფერის შეყვანით <a href=\"http://www.colorpicker.com/?colorcode=D96E21\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> დაგეხმარებათ ფერის არჩევაში და კოდის დაკოპირებაში."
-        custom_color2_instructions_text: "თქვენ შეგიძლიათ შეცვალოთ %{post_new_listing}-ის ღილაკის ფერი hex ფერის გამოყენებით. <a href=\"http://www.colorpicker.com/?colorcode=00a26c\" target=\"_blank\" rel=\"noreferrer\">ColorPicker.com</a> დაგეხმარებათ რომ აარციოთ პერი და დააკოპიროთ კოდი აქ."
+        new_listing_button_instructions_text: "შენ შეგიძლია შეცვალო პოსტის ფერი hex ფერის შეყვანის მეთოდით.%{link_to_colorpicker} დაგეხმარებათ აირჩიოთ ფერი და დააკოპიროთ მისი კოდი აქ."
         default_browse_view: "ნაგულისხმევი ხედი"
         default_browse_view_instructions_text: "ნაგულისხმევი ხედი გამოიყენება მთავარ გვერდზე, რომ განახოთ ჩამონათვალი როგორ იქნება ნაჩვენები დეფოლტად."
         grid: ცხრილი
@@ -132,6 +144,7 @@ ka:
         sender_name_placeholder: "გამგზავნის სახელი"
         sender_email_label: "ელ. ფოსტის მისამართი"
         sender_email_placeholder: sender-email@example.com
+        amazon_ses_notification: "თქვენ მიიღებთ იმეილს %{email_sender}სგან რომ დაადასტუროთ თქვენ ელ-ფოსტის მისამართი. იმეილის სახელი იქნება %{email_subject}. გთხოვთ მიყვეთ ინსტრუქციას რომ დაადასტუროთ ელ. ფოსტის მისამართი."
         this_is_how_it_will_look: "აი როგორ გამოჩნდება:"
         send_verification_button: "გააგზავნე დამდადასტურებელი მეილი"
         successfully_saved: "გამომგზავნის მისამართი წარმატებით იქნა შენახული. ეს დადასტურების მეილი მალე გაიგზავნება"
@@ -152,38 +165,6 @@ ka:
         follow_the_instructions: "გთხოვთ მიყევით ინსტრუქციას ელ. ფოსტაზე რომ დაადასტუროთ ელ. ფოსტის მისამართი"
       getting_started:
         getting_started: "დაწყების გიდი"
-        welcome_to_your_marketplace: "მოგესალმებით ბაზარზე, %{name}!"
-        intro: "ეს არის სწრაფი გიდი თქვენი ბაზრის დასარედაქტირებლად და სამართავად. თქვენ შეგიძლიათ პირდაპირ ნახვა %{live_site_link}-დან."
-        live_site_link_text: აქ
-        look_and_feel: "მანამ სანამ თქვენ საიტს საჯაროს გახდით, თქვენ აუცილებლად უნდა დაარედაქტიროთ რაღაცეები. მაგალითად თქვენ შეიძლება გინდათ %{logo_link} და შეცვალოთ გარეკანის სურათი და გსურთ რომ ფერები თქვენი ბრენდის იერსახეს  ემთხვეოდეს."
-        logo_link_text: "დაამატე შენი ლოგო"
-        custom_domain: "თქვენ შეიძლება გსურთ დაამატოთ დარედაქტირებული ვებ მისამართი (მაგალითად: www.yourmarketplace.com). ამის დაყენება მოითხოვს ინდივიდუალურად მუშაობას ჩვენი მხრიდან და ასევე ჩვენ უნდა შევიძინოთ SSL სერთიფიკატი რომ დომენმა შეინარჩუნოს თქვენი საიტი დაცულად. ამ მიზეზის გამო დარედაქტირებული დომენი არ არის შესაძლებელი უფასო ვერსიაში ეხლა. ასე რომ თქვენ უნდა გამოიწეროთ ჩვენი პრო-გეგმა ან უფრო მაღალი რომ გქონდეთ ეს. თუ თქვენ გინდათ რომ დარედაქტირებული დომენი, გთხოვთ %{contact_support_link}."
-        categories_and_custom_fields: "შემდეგი რაც უნდა გადაწყვიტოთ არის რა კატეგორიის ხალხს შეეძლება დააკომენტაროს თქვენი გვერდი. თქვენ შეგიძლიათ %{categories_link}, %{custom_fields_link} რეალური ჩამონათვალიდან, შეიცავს და გადაწყვეტთ %{filters_link} გამოიყენება, როცა ხალხი ჩამოტვირთავს ჩამონათვალს."
-        categories_link_text: "დაამატე კატეგორიები და ქვე კატეგორიები"
-        custom_fields_link_text: "დაარედაქტირე ფორმის ველები"
-        filters_link_text: "რა სახის ფილტრები"
-        order_types: "თქვენ ასევე შეგიძლიათ დაარედაქტიროთ თუ როგორ მუშაობს შეკვეთის პროცესი თქვენ ბაზარზე. მომხარებლები ყიდიან, აქირავებენ, გასცემენ თუ არა უფასოდ? სთავაზობენ გაქირავებას საათობრივად, დღიურად ან კვირეულად? ეს შეიძლება იყოს დაყენებული %{order_types_link}-დან."
-        order_types_link_text: "შეკვეთის ტიპის ხედი"
-        payments: "თუ გსურთ რომ ხალხმა შეძლოს თავისი შესყიდვებისთვის გადაიხადონ თქვენი ბაზრის დახმარებით, ისე რომ თქვენ დაარიცხოთ გადახდის საფასური თითოეულ ტრანზაქციაზე თქვენ უნდა %{payments_link}."
-        payments_link_text: "გამართე გადახდის მეთოდები"
-        info_texts: "არ დაგავიწყდეთ, რომ დაარედაქტიროთ ინფორმაცია გვერდებზე და  სხვა ტექსტები, სადაც შეძლებთ უთხრათ თქვენ მომხარებლებს, თქვენი ბაზრის შესახებ. კარგი ადგილები შესამოწმებლად არის თქვენი %{about_page_link} თქვენი %{terms_of_use_link} (თქვენ უნდა დაამატოთ თქვენი პირადი გამოყენების პირობები არსებული შაბლონის შეცვლით, ან ახალი დოკუმენტის შექმნით). თქვენი %{privacy_policy_link} და %{welcome_email_link} რაც გაიგზავნება ყველა ახალ მომხმარებელთან. ასევე არის რამოდენიმე %{instruction_texts_link} რომელიც შეგიძლიათ დაარედაქტიროთ."
-        about_page_link_text: "გვერდის შესახებ"
-        terms_of_use_link_text: "გამოყენების პირობები"
-        privacy_policy_link_text: "კონფიდენციალურობის პირობები"
-        welcome_email_link_text: "მისალმების ელ. ფოსტა"
-        instruction_texts_link_text: "სხვა ინსტრუქციის ტექსტი"
-        social_media: "სოციალური მედიის გამოყენება კარგი გზაა გაერთიანების შესაქმნელად. თქვენ შეგიძლიათ %{facebook_link} გააკეთოთ მარტივი ხალხისთვის თქვენ ბაზარზე შესვლა და %{twitter_link} რომ მიიღონ ფართო ხილვადობა როცა ხალხი tweet-ს დაწერს თქვენ ბაზარზე პროდუქტის შეასახებ."
-        facebook_link_text: "დაუკავშირდი თქვენ დარედაქტირებულ Facebook-ის აპლიკაციას"
-        twitter_link_text: "დაამატე თქვენი Twitter ანგარიში"
-        analytics: "კარგი აზრია %{analytics_link}. ეს არის მარტივი გზა რომ ნახო რა ხდება შენ ბაზარზე, რამდენი მნახველი გყავს და ა.შ."
-        analytics_link_text: "შეუერთეთ Google Analytics ანგარიშს"
-        settings: "არსებობს რამოდენიმე სხვა პარამეტრები რითიც შეგიძლიათ მანიპულაცია. მაგალითად, თქვენ შეგიძლიათ მოთხოვოთ ყველას რომ ქონდეს მოპატიჟება სხვა მომხმარებლებისგან, სანამ შემოუერთდებიან თქვენ ბაზარს და გახდიან მას პირადს, ისე რომ მხოლოდ მომხარებლებს ვინც სისტემაშია შესული შეეძლებათ კონტენტის ნახვა. %{settings_link}."
-        settings_link_text: "ნახე ბაზრის პარამეტრები აქ"
-        final_words: "ამის შესახებ! თუ ყველაფერი მზადაა, შენ შეგიძლია დაიწყო %{invite_link} შენ ბაზარზე. შენ ასევე შეგიძლია ნახო ყველა მომხმარებელი, ვინც შემუერთდა %{view_users_link} და ყველა ტრანზაქცია რაც დასრულდა %{view_transactions_link}. შენ ასევე შეგიძლია მარტივად მართო ჩამონათვალი: უბრალოდ გადადი ჩამონათვალის გვერდზე და ნახავ ადმინისტრატორის ბმულს დასარედაქტირებლად და დასახურად. თუ გჭირდება რაიმე დახმარება შეგიძლია %{contact_support_link} - ჩვენ აქ ვართ შენთვის!"
-        invite_link_text: "მომხმარებლების მოწვევა"
-        view_users_link_text: აქ
-        view_transactions_link_text: აქ
-        contact_support_link_text: "დაუკავშირდი ჩვენ დახმარებას"
       available_languages:
         en: ინგლისური
         en-AU: "ინგლისური (ავტრალია)"
@@ -209,24 +190,24 @@ ka:
       settings:
         settings: პარამეტრები
         general: ზოგადი
-        users_can_review_each_other_after_transaction: "შეკვეთის შემდეგ მომხმარებლებს შეუძლიათ ერმანეთის დათვალიერება"
         access: "წვდომის პარამეტრები"
         join_with_invite_only: "მომხმარებელს შეუძლია შეუერთდეს ბაზარს მხოლოდ მაშინ, თუ მას სხვა მომხმარებელი მოიწვევს"
-        users_can_invite_new_users: "ყველა მომხმარებელს შეუძლია მოიწვიოს ახალი მომხმარებელი ამ ბაზარზე"
+        users_can_invite_new_users: "ყველა მომხმარებელს შეუძლია მოიწვიოს ახალი მომხმარებელი მაგროზე"
         private: "ეს ბაზარი არის პირადი (მხოლოდ დარეგისტრირებულ მომხმარებლებს შეუძლიათ მისი შინაარსის ნახვა)"
-        require_verification_to_post_listings: "მხოლოდ ადმინისტრატორის მიერ დადასტურებულ მომხმარებლებს შეუძლიათ დაპოსტონ ახალი ჩამონათვალი"
+        require_verification_to_post_listings: "მხოლოდ ადმინისტრატორის მიერ დადასტურებულ მომხმარებლებს შეუძლიათ დაპოსტოს ახალი ჩამონათვალი"
         search_preferences: "ძებნის პარამეტრები"
         default_search_type: "ძებნის ტიპი: %{select_search_type}"
         keyword_search: "საკვანძო სიტყვის ძებნა"
+        keyword_and_location_search: "საკვანძო სიტყვით და ადგილით ძიება"
         location_search: "ადგილმდებარეობის ძებნ"
         select_distance_unit: "მაჩვენე დისტანცია %{distance_units_selector}-ში"
         km: კმ
         miles: მილები
+        show_only_nearby: "ძებნაში აჩვენე მხოლოდ ახლომდებარე პროდუქცია"
         listing_preferences: "ჩამონათვალის პარამეტრები"
         transaction_preferences: "შეკვეთის პარამეტრები"
         show_listing_publishing_date: "გამოაჩინე ჩამონათვალის გამოქვეყნების თარიღი ჩამონათვალის გვერდზე"
         show_category_in_listing_list: "მანახე ჩამონათვალის ტიპები სიის ხედით"
-        hide_expiration_date: "არ მოითხოვო, რომ ჩამონათვალს ქონდეს ვადის გასვლის დრო"
         listing_comments_in_use: "მიეცი მომხმარებლებს უფლება რომ დააკომენტარონ ჩამონათვალზე (რომელიც ხილული იქნება ყველა მომხმარებლისთვის)"
         email_preferences: "ელ. ფოსტის პარამეტრები"
         automatic_newsletters: "გააგზავნე ავტომატური ყოველდღიური/კვირეული სიახლეები ყველა მომხმარებელთან (გარდა იმისა ვინც ამოეწერება)"
@@ -234,7 +215,6 @@ ka:
         google_analytics_key: "Google Analytics ტრეკინგის  ID"
         twitter_handle: "Twitter handle (გამოიყენება tweet ღილაკთან ერთად ჩამონათვალის გვერდზე)"
         update_settings: "პარამეტრების დამახსოვრება"
-        automatically_confirmed: "შეკვეთა ავტომატურად მოინიშნება დასრულებულად, %{days_dropdown} დღის მერე რაც გადახდა მოხდება. თუ \"ესქროუ\" სისტემა გამოიყენება, თანხა იქნება გაშვებული პროვაიდერზე ამ ეტაპზე."
         automatically_confirmed_no_escrow: "შეკვეთა ავტომატურად მოინიშნება შესრულებულად გადახდის შესრულებიდან %{days_dropdown} დღის მერე"
         automatic_newsletter_frequency: "გააგზავნე ავტომატური სიახლეები: %{frequency_dropdown}"
         newsletter_daily: დღიური
@@ -244,7 +224,7 @@ ka:
         type_marketplace_domain_placeholder: "აკრიფე შენი ბაზრის დომენი აქ"
         once_you_delete: "თუ წაშლით ბაზარს ვეღარ შეძლებთ მასთან წვდომას. იყავით ფრთხილი."
         are_you_sure: "დარწმუნებული ხართ?"
-        i_understand_button: "მე მესმის, რომ ამ ღილაკზე ხელის დაჭერით ჩემი ბაზარი იქნება წაშლილი"
+        i_understand_button: "მე ვეთანხმები იმას რომ ამ ღილაკზე ხელის დაჭერით ჩემი ბაზარი იქნება წაშლილი"
         last_community_updates: "გთხოვთ დაიმახსოვრეთ, რომ წაშლის შემდეგ თქვენ და თქვენი ბაზარის მომხარებელმა შეიძლება ისევ მიიღოთ ბოლო ბაზრის განახლების წერილები. "
         you_will_be_redirected_to: "თქვენი ბაზრის წაშლის შემდეგ თქვენ გადამისამართდებით %{destination}-ზე. თქვენ აღარ გექნებათ წვდომა ბაზარზე."
         delete_this_marketplace: "წაშალეთ ეს ბაზარი"
@@ -252,6 +232,7 @@ ka:
         manage_members: "მართე მომხმარელები"
         email: "ელ. ფოსტა"
         name: სახელი
+        display_name: "საჩვენებელი სახელი"
         join_date: შეუერთდა
         admin: ადმინისტრატორი
         posting_allowed: "პოსტის გამოქვეყნება ნებადართულია"
@@ -262,6 +243,13 @@ ka:
         save_user_status_error: "კატეგორიის დამახსოვრების დროს მოხდა შეცდომა. გთხოვთ გადატვირთეთ გვერდი და ცადეთ თავიდან."
         ban_user_confirmation: "ეს წაშლის მომხმარებელს ბაზრიდან და შეუზრუდავს თავისი ანგარიშით საიტზე შემოსვლის უფლებას. დარწმუნებული ხარ რომ გსურს გაგრძელება?"
         ban_me_error: "თქვენ ვერ დაბლოკავთ საკუთარ თავს."
+      new_layout:
+        new_layout: "ახალი განლაგება"
+        description_roadmap_new: ~
+        enabled_for_you: "თქვენთვის გააქტიურდა"
+        enabled_for_all: "ყველასთვის გააქტიურდა"
+        new_topbar: "ახალი ზემოთა ბარი (ყველა გვერდზე ჩანს)"
+        searchpage: "ახალი გვერდის ძებნა (მოითხოვს ახალი ზედა ზოლის გამოყენებას)"
       social_media:
         social_media: "სოციალური მედია"
         twitter_handle: "Twitter handle"
@@ -296,6 +284,14 @@ ka:
         language: ენა
         url: URL
         empty: "თქვენ არ გაქვთ დამატებით მენიუს ბმულები"
+        max_number_of_links: "ზემოთ ნაჩვენები ბმულების მაქსიმალური რაოდენობა: %{select_max_number}"
+        all: ყველა
+        max_number_of_links_info: "%{about_page}ის ბმული ყოველთვის პირველ ბმულად იქნება ნაჩვენები მენიუში"
+        about_page: შესახებ
+      topbar:
+        topbar: "ზედა ბარი"
+        new_listing_button_label: "დაპოსტე ახალი ჩამონათვალის ღილაკის ტექსტი."
+        invalid_post_listing_button_label: "დაარქვი შესაბამისი სახელი \"განცხადების დამატების\" ღილაკს"
       transactions:
         export_all_as_csv: "დააექსპორტე ყველა CSV-დ"
         transactions: "ტრანზაქციების ნახვა"
@@ -320,17 +316,8 @@ ka:
           initiated: "ველოდებით PayPal-ით გადახდას"
           pending_ext: "ველოდებით PayPal-ით გადახდას"
         not_available: "არ არის ხელმისაწვდომი"
-      braintree_payment_gateway:
-        braintree_payment_gateway: "Braintree გადახდის API-ს გასაღები"
-        environment: გარემო
-        private_key: "პირადი გასაღები"
-        public_key: "საჯარო გასაღები"
-        client_side_encryption_key: "კლიენტის-მხარის დაშიფრვა (კმდ) ღილაკი"
-        merchant_id: "გამყიდველის ID"
-        master_merchant_id: "მთავარი გამყიდველის ID"
-        commission_from_seller: "საკომისიოს პროცენტი გამყიდველისგან"
       paypal_account:
-        paypal_admin_account: გადახდები
+        paypal_admin_account: "გადახდების სისტემა"
     custom_fields:
       edit:
         edit_listing_field: "დაარედაქტირე ჩამონათვალის დარგი %{field_name}"
@@ -343,6 +330,9 @@ ka:
       edit_location:
         edit_location_field: "დაარედაქტირე ლოკაციის ველი"
         this_field_is_required: "ეს ველი აუცილებელია"
+      edit_expiration:
+        edit_expiration_field: "დაარედაქტირე ველი \"ვადის გასვლის თარიღი\""
+        enable: "ვადის გასვლის თარიღის ჩართვა"
       form:
         field_required:
           this_field_is_required: "გააკეთე ეს ველი აუცილებელი რომ შეავსონ, ახალი ჩამონათვლის შექმნისას"
@@ -398,13 +388,19 @@ ka:
       users_and_transactions: "მომხმარებლები & ტრანზაქციები"
       configure: კონფიგურაცია
       emails_title: "ელ. ფოსტები"
-      support: დახმარება
       subscription: გამოწერა
       preview: "საიტის გადახედვა"
     listing_shapes:
+      availability_title: ხელმისაწვდომობა
+      read_more: "წაიკითხეთ მეტი ავტომატური ხელმისაწვდომობის მართვაზე."
+      read_more_availability_management: "წაიკითხეთ მეტი ხელმისაწვდომობის შესახებ"
+      allow_providers_to_manage_availability: "მიეცი უფლება პროვაიდერებს რათა მართონ მათი თავისუფალი დრო კალენდრიდან."
+      per_day_availability: "დღიური ხელმისაწვდომობა"
+      per_night_availability: "ხელმისაწვდომობა ღამე"
+      pricing_units_disabled_info: "ფასი ვერ იქნება გამოყენებული როცა ხელმისაწვდომობის კალენდარი გააქტიურებულია"
       index:
         listing_shapes: "შეკვეთის ტიპები"
-        description: "შეკვეთის ტიპი განსაზღვრავს როგორ მუშაობს შეკვეთის პროცესი შენ გვერდზე, შენ შეგიძლია გადაწყვიტო შენს მომხარებელს შეეძლება თუა არა გაყიდვა, გაქირავება ან თუნდაც განცხადებების დაპოსტვა და უფასო მესიჯებით კომუნიკაცია"
+        description: "შეკვეთის ტიპი განსაზღვრავს როგორ მუშაობს შეკვეთის პროცესი შენ გვერდზე, შენ შეგიძლია გადაწყვიტო შენს მომხარებელს შეეძლება თუა არა გაყიდვა, გაქირავება ან თუნდაც განცხადებების დაპოსტვა და მესიჯებით კომუნიკაცია"
         read_more_about_order_types: "წაიკითხე მეტი შეკვეტის ტიპების შესახებ"
         add_new_shape: "დაამატე ახალი შეკვეთის ტიპი:"
         select_template: "აირჩიეთ თარგი..."
@@ -483,16 +479,18 @@ ka:
           quantity_label: "რაოდენობა (ყოველ ცალზე, კგ-ზე, ადამიანზე, 2 საათიან ტურზე)"
           time_label: "დრო (ყოველ 30 წუთში, 2 კვირაში, წელიწადში...)"
     paypal_accounts:
-      marketplace_paypal_integration: "გადახდის პარამეტრები"
-      preferences_updated: "გადახდის პარამეტრებ განახლებულია"
-      marketplace_currency_used: "ბაზრი იყენებს  %{currency} თავის ვალუტად. ვალუტის შესაცვლელად, %{contact_support_link}."
+      marketplace_paypal_integration: "გადახდის სისტემის პარამეტრები"
+      preferences_updated: "გადახდის პარამეტრები განახლებულია"
       contact_support_link_text: "დაუკავშირდით Sharetribe-ს დახმარებას"
-      integration_info_text: "Sharetribe-ის გადახდები ეფუძნება PayPal-ს. იმისთვის რომ ნება დართო შენ მომხმარებლებს რომ გამოიყენონ შენი ბაზარი შენ უნდა დაუკავშირდე შენ PayPal-ის ანგარიშს. იმის შემდეგ რაც დაუკავშირდები შენი PayPal-ის ანგარიშს შეგიძლია მიუთითო მინიმუმ ტრანზაქციების ზომა და შესაძლო საკომისიო საფასური."
+      integration_info_text: "Sharetribe-ის გადახდები ეფუძნება PayPal-ს. იმისთვის რომ ნება დართო შენ მომხმარებლებს რომ გამოიყენონ შენი ბაზარი შენ უნდა დაუკავშირდე შენს PayPal ანგარიშს. იმის შემდეგ რაც დაუკავშირდები შენს PayPal ანგარიშს შეგიძლია მიუთითო მინიმუმ ტრანზაქციების ზომა და შესაძლო საკომისიო საფასური."
       link_paypal_personal_account_label: "თავად აწარმოებთ სერვისს ან პროდუქტს?"
       link_paypal_personal_account: "თუ კი, თქვენ ასევე დაგჭირდებათ თქვენ PayPal ანგარიშის დაკავშირება %{personal_payment_preferences_link}-სთან."
       personal_payment_preferences_link_text: "თქვენი პერსონალური ბაზრის ანგარიში"
       read_more_about_paypal: "წაიკითხე მეტი Sharetribe-ის გადახდის სისტემის შესახებ"
-      set_minimum_price_and_fee: "დააწესეთ მინიმალური ფასი & ტრანზაქციის გადასახადი"
+      edit_payment_settings: "დაარედაქტირეთ გადახდის პარამეტრები"
+      supported_currencies_information_text: "Sharetribe-ის ონლაინ გადახდების სისტემა 24 ვალუტას იტევს. თუ თქვენი ვალუტა არ არის ჩამონათვალში დააჭირეთ მხარდაჭერის ბმულს%{contact_support_link}. თუ შეცვლით ბაზრის ვალუტას, არსებული განცხადებები შეინარჩუნებენ მათ ძველ ვალუტას. თქვენ უნდა დაარედაქტიროთ ეს ჩამონათვლები ინდივიდუალურად რათა გადახვიდეთ ახალ ვალუტაზე."
+      currency_change_warning_text: "თუ თქვენ შეცვლით ვალუტას, არ დაგავიწყდეთ რომ თხოვოთ გამყიდველებს რათა მათ დაარედაქტირონ არსებული განცხადებები და შეცვალონ ის შესაბამის ვალუტაზე."
+      marketplace_currency_label: "ბაზრის ვალუტა"
       minimum_listing_price_label: "მინიმუმ ტრანზაქციის ზმა:"
       transaction_fee_label: "ტრანზაქციის გადასახადი:"
       minimum_transaction_fee_label: "მინიმუმი ტრანზაქციის გადასახადი:"
@@ -513,25 +511,25 @@ ka:
         sell: ყიდვა
         rent: გაქირავება
         request: შეთავაზება
-        offer: მოთხოვნა
+        offer: ყიდვა
         inquiry: კონტაქტი
   common:
     edit_page: "დაარედაქტირე გვერდი"
     default_community_slogan: "ბაზრის გაერთიანება"
-    default_community_description: "ეს არის ადგილი, სადაც შეგიძლიათ ნივთების და სერვისების  გაყიდვა, გაქირავება, გაცვლა ბაზრის სხვა მომხმარებლებთან."
+    default_community_description: "ეს არის ადგილი, სადაც შეგიძლიათ პროდუქტების და სერვისების  გაყიდვა, გაქირავება და გაცვლა ბაზრის სხვა მომხმარებლებთან."
     cancel: გაუქმება
     fields_that_are_mandatory: "ველები მონიშნული (*)-ით აუცილებლად უნდა შეავსოთ."
     or: ან
     password: პაროლი
     service_name: "%{service_name}"
     share_types:
-      request: მოთხოვნა
+      request: ყიდვა
       offer: შეთავაზება
       borrow: სესხება
       buy: ყიდვა
       give_away: დარიგება
       lend: გასესხება
-      receive: "უფასოდ აღება."
+      receive: "უფასოდ აღება"
       rent: ქირაობა
       rent_out: ქირავდება
       sell: გაყიდვა
@@ -572,8 +570,6 @@ ka:
     accept:
       details: "შეკვეთის დეტალები"
       order_by: "შეკვეთა %{orderer_link}ს"
-      respond_to_offer: "შეთავაზებაზე პასუხის გაცემა"
-      respond_to_request: "მოთხოვნაზე პასუხის გაცემა"
       accept_offer: "შემოთავაზებაზე დათანხმება"
       accept_request: "მოთხოვნაზე დათანხმება"
       reject_offer: "ამჯერად არა"
@@ -582,9 +578,6 @@ ka:
       update_later: "დატოვე ჩამონათვალი ღია"
       optional_message: "ალტერნატიული წერილი"
       price_to_pay: "გადასახდელი ჯამური თანხა"
-      you_need_to_fill_payout_details_before_accepting: "თქვენ უნდა შეავსოთ გადახდის დეტალები, მანამდე, სანამ თქვენ გექნებათ უფლება რომ მოითხოვოთ ან მიიღოთ გადახდები. შედით %{payment_settings_link}-ზე რომ შეავსოთ ყველა დეტალი."
-      payment_settings_link: "გადახდის პარამეტრები"
-      minimum_price_error_message: "ფასი ვერ იქნება %{amount}ზე დაბალი"
       accept: დადასტურება
       decline: უარყოფა
       quantity_label: რაოდენობა
@@ -594,7 +587,7 @@ ka:
       total_label: ჯამი
       total_value: "%{seller_gets}"
       paypal_fee_info: "არ შეიცავს <a id='%{fee_info_link_id}' href='#'> PayPal-ის გადახდის საფასურს </a>"
-      shipping_price_label: "ტრანსპორტირება:"
+      shipping_price_label: გაგზავნა
     confirm:
       confirm_description: "თუ თქვენი შეკვეთა შესრულდა უნდა მონიშნოთ იგი დასრულებულად. შემდეგ შეგეძლებათ მისცეთ შეფასება სხვა ნაწილს."
       cancel_description: "თუ თქვნეი შეკვეთა არ შესრულდა, თქვენ შეგიძლიათ მონიშნოთ იგი როგორც, \"სადავო\". თქვენ ისევ გაქვთ შესაძლებლობა მისცეთ შეფასება მეორე მხარეს და აღწეროთ რა მოხდა. "
@@ -626,7 +619,7 @@ ka:
       canceled_offer: "შეთავაზება გაუქმებულია"
       message_from: "წერილი %{person}სგან"
       about_listing: "ჩამონათვალის შესახებ %{listing_title}"
-      free_message: "უფასო წერილი"
+      free_message: "პირდაპირი მიმოწერა"
       message_content_not_available: "მესიჯის შიგთავსი მიუწვდომელია"
     message:
       accepted_request: "მოთხოვნა დადასტურდა"
@@ -665,11 +658,10 @@ ka:
       last_message_at: "(ბოლო წერილი %{time})"
       price: "ფასი: %{price}"
       sum: "ჯამი: %{sum}"
-      price_excludes_vat: "(არ შეიცავს დღგ-ს)"
       total: "ჯამი: %{total}"
     status:
       payment_errored: "გადახდა ვერ მოხერხდა. გთხოვთ ცადოთ კიდევ ერთხელ."
-      payment_errored_starter: "გადახდა ვერ მოხერხდა. გთხოვთ ცადოთ თავიდან. თუ პრობლემა გაგრძელდება გთხოვთ დაუკასირდით ჩვენ მხარდამჭერ გუნდს. "
+      payment_errored_starter: "გადახდა ვერ მოხერხდა. გთხოვთ სცადოთ თავიდან. თუ პრობლემა გაგრძელდება გთხოვთ დაუკავშირდეთ ჩვენს გუნდს."
       payment_errored_author: "გადახდა ვერ მოხერხდა. გთხოვთ დაუკავშირდი %{starter_name} და თხოვთ მას რომ ცადოს გადახდა თავიდან. "
       cancel_payed_transaction: გაუქმება
       feedback_given: "შეფასება გაკეთებულია"
@@ -724,54 +716,11 @@ ka:
       reject_preauthorized_request: "ახლა არა"
       confirm: "მონიშნე დასრულებულად"
       cancel: დავა
-  braintree_accounts:
-    new:
-      add_payout_details: "დაამატეთ თქვენი გადახდის დეტალები"
-      first_name: სახელი
-      last_name: გვარი
-      email: "ელ. ფოსტა"
-      phone: "ტელეფონის ნომერი"
-      address_street_address: ქუჩა
-      address_postal_code: "საფოსტო ინდექსი"
-      address_locality: ქალაქი
-      address_region: შტატი
-      date_of_birth: "დაბადების თარიღი"
-      ssn: SSN
-      routing_number: "მარშრუტიზაციის ნომერი"
-      account_number: "ანგარიშის ნომერი"
-      save: დამახსოვრება
-    show:
-      payout_details: "თქვენი გადახდის დეტალები"
-      first_name: სახელი
-      last_name: გვარი
-      email: "ელ. ფოსტა"
-      phone: "ტელეფონის ნომერი"
-      address_street_address: ქუჩა
-      address_postal_code: "საფოსტო ინდექსი"
-      address_locality: ქალაქი
-      address_region: შტატი
-      date_of_birth: "დაბადების თარიღი"
-      ssn: SSN
-      routing_number: "მარშრუტიზაციის ნომერი"
-      account_number: "ანგარიშის ნომერი"
-  braintree_payments:
-    edit:
-      new_credit_card_payment: "ახალი საკრედიტო ბარათით გადახდა"
-      payment_receiver: "გადახდის მიმღები"
-      cardholder_name: "ბარათის მფლობელის სახელი"
-      credit_card_number: "საკრედიტო ბარათის ნომერი"
-      cvv: CVV
-      credit_card_expiration_date: "საკრედიტო ბარათის ვადა"
-      confirm_payment: "დაადასტურე გადახდა"
-      exp: "ვადის გასვლა:"
   feedback:
     feedback_subject: "ახალი სეფასება %{service_name} სგან"
     feedback_body: "%{author_name_and_email} გამოაგზავნა შეფასება %{service_name}-სგან"
     unlogged_user: "სისტემიდან გამოსული მომხმარებელი"
     anonymous_user: "ანონიმური მომხმარებელი"
-  preauthorize_payments:
-    edit:
-      confirm_payment: "დაადასტურე გადახდა"
   community_memberships:
     access_denied:
       access_denied: "წვდომა უარყოფილია"
@@ -806,23 +755,12 @@ ka:
       powered_by: "%{service_name} ფუნქციონირებს %{sharetribe_link}-ის ბაზრის პლატფორმაზე."
       create_own: "გსურთ რომ შექმნათ თქვენი პირადი ბაზრის ონლაინ ვებ გვერდი როგორიცაა %{service_name}-ს? %{learn_more}."
       learn_more: "გაიგე მეტი"
-    braintree_account_approved:
-      account_ready: "თქვენ მზად ხართ გადახდების მისაღებად"
-      message: "თქვენი გადახდის დეტალები დადასტურდა და ეხლა თქვენ მზად ხართ რომ მიიღოთ გადახდები %{service_name}-ში."
     confirm_reminder:
       you_have_not_yet_confirmed_or_canceled_request: "თქვენ ჯერ არც დაგიდასტურებიათ და არც უარი გითხვამთ შეკვეთაზე %{request_link}. თუ შეკვეთა დასრულებულია უნდა დაადასტუროთ. მხოლოდ ამის შემდეგ თქვენ შეგეძლებათ შეფასების მიცემა %{other_party_given_name}-ზე."
-      you_have_not_yet_confirmed_or_canceled_request_escrow_automatic_confirmation: "თქვენ ჯერ არც დაგიდასტურებიათ და არც უარი გითქვამთ მოთხოვნაზე %{request_link}. ჩვენ გადავრიცხავთ თანხას %{other_party_given_name} მხოლოდ მაშინ, როცა ა) მონისნავ მოთხოვნას დასრულებულად ან ბ) %{days_to_automatic_confirmation} დღე გავა გადახდიდან. მოთხოვნის შესრულებულად მონიშვნის შემდეგ შეგეძლებათ მისთეთ შეფასება %{other_party_given_name}-ს."
       remember_to_confirm_request: "გახსოვდეთ, რომ დაადასტუროთ ან უარყოთ მოთხოვნა"
       if_will_not_happen_you_should_cancel: "თუ თვლით, რომ ეს შეკვეთა არ დასრულდება ერთი ან რამოდენიმე მიზეზის გამო, თქვენ შეგიძლიათ %{cancel_it_link}."
-      if_will_not_happen_you_should_cancel_escrow: "თუ თვლით, რომ ეს შეკვეთა არ დასრულდება ერთი ან რამოდენიმე მიზეზის გამო, თქვენ შეგიძლიათ %{cancel_it_link}. ინფორმაცია ამის შესახებ მიუვა ადმინისტრატორს, რომელიც დაგიკავშირდებათ თანხის უკან დაბრუნების შესახებ."
-      if_will_not_happen_you_should_cancel_escrow_automatic_confirmation: "თუ თვლით რომ შეკვეთა არ შესრულდება ერთი ან რამოდენიმე მიზეზის გამო, თქვენ შეგიძლიათ %{days_to_cancel} დღეში %{cancel_it_link}. ამის შესახებ ინფორმაცია მიუვა ადმინისტრატორს, რომელიც დაგეკონტაქტებათ თქვენ თანხის უკან დაბრუნების შესახებ."
       cancel_it_link_text: გააუქმე
       automatic_confirmation: "თუ თქვენ არ დაადასტურებთ ან გააუქმებთ შეკვეთას %{days_to_automatic_confirmation}-ს მოთხოვნის დადასტურებიდან რამოდენიმე დღის განმავლობაში, ჩვენ ამას მოვნიშნავთ როგორც დასრულებულად."
-    payment_reminder:
-      remember_to_pay: "გახსოვდეთ რომ გადაიხადო %{listing_title}სთვის"
-      you_have_not_yet_paid: "თქვენ ჯერ არ გადაგიხდიათ %{listing_title}-ს. %{other_party_name}-მ დატანხმდა რომ შემოგთავაზოთ თქვენ. "
-      if_will_not_happen_you_should_cancel: "თუ თვლით, რომ ეს შეკვეთა არ დასრულდება ერთი ან რამოდენიმე მიზეზის გამო, თქვენ შეგიძლიათ ასევე %{cancel_it_link}."
-      cancel_it_link_text: გააუქმე
     payment_settings_reminder:
       remember_to_add_payment_details: "არ დაგავიწყდეთ გადახდის დეტალების დამატება, რომ მიიღოთ გადახდები; "
       you_have_added_listing_with_payment: "თქვენ დაამატეთ ჩამონათვალი %{listing_link} გადახდით. მაგრამ თქვენ ჯერ არ დაგიმატებიათ გადახდის დეტალები. გადახდის მიღებისთვის აუცილებელია რომ შეავსოთ ეს ინფორმაცია."
@@ -848,18 +786,11 @@ ka:
           შეფასების მიცემა ყოველთვის კარგი იდეაა. თუ ყველაფერმა კარგად ჩაიარა შენ უნდა შეგვატყობინო, რომ %{other_party_given_name}-ს ნდობა შეიძლება. თუ რაიმე პრობლემა იყო, კარგი იქნებოდა მათი აღნიშვნაც.
       give_feedback_to: "მიეცით შეფასება %{other_party_given_name}ს"
       show_thread: "მანახე მიმოწერა"
-    escrow_canceled:
-      subject: "გადახდა გაუქმებულია"
-      has_marked_request_as_canceled: "%{other_party_full_name} მონიშნა მოთხოვნა %{request}-ს შესახებ გაუქმებულად. ამ ტრანზაქციიდან თქვენ ვერ მიიღებთ თანხას."
-      if_this_was_error: "თუ ფიქრობთ რომ ეს იყო შეცდომა, %{please_contant_admin_link}"
-      please_contant_admin_link: "გთხოვთ დაუკავშირდით ადმინისტრატორს"
     confirmation_instructions:
       confirmation_instructions_signature: "საუკეთესო სურვილებით, %{service_name} გუნდი"
-      welcome_to_kassi: "მოგესალმებით %{service_name}ზე!"
       need_to_confirm: "თქვენ უნდა დაადასტუროთ ელ. ფოსტა. "
       confirmation_link_text: "ელ. ფოსტის დადასტურება"
-      or_paste_link: "ალტერნატიულად, თქვენ შეგიძლიათ დააკოპიროთ ეს ბმული თქვენ ბრაუზერის მისამართის ველში:"
-      turning_on_confirmations_in_this_community: "ჩვენ დავიწყეთ გამოვიყენოთ დასტური ელ. ფოსტაზე ამ %{service_name} ბაზარზე"
+      or_paste_link: "ან თქვენ შეგიძლიათ დააკოპიროთ ეს ბმული თქვენი ბრაუზერის მისამართის ველში:"
     common:
       hey: "გამარჯობა %{name},"
       kassi_team: "%{service_name}  გუნდი"
@@ -906,13 +837,12 @@ ka:
       you_have_received_new_payment: "თქვენ გადაგიხადეს <b>%{payment_sum}</b> <b>%{listing_title}</b>-სთვის %{payer_full_name}-ნ. აქ არის თქვენი ქვითარი."
     paypal_new_payment:
       paypal_gateway_fee: "PayPal-ის გადასახადი:"
-      shipping_total: "ტრანსპორტირება:"
+      shipping_total: "ფოსტით გაგზავნა:"
     braintree_new_payment:
       product: პროდუქტი
       price_payer_paid: "ფასი %{payer_full_name} გადახდილია:"
       service_fee: "%{service_name} სერვისის ღირებულება"
       you_will_get: "ჯამი:"
-      money_will_be_transferred: "ფული გადმორიცხული იქნება შენ ანგარიშზე როცა ა) %{payer_name} მონისნავს შეკვეთას დასრულებულად ან ბ) %{automatic_confirmation_days} დღეები გავა %{payer_name}-ს გადახდიდან."
     receipt_to_payer:
       receipt_of_payment: "გადახდის დამადასტურებელი ქვითარი"
       you_have_made_new_payment: "თქვენ გადაიხადეთ <b>%{payment_sum}</b> %{listing_title}</b> სთვის %{recipient_full_name}-ს. აქ არის გადახდის ქვითარი."
@@ -941,7 +871,6 @@ ka:
       title_link_text: "%{community_name}"
       intro_paragraph: "აქ არის რამოდენიმე შემთხვევა, რაც მოხდა %{community_link}ზე გასული %{time_since_last_update} დროს."
       intro_paragraph_link_text: "%{community_name}"
-      post_a_new_listing: "დაპოსტე ახალი სია!"
       reduce_email_footer_text: "ძალიან ბევრი ელ. ფოსტა? %{settings_link} ან %{unsubscribe_link}."
       settings_link_text: "დააკორექტირე შენი ელ. ფოსტის პარამეტრები აქ"
       unsubscribe_link_text: "გამოწერის გაუქმება"
@@ -960,6 +889,8 @@ ka:
       subject: "%{requester} მოითხოვა და ავტორიზება გაუკეთა %{listing_title}-ს გადახდას"
       transaction_requested_by_user: "%{requester} მოითხოვა და ავტორიზება გაუკეთა %{listing_title}-ს გადახდას"
       you_have_time_to_accept: "თქვენ უნდა დათანხმდეთ ან უარყოთ მოთხოვნა %{payment_expires_in} განმავლობაში. თუ დათანხმდებით ამ დროის განმავლობაში გადახდა განხორციელდება. თუ არ დათანხმდებით მოთხოვნა ავტომატურად უარყოფილი იქნება და ვერ მიიღებთ გადახდას."
+      if_you_do_accept: ~
+      if_you_do_not_accept: ~
       click_here_to_reply: "დააჭირე აქ რომ უპასუხო მოთხოვნას"
     transaction_preauthorized_reminder:
       subject: "არ დაგავიწყდეთ რომ დაადასტუროთ %{listing_title} ჩამონათვალის შესახებ მოთხოვნა %{requester}-სგან"
@@ -972,29 +903,20 @@ ka:
       love_marketplace_crew: "სიყვარული, <br /><i>%{service_name} ეკიპაჟი </i>"
       welcome_email_footer_text: "რა სახის ელ. ფოსტა გინდათ რომ მიიღოთ %{service_name}-სგან? %{settings_link}"
       settings_link_text: "შეამოწმე შენი პარამეტრები"
-      welcome_email_subject_for_marketplace_creator: "მოგესალმებით Sharetribe-ზე"
-      welcome_to_marketplace_creator: "მოგესალმებით Sharetribe-ზე, %{name}!"
-      congrats_for_creating_your_marketplace: "გილოცავთ თქვენი ბაზრის შექმნას. იოლი იყო არა?"
-      here_is_your_account_information: "აქ არის ინფორმაცია თქვენ ანგარიშზე."
-      your_email_address: "ელ. ფოსტა, რომელიც უნდა გამოიყენოთ შესვლისთვის:"
-      your_marketplace_address: "თქვენი ბაზრის მისამართი:"
-      your_marketplace_admin_area: "თქვენი ბაზრის ადმინისტრაციის სივრცე:"
-      just_follow_details: "მიყევით ამ ბმულებს და გაიგებთ მეტ დეტალს იმის შესახებ თუ როგორ დაიწყოთ თქვენი ბაზრის მშენებლობა!"
-      we_will_guide_you_along_the_way: "ჩვენ გაგიწევთ გიდობას მთელ გზაზე."
-      are_you_new_to_online_marketplaces: "დახმარება გჭირდება შენ ბაზარზე? არ იდარდო ჩვენ აქვ ვართ იმისთვის რომ დაგეხმაროთ. ჩვენ გამოგიგზავნით ელ. ფოსტაზე წერილების სერიას, რაც დაგეხმარება უფრო დეტალურად შეისწავლოთ Sharetribe და ააწყოთ წარმატებული ბაზრის ბიზნესი. პირველ ნაწილს მალე გადმოგიგზავნით."
-      have_questions: "გაქვთ კითხვები?"
-      our_happiness_team_is_here_to_help: "ჩვენი გუნდი თქვენ გვერდითაა! ან %{knowledge_base_link}, ან დაუკავშირდით დახმარებას %{admin_panel_link}-ს გამოყენებით."
-      love: "სიყვარული,"
-      sharetribe_crew: "Sharetribe-ის ეკიპაჟი"
-      knowledge_base_link_text: "შეამოწმე ჩვენი ცოდნის ბაზა"
-      contact_support_link_text: "დაუკავშირდი ჩვენ დახმარებას"
-      admin_panel_link_text: "ადმინისტრატორის პანელი"
     new_listing_by_followed_person:
       subject: "%{author_name} გამოაქვეყნა ახალი ჩამონათვალი %{service_name}-ში"
       has_posted_a_new_listing: "%{author_name} დაპოსტა ახალი ჩამონათვალი"
       you_are_receiving_this_because: "თქვენ მიიღეთ შეტყობინება, იმიტომ, რომ მისდევთ %{author_name}-ს."
       view_listing: "ნახე ჩამონათვლები"
+    new_member_notification:
+      new_member_has_joined: "ახალი წევრი შემოუერთდა %{community}ს. მათ მოუწევთ ელ.ფოსტის დადასტურება."
+      this_is_automatic_message: "ეს არის ავტომატური წერილი რომელიც გაეგზავნა %{community}ის ადმინისტრატორებს"
+      person_name: "სახელი:"
+      person_email: "ელ.ფოსტა:"
   error_messages:
+    booking:
+      booking_failed_payment_voided: ""
+      double_booking_payment_voided: "სამწუხაროთ თარიღები რომელიც მონიშნეთ აღარ არის ხელმისაწვდომი. გთხოვთ აარჩიოთ სხვა თარიღები. თქვენ არ ჩამოგეჭრებათ არანაირი თანხა."
     onboarding:
       server_rendering: "დაწყების გიდის ჩატვირთვა ვერ მოხერხდა. ჩვენ ვართ ინფორმირებულები ამის შესახებ და ვმუშაობთ მის გამოსწორებაზე."
     listings:
@@ -1009,9 +931,10 @@ ka:
     transaction_agreement:
       required_error: "თქვენ უნდა დაადასტუროთ ხელშეკრულება"
     paypal:
+      transaction_cannot_complete: "ტრანზაქცია ვერ განხორციელდა. ეს ალბათ გამოწვეულია საკრედიტო ბარათის მიერ. სავარაუდოდ ვერ მოხდა ბანკის მიერ მისი ავტორიზაცია. გთხოვთ სცადოთ თავიდან - ალტერნატიული გადახდის მეთოდის გამოყენებით."
       buyer_cannot_pay_error: "გადახდის უარყოფა მოხდა PayPal-დან. გთხოვთ დაუკავშირდეთ მათი კლიენტთა მოსმახურების სერვისს მეტი ინფორმაციისთვის: %{customer_service_link}"
       pending_review_error: "გადახდა დარეგსისტრირდა, მაგრამ მონიშნულია PayPal-ზე როგორც \"საჭიროებს გადახედვას\" როდესაც PayPal გადახედავს გადახდა ავტომატურად ავტორიზებული გახდება."
-      seller_express_checkout_disabled: "PayPal-ის ექსპრეს გადახდა შეჩერებულია ჩამონათვლის ავტორებისთვის PayPal-ის ანგარიშზე. გთხოვთ დაუკავშირდით ავტორს და შეატყობინე, რომ რაღაც პრობლემაა მათი PayPal-ის ანგარიშთან და ურჩიე, რომ დაუკავშირდნენ PayPal-ის კლიენტთა მომსახურებას."
+      seller_express_checkout_disabled: "PayPal-ის ექსპრეს გადახდის სერვისი შეჩერებულია გამყიდველებისთვის PayPal-ის ანგარიშზე. გთხოვთ დაუკავშირდით გამყიდველს და შეატყობინოთ, რომ რაღაც პრობლემაა მათი PayPal-ის ანგარიშზე და ურჩიეთ, რომ დაუკავშირდნენ PayPal-ის კლიენტთა მომსახურების ცენტრს."
       generic_error: "გადახდისას მოხდა შეცდომა. ვერ ხერხდება PayPal-ით გადახდის დასრულება."
       cancel_error: "შეცდომა მოხდა გაუქმების დროს. გაუქმება ვერ დასრულდა"
       accept_authorization_error: "შეცდომა მოხდა Paypal-ის პრეავტორიზებული გადახდის დადასტურების მცდელობისას. გთხოვთ კიდევ სცადოთ."
@@ -1039,8 +962,8 @@ ka:
       javascript_is_disabled_in_your_browser: "Javascript გამორთულია თქვენ ბრაუზერზე"
       kassi_does_not_currently_work_without_javascript: "%{service_name} არ მუშაობს გამართულად javascript-ის გარეშე. ცადეთ რომ javascript ჩართოთ თქვენი ბრაუზერის პარამეტრებიდან და გადატვირთეთ გვერდი კიდევ ერთხელ."
       contact_us: დაგვიკავშირდით
-      send_feedback: "შეფასების გაგზავნა"
-      your_feedback_to_admins: "თქვენი შეფასება ადმინისტრატორებს"
+      send_feedback: "წერილის გაგზავნა"
+      your_feedback_to_admins: "თქვენი მესიჯი %{service_name} გუნდს"
     send: გაგზავნა
     your_email_address: "თქვენი ელ. ფოსტა"
   errors:
@@ -1078,7 +1001,7 @@ ka:
     comment:
       commented: "%{commenter_name} დააკომენტარა ჩამონათვალზე%{listing_title}%{time_ago}"
       offer_partitive: შეთავაზება
-      request_partitive: მოთხოვნა
+      request_partitive: ყიდვა
   header:
     about: შესახებ
     home: მთავარი
@@ -1129,7 +1052,7 @@ ka:
       some_private_offers_exist: "უკვე არსებობს %{number_of_listings} შეთავაზებები"
       some_private_requests_exist: "უკვე არსებობს %{number_of_listings} მოთხოვნები"
     custom_filters:
-      update_view: "განაახლე ხედი"
+      update_view: "განაახლე სია"
       min: "მინ:"
       max: "მაქს:"
     event_feed:
@@ -1146,7 +1069,7 @@ ka:
       is: არის
       are: არიან
       what_do_you_need: "რას ეძებთ?"
-      post_new_listing: "დაპოსტე ახალი სია"
+      post_new_listing: "განცხადების დამატება"
       are_offering: შეთავაზება
       add_news_item: "სტატიის დამატება"
       lend_rent_help_carpool: "გაყიდვა, თხოვება, დახმარება, დამგზავრება"
@@ -1185,7 +1108,7 @@ ka:
     profile_info_empty_notification:
       add_your_info: "დაამატეთ თქვენი საკონტაქტო ინფო"
       add_a_profile_picture: "პროფილის სურათის დამატება"
-      you_have_not_added_your_info: "თქვენ არ დაგიმატებიათ თქვენი საკონტაქტო ინფორმაცია. გთხოვ დაამატე, რომ სხვებმა მოგმათონ იოლად. ასევე დაამატე პროფილის სურათი რომ სხვებს არ გაუჭირდეთ შენი ნდობა."
+      you_have_not_added_your_info: "თქვენ არ დაგიმატებიათ თქვენი საკონტაქტო ინფორმაცია. გთხოვთ დაამატოთ, რომ სხვებმა მოგმათონ იოლად. ასევე დაამატეთ პროფილის სურათი რათა თქვენი ნდობის ფაქტორი მაღალი იყოს."
       add_your_info_link: "დაამატეთ თქვენი ინფო ეხლა"
     recent_listing:
       please_offer: შეთავაზება
@@ -1216,6 +1139,9 @@ ka:
       search: ძებნა
       signup: დარეგისტრირდი
       search_placeholder: "რას ეძებთ?"
+      search_location_placeholder: ადგილმდებარეობა
+    listings:
+      no_listing_image: "სურათი ვერ მოიძებნა"
   layouts:
     admin:
       admin: "%{service_name} ადმინისტრატორის პანელი"
@@ -1226,17 +1152,17 @@ ka:
     no_tribe:
       inbox: "შემოსული წერილები"
       settings: პარამეტრები
-      feedback: კონტაქტი
+      feedback: "დაუკავშირდით %{service_name}ს გუნდს"
     application:
       join_this_community: "შეუერთდი ბაზარს"
       read_more: "წაიკითხე მეტი"
-      feedback: "რა გსურს რომ გვითხრა?"
-      default_feedback: "ხომ არ გექმნებათ პრობლემა %{service_name}-თან? სერვისის გამოსწორების შეთავაზება ხომ არ გაქვთ? საეჭვო შინაარსის მქონე რამ ხომ არ შეგინიშნავთ? ან რაიმეზე საუბარი ხომ არ გსურთ ჩვენთან? შეგვატყობინე!"
+      feedback: " თქვენი წერილი %{service_name} გუნდს"
+      dont_use_to_contact_support: "ჩვენ შევნიშნეთ რომ თქვენ ხართ%{service_name}ის ადმინისტრატორი. ამ ფორმის მეშვეობით თქვენი მომხმარებლები გიკავშირდებიან. ამ ფორმით თქვენ ვერ დაუკავშირდებით Sharetribe დამხმარე გუნდს. ეს შეგიძლიათ Support link-ის მეშვეობით რომელიც ადმინ პანელშია განთავსებული."
       feedback_forum: "შეფასების ფორუმი"
       feedback_handle: შეფასება
       give_feedback: კონტაქტი
       or_check_our: ".. ან შეამოწმეთ ჩვენი"
-      send_feedback_to_admin: "შეფასების გაგზავნა"
+      send_feedback_to_admin: "წერილის გაგზავნა"
       to_see_what_others_have_suggested: "რომ ნახოთ რა შეთავაზეს სხვა მომხმარებლებმა და ხმა მისცეთ იდეებს. "
       your_email_address: "თქვენი ელ. ფოსტა (რომ დაგიკავშირდეთ)"
       connect: დარეგისტრირება
@@ -1306,7 +1232,7 @@ ka:
       error_with_session: "სესიის შეცდომა."
       feedback_considered_spam: "შეფასება არ იქნა დამახსოვრებული მისი ფორმატიდან გამომდინარე. სცადეთ თავიდან, ან გამოიყენეთ შეფასების ფორუმი"
       feedback_not_saved: "შეფასება ვერ გაიგზავნება"
-      feedback_saved: "დიდი მადლობა შეფასებისთვის! დაგიბრუნდებით პასუხით რაც შეიძლება მალე"
+      feedback_saved: "დიდი მადლობა წერილის გამოგზავნისთვის. ჩვენ მალე გიპასუხებთ."
       feedback_sent_to: "შეფასება გაგზავნილია %{target_person}სთვის"
       feedback_skipped: "შეფასება გამოტოვებულია"
       invitation_cannot_be_sent: "მოწვევა ვერ გაიგზავნა"
@@ -1331,6 +1257,8 @@ ka:
       offer_rejected: "შეთავაზება უარყოფილია"
       offer_canceled: "შეთავაზება გაუქმებულია"
       listing_updated_successfully: "ჩამონათვალი წარმატებით განახლდა"
+      listing_updated_availability_management_enabled: "ჩამონათვალი წარმატებით განახლდა"
+      listing_updated_availability_management_disabled: "ჩამონათვალი წარმატებით განახლდა"
       only_kassi_administrators_can_access_this_area: "მხოლოდ %{service_name}ს ადმინისტრატორს შეუძლია შევიდეს ამ ადგილას"
       only_listing_author_can_close_a_listing: "მხოლოდ სიის ავტორს შეუძლია დახუროს ეს სია"
       only_listing_author_can_edit_a_listing: "მხოლოდ სიის ავტორს შეუძლია მისი დარედაქტირება."
@@ -1361,7 +1289,7 @@ ka:
       message_sent: "წერილი გაიგზავნა"
       message_not_sent: "წერილის გაგზავნა ვერ მოხერხდა. გთხოვთ ცადეთ კიდევ ერთხელ."
       this_content_is_not_available_in_this_community: "ეს კონტენტი მიუწვდომელია"
-      unknown_error: "უცნობი შეცდომა. გთხოვთ გამოიყენოთ კონტაქტის ღილაკი რომ დეტალურად მოგვწეროთ თუ რა მოხდა"
+      unknown_error: "უცნობი შეცდომა. გთხოვთ გამოიყენოთ კონტაქტის ღილაკი რომ დეტალურად მოგვწეროთ თუ რა მოხდა."
       update_error: "შეცდომა მოხდა თქვენი ინფორმაციის განახლების დროს, გთხოვთ ცადოთ კიდევ ერთხელ"
       you_are_not_allowed_to_give_feedback_on_this_transaction: "თქვენ არ ხართ ავტორიზებული, რომ შეაფასოთ ეს ღონისძიება"
       you_are_not_authorized_to_do_this: "თქვენ არ ხართ ავტორიზებული, რომ ეს გააკეთოთ"
@@ -1374,7 +1302,7 @@ ka:
       you_have_already_given_feedback_about_this_event: "თქვენ უკვე შეაფასეთ ეს ღონისძიება"
       you_are_now_member: "მოგესალმებით %{service_name}ზე!"
       you_are_already_member: "თქვენ უკვე ხართ %{service_name}ს წევრი. კეთილი იყოს თქვენი დაბრუნება."
-      you_must_log_in_to_create_new_listing: "თქვენ უნდ აშეხვიდეთ %{service_name}-ში, რათა შექმნათ ახალი ჩამონათვალი. თუ არ გაქვთ ანგარიში თქვენ შეგიძლიათ %{sign_up_link}."
+      you_must_log_in_to_create_new_listing: "თქვენ უნდა შეხვიდეთ %{service_name}ზე, რათა დაამატოთ განცხადება. თუ ჯერ არ გაქვთ ანგარიში, შეგიძლიათ %{sign_up_link}."
       additional_email_confirmed_dashboard: "თქვენი ელ-ფოსტა ეხლა დადასტურდა."
       you_must_log_in_to_give_feedback: "თქვენ უნდა შეხვიდეთ სისტემაში რათა შეაფასოთ"
       you_must_log_in_to_invite_new_users: "თქვენ უნდა შეხვიდეთ სისტემაში რათა მოიწვიოთ ახალი მომხმარებლები %{service_name}ზე"
@@ -1387,21 +1315,17 @@ ka:
       you_must_log_in_to_view_your_settings: "თქვენ უნდა შეხვიდეთ %{service_name}ში რომ ნახოთ პარამეტრები"
       you_must_log_in_to_add_news_item: "თქვენ უნდა შეხვიდეთ %{service_name}ში რათა დაამატოთ ახალი სტატია."
       you_must_log_in_to_change_profile_settings: "თქვენ უნდა შეხვიდეთ %{service_name}ში რომ შეცვალოთ პროფილის პარამეტრები"
-      you_must_log_in_to_change_payment_settings: "თქვენ უნდა შეხვიდეთ %{service_name}ში, რომ შეცვალოთ გადახდის პარამეტრები"
       you_must_log_in_to_accept_or_reject: "თქვენ უნდა შეხვიდეთ სისტემაში რომ დაადასტუროთ ან უარყოთ ტრანზაქცია"
       you_must_log_in_to_confirm_or_cancel: "თქვენ უნდა შეხვიდეთ სისტემაში რომ გააუქმოთ ან დაადასტუროთ ტრანზაქცია"
       you_need_to_confirm_your_account_first: "თქვენ უნდა დაადასტუროთ ელ. ფოსტა. "
       you_must_fill_all_the_fields: "თქვენ უნდა შეავსოთ ყველა ველი"
       you_unfollowed_listing: "თქვენ უკვე აღარ ადევნებთ თვალს ამ სიას"
       joining_community_failed: "გაწევრიანება ვერ მოხერხდა"
-      can_not_login_with_private_user: "თქვენ არ შეგიძლიათ სისტემაში შესვლა პერსონალური ანგარიშის გარეშე. შედით სისტემაში კორპორატიული ანგარიშით და შექენით ახალი ანგარიში"
       can_not_delete_email: "თქვენ არ შეგიძლიათ ელ. ფოსტის წაშლა"
       user_does_not_have_email_to_delete: "თქვენ არ გაქვთ ის ელ. ფოსტა, რომლის წაშლავც გსურთ. "
       email_deleted: "ელ. ფოსტა წაშლილია"
-      payment_details_add_successful: "წარმატებით დაემატა გადახდის დეტალები"
-      payment_details_add_error: "ვერ დაემატა გადახდის დეტალები"
-      listing_author_payment_details_missing: "გთხოვთ დაუკავშირდით ავტორს, \"კონტაქტი\"-ს ღილაკზე ხელის დაჭერით. მათ უნდა განაახლონ თავისი გადახდის დეტალები რომ მიიღონ გადახდა."
-      stylesheet_needs_recompiling: "Stylesheet კომპლექტირდება. გთხოვთ გადატვირთოთ გვერდი ცოტა ხანში."
+      listing_author_payment_details_missing: "გთხოვთ დაუკავშირდეთ განცხადების ავტორს, \"კონტაქტი\"-ს ღილაკზე თითის დაჭერით. იმისათვის რომ მიიღონ გადახდა, მათ უნდა დაამატონ გადახდის მეთოდი."
+      images_are_processing: "სურათები იტვირთება. 2 წუთში ყველა გამოჩნდება, გთხოვთ დაიცადოთ."
       maintenance_mode:
         zero: "საიტი იქნება გამორთული შეკეთებისთვის "
         other: "საიტი იქნება გამორთული შეკეთებისთვის %{count} წუთში"
@@ -1421,7 +1345,7 @@ ka:
       delete: წაშლა
       are_you_sure: "დარწმუნებული ხართ რომ გინდათ კომენტარის წაშლა?"
     comment_form:
-      ask_a_question: "დააკომენტარი სიაზე და იკითხე მეტი დეტალი. ყველა სხვა მომხმარებელს შეეძლება თქვენი კომენტარის ნახვა."
+      ask_a_question: "დააკომენტარე განცხადებაზე და ჰკითხე გამყიდველს მეტი მის შესახებ. "
       log_in: შესვლა
       send_comment: "კომენტარის გაგზავნა"
       to_send_a_comment: "ახალი კომენტარის გაგზავნა"
@@ -1444,6 +1368,9 @@ ka:
       open_in_google_maps: "გახსენი Google Maps-ში"
     error:
       something_went_wrong: "რაღაც შეცდომით მოხდა. შეცდომის კოდი: %{error_code}"
+      something_went_wrong_plain: "რაღაც შეცდომა მოხდა"
+      create_failed_to_connect_to_booking_service: "განხხადება ჩავარდა: ვერ შეერთდა დასაჯავშნ სერვისთან. გთხოვთ სცადოთ თავიდან."
+      update_failed_to_connect_to_booking_service: ""
     follow_links:
       follow: "მიიღეთ ელ. ფოსტა ახალი კომენტარების შესახებ"
       unfollow: "არ მიიღოთ ელ. ფოსტა ახალი კომენტარების შესახებ"
@@ -1506,13 +1433,11 @@ ka:
         no_service_fee_you_will_get_paypal_text: "%{paypal_fee_info_link} დაიქვითება ფასიდან."
         after_service_fee_you_will_get_paypal_text: "%{service_name} საფასური %{sum_with_currency} და %{paypal_fee_info_link} გამოიქვითება ფასიდან."
         paypal_fee_info_link_text: "PayPal-ით გადახდის საფასური"
-        after_service_fee_you_will_get_vat: "%{service_name}-ს და გადახდის საფასურის შემდეგ თქვენ მიიღებთ დაახლოებით %{sum_with_currency} (დღგ 0%)"
-        price_excludes_vat: "ფასი არ შეიცავს დღგ-ს"
         delivery: "მიტანის მეთოდი"
-        shipping: "ტრანსპორტირება:"
+        shipping: "ფოსტით გაგზავნა:"
         shipping_price: "ტრანსპორტირების გადასახადი"
         shipping_price_additional: "დამატებითი  ნივთები"
-        pickup: აღება
+        pickup: "ადგილზე აღება"
       origin:
         location: ადგილმდებარეობა
         origin: თავდაპირველი
@@ -1569,7 +1494,6 @@ ka:
       request_type: "მოთხოვნის ტიპი"
       requests: მოთხოვნა
       rideshare: დამგზავრება
-      search_verb: ძებნა
       you_have_something_others_do_not: "შეგიძლიათ რამის შემოთავაზება?"
       feed_title: "%{listing_type} %{service_name}ში %{optional_category}"
     left_panel_link:
@@ -1593,8 +1517,8 @@ ka:
       booking_to: ზე
       how_paypal_works: "როგორ მუშაობს PayPal"
       payment_help: "გადახდის დახმარება"
+      unable_load_availability: "ვერ მოხდა ჩატვირთვა ხელმისაწვდომობაზე. გთხოვთ თავიდან სცადოთ."
     new:
-      post_a_new_listing: "დაპოსტე ახალი ჩამონათვალი"
       listing: სია
       selected_category: "კატეგორია: %{category}"
       selected_subcategory: ქვეკატეგორია
@@ -1625,7 +1549,7 @@ ka:
       contact_by_phone: "დაეკონტაქტე ტელეფონით:"
       contact: კონტაქტი
       favor_offer: "სერვისის შეთავაზება"
-      favor_request: "სერვისის მოთხოვნა"
+      favor_request: "სერვისის ყიდვა"
       inquiry: განცხადება
       item_offer_trade: "გაცვალე შეთავაზება"
       item_request_trade: "გაცვალე მოთხოვნა"
@@ -1637,7 +1561,7 @@ ka:
       open_until: "ღიაა %{date}მდე"
       feedback: შეფასება
       qr_code: "QR კოდი"
-      request: მოთხოვნა
+      request: ყიდვა
       rideshare_offer: "დამგზავრების შეთავაზება"
       rideshare_request: "დამგზავრების მოთხოვნა"
       send_private_message: "გააგზავნეთ პერსონალური წერილი"
@@ -1645,18 +1569,17 @@ ka:
       time: დრო
       times: დრო
       times_viewed: ნანახი
-      processing_uploaded_image: "(სურათის ატვირთვა პროგრესშია)"
-      price_excludes_vat: "(დღგ-ს გარეშე)"
+      processing_uploaded_image: "(სურათი იტვირთება)"
       listing_created_at: "ჩამონათვალი შექმნილია"
       price:
         per_quantity_unit: "ყოველ %{quantity_unit}"
         per_day: დღიურად
       delivery: "მიტანის მეთოდი"
-      shipping: "ტრანსპორტირება (+%{price})"
-      shipping_no_price: "ტრანსპორტირება:"
+      shipping: "ფოსტით გაგზავნა (+%{price})"
+      shipping_no_price: "ფოსტით გაგზავნა"
       shipping_price_additional: "მგზავრობა (+%{price}, დამატებითი ნივთები: +%{shipping_price_additional})"
-      pickup: აღება
-      pickup_no_price: აღება
+      pickup: "ადგილზე აღება"
+      pickup_no_price: "ადგილზე აღება"
       youtube_video_player: "YouTube ვიდეო დამკვრელი"
     unit_types:
       piece: ცალი
@@ -1669,13 +1592,18 @@ ka:
       verification_required: "ვერიფიკაცია სავალდებულოა"
   listing_conversations:
     preauthorize:
+      dates_not_available: "აღნიშნული თარიღები მიუწვდომელია"
+      error_in_checking_availability: "ვერ მოხდა ხელმისაწვდომობის შემოწმება აღნიშნულ თარიღებზე."
       details: დეტალები
       by: "%{listing} %{author}სგან"
       payment: გადახდა
       exp: "ვადის გასვლა:"
-      you_will_be_charged: "თქვენ დაგერიცხებათ თანხა, მხოლოდ მაშინ, როცა %{author} დაადასტურებს ტრანზაქციას. %{author} საჭიროა დაადასტუროს ტრანზაქცია %{expiration_period} დღის განმავლობაში. თუ %{author} უარყოფს ან არ უპასუხებს მაშინ დარიცხვა არ მოხდება."
+      you_will_be_charged: "თქვენ ჩამოგეჭრებათ თანხა, მხოლოდ მაშინ, როცა %{author} დაადასტურებს ტრანზაქციას. %{author} საჭიროა დაადასტუროს ტრანზაქცია %{expiration_period} დღის განმავლობაში. თუ %{author} უარყოფს ან არ უპასუხებს მაშინ თქვენ თანხა არ ჩამოგეჭრებათ."
       day: დღე
       days: დღეები
+      night: ღამე
+      nights: ღამე
+      invalid_parameters: "ახალი ტრანზაქციისთვის ასეთი სახელი არ არსებობს"
     transaction_agreement_checkbox:
       read_more: ნახვა
   mapview:
@@ -1697,7 +1625,6 @@ ka:
       request_type: "მოთხოვნის ტიპი"
       requests: მოთხოვნები
       rideshare: დამგზავრება
-      search_verb: ძებნა
       you_have_something_others_do_not: "შეგიძლიათ რამის შემოთავაზება?"
     please_comment: კომენტარი
   mercury:
@@ -1705,26 +1632,6 @@ ka:
   okl:
     member_id: "წევრის ID"
     member_id_or_email: "წევრის ID ან ელ. ფოსტა"
-  payments:
-    new:
-      new_payment: "ახალი გადახდა"
-      continue: გაგრძელება
-      payment_receiver: "გადახდის მიმღები"
-      sum: "გადახდის ჯამი:"
-    form:
-      total: ჯამი
-      service_charge: "სერვისის გადასახადი"
-      product: "პროდუქტი:"
-      price: "ჯამი:"
-      price_for: "ფასი %{payer_given_name}სთვის"
-      continue_to_pay: "გააგრძელე გადახდა"
-      invoice: ინვოისი
-      service_fee: "%{service_name} სერვისის ღირებულება"
-      you_will_get: "თქვენ მიიღებთ:"
-    braintree:
-      terms:
-        braintree_terms_also_included: "შენიშვნა: Braintree არის გადახდის პროვაიდერი სერვისი და ამ ვებ გვერდის გამოყენებით თქვენ ასევე ეთანხმებით %{terms_link_text}ს, ქვემოთ აღნიშნულ პირობებთან ერთად."
-        terms_link_text: "Braintree მოხმარების პირობები"
   paypal_accounts:
     payout_info_title: "თანხის მიღება"
     paypal_account_email_connected: "<del> PayPal-ის ანგარიშის მიბმა </del> წარმატებით დასრულდა!"
@@ -1735,7 +1642,8 @@ ka:
     connected_account: "PayPal-ის ანგარიში %{email} წარმატებით შეერთდა"
     paypal_receive_funds_info_label_australia_only: "თქვენი PayPal-ის ანგარიშს ჭირდება გადახდის მიღების უფლების ქონა. ეს მოითხოვს პრემიალურ ან ბიზნეს ანგარიშს."
     paypal_receive_funds_info_label: "თქვენი PayPal-ის ანგარიშს სჭირდება შესაძლელბობა რომ დაადასტუროს გადახდები. ამისთვის შეიძლება საჭირო იყოს ბიზნეს ანგარიში."
-    paypal_receive_funds_info: "თუ ხედავ შეცდომას შენ ანგარიშის %{service_name}-სთან დაკავშირების დროს , განაახლე PayPal-ის ანგარისი %{upgrade_paypal_account_link}-ით. ეს უფასო და მარტივია. თუ ფიზიკური პირი ხართ PayPal გირჩევთ გამოიყენოთ თქვენი სახელი ბიზნესის სახელად."
+    paypal_receive_funds_info_australia_only: "თუ ხედავთ \"error\" მესიჯს როცა თქვენ აკავშირებთ ანგარიშს %{service_name}თან, ან %{upgrade_paypal_account_link}, (იმ შემთხვევაში თუ ფიზიკური პირი ხართ) მაშინ შექმენით Premier ანგარიში. ორივე ანგარიში სრულიად უფასოა."
+    paypal_receive_funds_info: "თუ ხედავ შეცდომას შენ ანგარიშის %{service_name}-სთან დაკავშირების დროს , განაახლე PayPal-ის ანგარიში %{upgrade_paypal_account_link}ით. ეს უფასო და მარტივია. თუ ფიზიკური პირი ხართ PayPal გირჩევთ გამოიყენოთ თქვენი სახელი ბიზნესის სახელად."
     upgrade_paypal_account_link_text: "სისტემაში შესვლა და განახლების ბმულზე დაჭერა"
     admin_account_not_connected: "%{service_name}-ს გადახდის სისტემის სერვისის გამოყენება გადახდების მისაღებად შეუძლებელია, რადგან გადახდები არ არის დაყენებული. გთხოვთ %{contact_admin_link} დეტალებისთვის."
     contact_admin_link_text: "დაუკავშირდით ბაზრის ადმინისტრატორს"
@@ -1777,11 +1685,11 @@ ka:
     paypal_account_connected_title: "PayPal-ის ანგარიში დაკავშირებულია"
     paypal_account_connected: "PayPal ანგარიში %{email} დაუკავშირდა %{service_name}ს."
     change_account: "შეცვალე PayPal ანგარიში"
-    missing: "თქვენ გახსენით ჩამონათვალი, მაგრამ თქვენი Paypal ანგარიში არ არის დაყენებული, რომ მიიღოს გადახდები. დაუკავშირდით თქვენ Paypal ანგარიშს და დართეთ %{service_name} უფლება რომ დაგარიცხოთ ტრანზაქციის საფასური თქვენი %{settings_link}-დან."
+    missing: "თქვენ დამატებული გაქვთ განცხადებები, თუმცა იმისათვის რომ მიიღოთ გადახდები, უნდა მიაბათ სისტემას თქვენი Paypal ანგარიში. დაუკავშირდით თქვენს Paypal ანგარიშს და დართეთ %{service_name}ს უფლება რომ დაგარიცხოთ ტრანზაქციის საფასური თქვენი %{settings_link}დან."
     from_your_payment_settings_link_text: "გადახდის პარამეტრები"
     redirect_message: "გადამისამართება თქვენ PayPal-ზე. თუ არაფერი მოხდა დააჭირე %{redirect_link}-ს."
     redirect_link_text: აქ
-    paypal_account_all_set_up: "ურა, ყველაფერი დაყენებულია!"
+    paypal_account_all_set_up: "გილოცავთ, უკვე ყველაფერი გამართულად მუშაობს!"
     can_receive_payments: "თქვენ ეხლა შეგიძლიათ გადახდების მიღება ჩამონათვლებისგან."
     paypal_account_connected_summary: "PayPal-ის ანგარიში %{email} წარმატებით შეერთდა"
     paypal_permission_granted_summary: "ტრანზაქციის საფასურზე უფლება მიცემულია"
@@ -1801,7 +1709,7 @@ ka:
     help_texts:
       feedback_description_title: შეფასება
       help_invitation_code_title: "თქვენ გჭირდებათ მოწვევა რომ შეუერთდეთ"
-      terms_title: "%{service_name} მოხმარების ვადები"
+      terms_title: "%{service_name} მოხმარების პირობებს"
       invite_only_help_text: "მონიშნე ეს ოფცია, თუ გინდა რომ ახალი მომხმარებლები შემოუერთდნენ მხოლოდ მაშინ თუ მათ ექლებათ მოთხოვნა უკვე არსებული მომხმარებლისგან."
       invite_only_help_text_title: "მოიწვიე მხოლოდ"
     inactive_notification:
@@ -1822,11 +1730,10 @@ ka:
       invitation_code: "მოწვევის კოდი"
       not_required: "არ არის მოთხოვნილი"
       notification_is_mandatory: "თქვენ უნდა აირჩიოთ მინიმუმ ერთი ელ. ფსოტის მისამართი რომ მიიღოთ შეტყობინებები. თუ თქვენ არ გსურთ რაიმე სახის წერილის მიღება %{service_name}-სგან, შეამოწმეთ თქვენი ელ ფოსტის შეტყობინების პარამეტრები"
-      organization_name: "ორგანიზაციის დასახელება"
       password_again: "პაროლის დადასტურება"
       show_my_name_to_others: "აჩვენე ჩემი ნამდვილი სახელი სხვა %{service_name}ის მომხმარებლებს"
       sign_up: "შექმენით ახალი %{service_name} ანგარიში"
-      terms: "მოხმარების ვადები"
+      terms: "მოხმარების პირობები"
       username_is_in_use: "მომხმარებლის ეს სახელი უკვე გამოყენებულია"
       username_is_invalid: "მომხმარებლის სახელი არასწორია. დაშვებული სასვენი ნიშნებია ასოები, ციფრები და ქვედა ტირე."
       visible_only_to_you: "ხილული მხოლოდ შენთვის და ბაზრის ადმინისტრაციისთვის"
@@ -1884,16 +1791,6 @@ ka:
       following: მიყვება
       follow: გაყოლა
       unfollow: "შეწყვიტე მიყოლა"
-  search:
-    show:
-      all_results: "ყველა შედეგი"
-      loading_more_search_results: "იტვირთება მეტი ძებნის შედეგები"
-      offers: შეთავაზებები
-      requests: მოთხოვნები
-      search: ძებნა
-      search_results: "ძებნის შედეგები"
-      search_returned_no_results: "თქვენ ძებნას შედეგი არ მოჰყვა"
-      search_verb: ძებნა
   sessions:
     new:
       create_new_account: "ახალი ანგარიშის შექმნა"
@@ -1923,9 +1820,12 @@ ka:
       change_email: შეცვლა
       confirm_your_email: "გთხოვთ დაადასტურეთ თქვენი ელ. ფოსტა"
       account_confirmation_instructions: "თქვენ მალე მიიღებთ წერილს ელ. ფოსტაზე ბმულით რომ დაადასტუროთ თქვენი ელ. ფოსტის მისამართი. არ დაგავიწყდეთ სპამის ფოლდერის შემოწმება. თქვენი ელ. ფოსტის დადასტურების შემდეგ თქვენ შეგიძლით შემოუერთდეთ %{service_name}-ს."
-      account_confirmation_instructions_title_admin: "მოგესალმებით თქვენ ბაზარზე!"
-      your_marketplace_has_now_been_created: "თქვენი ბაზარი უკვე შეიქმნა. იოლი იყო არა? მხოლოდ ერთი ნაბიჯი დაგრჩათ სანამ შეხვალთ თქვენს გვერდზე: ჩვენ გვინდა რომ ელ. ფოსტა დაადასტუროთ."
+      account_confirmation_instructions_title_admin: "დაადასტურეთ თქვენი ელ-ფოსტის მისამართი."
+      before_full_access_you_need_to_confirm_email: "სანამ ჩვენ მოგცემთ სრულ წვდომას თქვენს ბაზარზე, ერთი რამ გვინდა გთხოვოთ: დაადასტურეთ თქვენი ელ-ფოსტა."
+      before_confirmation_only_access_admin_dashboard: "დადასტურებამდე თქვენ წვდომა გექნებათ მხოლოდ %{admin_dashboard_link}ს"
+      admin_dashboard_link_text: "ადმინისტრატორის პანელი"
       account_confirmation_instructions_admin: "თქვენ მალე მიიღებთ წერილს ელ. ფოსტაზე ბმულით რომ დაადასტუროთ თქვენი ელ. ფოსტის მისამართი. არ დაგავიწყდეთ სპამის ფოლდერის შემოწმება. ბმულის გახსნის შემდეგ თქვენ შეგიძლიათ დაიწყოთ თქვენი ბაზრის დაყენება."
+      contact_support_link_text: "დაუკავშირდით ჩვენ დამხარებას"
   settings:
     account:
       change: შეცვლა
@@ -1961,7 +1861,6 @@ ka:
       i_want_to_get_email_notification_when: "მე მინდა მივიღო ელ. ფოსტაზე შეტყობინებები როცა..."
       newsletters: "ელ. ფოსტა ადმინისტრატორისგან"
       community_updates: სიახლეები
-      email_about_accept_reminders: "... დამავიწყდა შეთავაზების ან მოთხოვნის დადასტურება"
       email_about_confirm_reminders: "... დამავიწყდა მომენიშნა შეკვეთა დასრულებულად"
       email_about_new_comments_to_own_listing: "... ვიღაცამ დააკომენტარა შენს შეთავაზებაზე ან მოთხოვნაზე"
       email_about_new_messages: "... ვიღაცამ მესიჯი გამომიგზავნა"
@@ -1974,7 +1873,6 @@ ka:
       email_when_conversation_rejected: "...ვიღაცამ უარყო ჩემი შეთავაზება ან მოთხოვნა"
       email_about_completed_transactions: "... ვიღაცამ მონიშნა ჩემი შეკვეთა დასრულებულად"
       email_about_new_payments: "... მე მივიღე ახალი გადახდა"
-      email_about_payment_reminders: "... მე დამავიწყდა გადახდა"
       email_about_new_listings_by_followed_people: "... ვიღაც, ვისაც მივყვები დაპოსტა ახალი ჩამონათვალი"
       unsubscribe_succesful: "გამოწერა წარმატებით გაუქმდა"
       unsubscribe_info_text: "თქვენ აღარ მიიღებთ ამ წერილს ელ. ფოსტაზე. შეამოწმე თქვენი %{settings_link} რათა აირჩიოთ რა სახის წერილები გინდა რო მიიღოთ %{service_name}-დან, ან დაბრუნდით %{homepage_link}-ზე"
@@ -1989,6 +1887,8 @@ ka:
       given_name: სახელი
       first_name_with_initial: "( სხვა მომხმარებლებისთვის მხოლოდ პირველი ასოა ხილული)"
       first_name_only: "(სხვა მომხმარებლებისთვის არ არის ხილული)"
+      display_name: "საჩვენებელი სახელი"
+      display_name_description: "თუ თქვენ წარმოადგენთ ორგანიზაციას, თქვენ შეგიძლიათ გამოიყენოთ მისი სახელი. ამ შემთხვევაში მომხმარებელი უყურებს თქვენს ბიზნესის დასახელებას და არა თქვენს პირად სახელს."
       location_description: "თქვენ შეგიძლიათ მიუთითოთ თქვენი ზუსტი ადგილმდებარეობა, მაგალითად თქვენი საფოსტო ყუთის ნომერი. გთხოვთ დაამატე განახლებული საფოსტო ყუთის ნომერი. თქცენ ასევე შეგიძლიათ მონიშნოთ ადგილმდებარეობა პირდაპირ რუკიდან."
       phone_number: "ტელეფონის ნომერი"
       profile_picture: "პროფილის სურათი"
@@ -2001,7 +1901,7 @@ ka:
       visible_to_registered_users: "(ხილულია სისტემაში შესული მომხმარებლებისთვის)"
       default_in_listing: "(გამოიყენება მხოლოდ როგორც ნაგულისხმები როცა იქნება ახალი ჩამონათვალი)"
       invisible: "(სხვა მომხმარებლებისთვის არ არის ხილული)"
-      image_is_processing: "თქვენი პროფილის სურათი მზადდება. გთხოვთ გადატვირთეთ გვერდი რამოდენიმე ხანში. "
+      image_is_processing: "თქვენი პროფილის სურათი იტვირთება. დაელოდეთ ცოტა ხანი, 1-2 წუთში მზად იქნება."
     save_information: "ინფორმაციის შენახვა"
   shipping_address:
     shipping_address: "ტრანსპორტირების მისამართი"
@@ -2011,11 +1911,11 @@ ka:
       without_tag: "მონიშვნის გარეშე"
   terms:
     show:
-      accept_terms: "~%{service_name} მოხმარების ვადების დადასტურება"
+      accept_terms: "~%{service_name} მოხმარების პირობების დადასტურება"
       here: "ღილაკზე დაჭერით"
       i_accept_new_terms: "ვადასტურებ ახალ ვადებს"
       i_accept_terms: "ვადასტურებ ვადებს"
-      terms: "%{service_name} მოხმარების ვადები"
+      terms: "%{service_name} მოხმარების პირობებს"
       terms_have_changed: "მოხმარების ვადები შეიცვალა"
       you_can_view_the_new_terms: "თქვენ შეგიძლიათ იხილოთ ახალი ვადები "
       you_need_to_accept: "მოგესალმებით %{service_name}-ზე! მგონი პირველად იყენებთ ამ სერვისს. სანამ დაიწყებთ თქვენ უნდა დაადასტუროთ"
@@ -2130,10 +2030,16 @@ ka:
   transactions:
     initiate:
       booked_days: "დაჯავშნილი დღეები:"
+      booked_nights: "დაჯავშნილი ღამეები"
+      booked_days_label:
+        other: "დაჯავშნილი დღე:"
+      booked_nights_label:
+        other: "დაჯავშნილი ღამე"
       price_per_day: "ფასი დღიურად"
+      price_per_night: "ერთი ღამის ფასი:"
       quantity: რაოდენობა
       subtotal: "ჯამი:"
-      shipping-price: "ტრანსპორტირება:"
+      shipping-price: "ფოსტით გაგზავნა:"
     price_per_quantity: "ფასი ყოველ %{unit_type}"
     price: "ფასი:"
     quantity: "რაოდენობა: %{quantity}"
@@ -2143,15 +2049,54 @@ ka:
     day: დღე
     days: დღეები
   web:
+    listings:
+      errors:
+        availability:
+          something_went_wrong: "ჩვენ ვერ შევძელით გვეჩვენებინა ხელმისაწვდომობის ინფორმაცია. გთხოვთ სცადოთ გვერდის გადატვირთვა."
+          saving_failed: "ცვლილებების შენახვა ვერ მოხერხდა. გთხოვთ სცადოთ გვერდის გადატვირთვა."
+      pricing_units:
+        piece: ""
+        hour: საათი
+        day: დღე
+        night: ღამე
+        week: კვირა
+        month: თვე
+      edit_availability_header: ხელმისაწვდომობა
+      save_and_close_availability_editing: "შეინახეთ და დახურეთ"
+      confirm_discarding_unsaved_availability_changes_explanation: "თქვენ არ დაგისრულებიათ ცვლილებების შეტანა. თუ გააგრძელებთ, ეს ცვლილებები დაიკარგება."
+      confirm_discarding_unsaved_availability_changes_question: "დარწმუნებული ხართ რომ გსურთ უარყოთ ცვლილებები?"
+      edit_listing_availability: "დაარედაქტირე ჩამონათვალის ხელმისაწვდომობა"
+    no_listings:
+      sorry: "სამწუხაროდ თქვენი ძებნის კატეგორიით ვერ მოიძებნა ჩამონათვალი. იქნებ სხვა ძებნის პირობები ცადოთ?"
+      try_other_search_terms: "იქნებ სცადოთ სხვა ძებნის პირობები."
+    listing_card:
+      add_picture: "დაამატე სურათი"
+      no_picture: "სურათი არ არის"
+    search:
+      page: გვერდი
+      page_of_pages: "%{total_number_of_pages}ის"
     topbar:
       menu: მენიუ
+      more: მეტი
       search_placeholder: ძებნა...
-      user: ~
-      inbox: ~
-      profile: ~
-      manage_listings: ~
-      settings: ~
-      logout: ~
+      search_location_placeholder: ადგილმდებარეობა
+      user: მომხმარებელი
+      inbox: ინბოქსი
+      profile: პროფილი
+      manage_listings: "განცხადებების მართვა"
+      settings: პარამეტრები
+      logout: გამოსვლა
+      login: შესვლა
+      signup: დარეგისტრირება
+      admin_dashboard: "ადმინისტრატორის პანელი"
+      language: ენა
+    utils:
+      km: კილომეტრი
+      mi: მილი
+    branding:
+      powered_by: "%{service_name} ფუნქციონირებს %{sharetribe_link}-ის ბაზრის პლატფორმაზე."
+      create_own: "გსურთ რომ შექმნათ თქვენი პირადი ბაზრის ონლაინ ვებ გვერდი როგორიცაა %{service_name}? %{learn_more}."
+      learn_more: "გაიგეთ მეტი"
   will_paginate:
     models:
       person:

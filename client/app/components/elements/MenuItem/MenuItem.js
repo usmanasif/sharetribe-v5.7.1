@@ -19,6 +19,8 @@ class MenuItem extends Component {
     const linkProps = Object.assign({
       className: `MenuItem_link ${css.menuitemLink} ${extraClassesLink}`,
       href: this.props.href,
+      target: this.props.external ? '_blank' : null,
+      rel: this.props.external ? 'noopener noreferrer' : null,
     }, inlineStyling);
 
     return div({ className: `MenuItem ${css.menuitem}  ${extraClasses}` }, [
@@ -35,18 +37,22 @@ class MenuItem extends Component {
   }
 }
 
-const { bool, number, string } = PropTypes;
+const { arrayOf, bool, node, number, oneOfType, string } = PropTypes;
 
 MenuItem.propTypes = {
   active: bool.isRequired,
   activeColor: string.isRequired,
-  content: string.isRequired,
+  content: oneOfType([
+    arrayOf(node),
+    node,
+  ]),
   extraClasses: string,
   extraClassesLink: string,
   href: string.isRequired,
   index: number.isRequired,
   textColor: string,
   type: string.isRequired,
+  external: bool,
 };
 
 export default MenuItem;

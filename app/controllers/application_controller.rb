@@ -1,7 +1,6 @@
 require 'will_paginate/array'
 
 class ApplicationController < ActionController::Base
-  class FeatureFlagNotEnabledError < StandardError; end
 
   module DefaultURLOptions
     # Adds locale to all links
@@ -12,51 +11,46 @@ class ApplicationController < ActionController::Base
 
   include ApplicationHelper
   include IconHelper
-  include FeatureFlagHelper
   include DefaultURLOptions
   protect_from_forgery
   layout 'application'
 
-  before_filter :check_http_auth,
+  before_action :check_http_auth,
     :check_auth_token,
     :fetch_community,
     :fetch_community_plan_expiration_status,
     :perform_redirect,
     :fetch_logged_in_user,
+    :initialize_feature_flags,
     :save_current_host_with_port,
     :fetch_community_membership,
     :redirect_removed_locale,
     :set_locale,
     :redirect_locale_param,
-    :generate_event_id,
-    :set_default_url_for_mailer,
     :fetch_community_admin_status,
     :warn_about_missing_payment_info,
     :set_homepage_path,
-    :report_queue_size,
     :maintenance_warning,
     :cannot_access_if_banned,
     :cannot_access_without_confirmation,
     :ensure_consent_given,
     :ensure_user_belongs_to_community,
-    :can_access_only_organizations_communities
+    :set_display_expiration_notice
 
   # This updates translation files from WTI on every page load. Only useful in translation test servers.
-  before_filter :fetch_translations if APP_CONFIG.update_translations_on_every_page_load == "true"
+  before_action :fetch_translations if APP_CONFIG.update_translations_on_every_page_load == "true"
 
   #this shuold be last
-  before_filter :push_reported_analytics_event_to_js
-  before_filter :push_reported_gtm_data_to_js
-
-  rescue_from RestClient::Unauthorized, :with => :session_unauthorized
+  before_action :push_reported_analytics_event_to_js
+  before_action :push_reported_gtm_data_to_js
 
   helper_method :root, :logged_in?, :current_user?
 
   attr_reader :current_user
 
   def redirect_removed_locale
-    if params[:locale] && Kassi::Application.config.REMOVED_LOCALES.include?(params[:locale])
-      fallback = Kassi::Application.config.REMOVED_LOCALE_FALLBACKS[params[:locale]]
+    if params[:locale] && Rails.application.config.REMOVED_LOCALES.include?(params[:locale])
+      fallback = Rails.application.config.REMOVED_LOCALE_FALLBACKS[params[:locale]]
       redirect_to_locale(fallback, :moved_permanently)
     end
   end
@@ -66,7 +60,7 @@ class ApplicationController < ActionController::Base
 
     # We should fix this -- START
     #
-    # There are a couple of controllers (amazon ses bounces, braintree webhooks) that
+    # There are a couple of controllers (amazon ses bounces, etc.) that
     # inherit application controller, even though they shouldn't. ApplicationController
     # has a lot of community specific filters and those controllers do not have community.
     # Thus, we need to add this kind of additional logic to make sure whether we have
@@ -76,20 +70,8 @@ class ApplicationController < ActionController::Base
     community_locales = m_community.locales.or_else([])
     community_default_locale = m_community.default_locale.or_else("en")
     community_id = m_community[:id].or_else(nil)
-    community_backend = I18n::Backend::CommunityBackend.instance
 
-    # Load translations from TranslationService
-    if community_id
-      community_backend.set_community!(community_id, community_locales.map(&:to_sym))
-      community_translations = TranslationService::API::Api.translations.get(community_id)[:data]
-      TranslationServiceHelper.community_translations_for_i18n_backend(community_translations).each { |locale, data|
-        # Store community translations to I18n backend.
-        #
-        # Since the data in data hash is already flatten, we don't want to
-        # escape the separators (. dots) in the key
-        community_backend.store_translations(locale, data, escape: false)
-      }
-    end
+    I18nHelper.initialize_community_backend!(community_id, community_locales) if community_id
 
     # We should fix this -- END
 
@@ -159,9 +141,9 @@ class ApplicationController < ActionController::Base
 
   def redirect_to_locale(new_locale, status)
     if @current_community.default_locale == new_locale.to_s
-      redirect_to url_for(params.except(:locale).merge(only_path: true)), :status => status
+      redirect_to url_for(params.to_unsafe_hash.symbolize_keys.except(:locale).merge(only_path: true)), :status => status
     else
-      redirect_to url_for(params.merge(locale: new_locale, only_path: true)), :status => status
+      redirect_to url_for(params.to_unsafe_hash.symbolize_keys.merge(locale: new_locale, only_path: true)), :status => status
     end
   end
 
@@ -178,6 +160,18 @@ class ApplicationController < ActionController::Base
     else
       
     end
+  end
+
+  def initialize_feature_flags
+    # Skip this if there is no current marketplace.
+    # This allows to avoid skipping this filter in many places.
+    return unless @current_community
+
+    FeatureFlagHelper.init(community_id: @current_community.id,
+                           user_id: @current_user&.id,
+                           request: request,
+                           is_admin: Maybe(@current_user).is_admin?.or_else(false),
+                           is_marketplace_admin: Maybe(@current_user).is_marketplace_admin?(@current_community).or_else(false))
   end
 
   # Ensure that user accepts terms of community and has a valid email
@@ -214,7 +208,7 @@ class ApplicationController < ActionController::Base
   def ensure_user_belongs_to_community
     return unless @current_user && @current_community
 
-    if !@current_user.is_admin? && @current_user.accepted_community != @current_community
+    if !@current_user.has_admin_rights?(@current_community) && @current_user.accepted_community != @current_community
 
       logger.info(
         "Automatically logged out user that doesn't belong to community",
@@ -225,7 +219,6 @@ class ApplicationController < ActionController::Base
       )
 
       sign_out
-      session[:person_id] = nil
       flash[:notice] = t("layouts.notifications.automatically_logged_out_please_sign_in")
 
       redirect_to search_path
@@ -233,11 +226,23 @@ class ApplicationController < ActionController::Base
   end
 
   # A before filter for views that only users that are logged in can access
+  #
+  # Takes one parameter: A warning message that will be displayed in flash notification
+  #
+  # Sets the `return_to` variable to session, so that we can redirect user back to this
+  # location after the user signed up.
+  #
+  # Returns true if user is logged in, false otherwise
   def ensure_logged_in(warning_message)
-    return if logged_in?
-    session[:return_to] = request.fullpath
-    flash[:warning] = warning_message
-    redirect_to login_path and return
+    if logged_in?
+      true
+    else
+      session[:return_to] = request.fullpath
+      flash[:warning] = warning_message
+      redirect_to login_path
+
+      false
+    end
   end
 
   def logged_in?
@@ -275,70 +280,22 @@ class ApplicationController < ActionController::Base
     request.env[:community_id] = m_community.id.or_else(nil)
 
     setup_logger!(marketplace_id: m_community.id.or_else(nil), marketplace_ident: m_community.ident.or_else(nil))
-
-    # Save :found or :not_found to community status
-    # This is needed because we need to distinguish to cases
-    # where community is nil
-    #
-    # 1. Community is nil because it was not found
-    # 2. Community is nil beucase fetch_community filter was skipped
-    @community_search_status = @current_community ? :found : :not_found
-  end
-
-  def community_search_status
-    @community_search_status || :skipped
   end
 
   # Performs redirect to correct URL, if needed.
   # Note: This filter is safe to run even if :fetch_community
   # filter is skipped
   def perform_redirect
-    community = Maybe(@current_community).map { |c|
-      {
-        ident: c.ident,
-        domain: c.domain,
-        deleted: c.deleted?,
-        use_domain: c.use_domain?,
-        domain_verification_file: c.dv_test_file_name,
-        closed: Maybe(@current_plan)[:closed].or_else(false)
-      }
-    }.or_else(nil)
-
-    paths = {
-      community_not_found: Maybe(APP_CONFIG).community_not_found_redirect.map { |url| {url: url} }.or_else({route_name: :community_not_found_path}),
-      new_community: {route_name: :new_community_path}
+    redirect_params = {
+      community: @current_community,
+      plan: @current_plan,
+      request: request
     }
 
-    configs = {
-      always_use_ssl: Maybe(APP_CONFIG).always_use_ssl.map { |v| v == true || v.to_s.downcase == "true" }.or_else(false), # value can be string if it comes from ENV
-      app_domain: URLUtils.strip_port_from_host(APP_CONFIG.domain),
-    }
-
-    other = {
-      no_communities: Community.count == 0,
-      community_search_status: community_search_status,
-    }
-
-    MarketplaceRouter.needs_redirect(
-      request: request_hash,
-      community: community,
-      paths: paths,
-      configs: configs,
-      other: other) { |redirect_dest|
-      url = redirect_dest[:url] || send(redirect_dest[:route_name], protocol: redirect_dest[:protocol])
-
-      redirect_to(url, status: redirect_dest[:status])
-    }
-  end
-
-  def request_hash
-    @request_hash ||= {
-      host: request.host,
-      protocol: request.protocol,
-      fullpath: request.fullpath,
-      port_string: request.port_string,
-      headers: request.headers
-    }
+    MarketplaceRouter.perform_redirect(redirect_params) do |target|
+      url = target[:url] || send(target[:route_name], protocol: target[:protocol])
+      redirect_to(url, status: target[:status])
+    end
   end
 
   def fetch_community_membership
@@ -391,48 +348,22 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def can_access_only_organizations_communities
-    if (@current_community && @current_community.only_organizations) &&
-      (@current_user && !@current_user.is_organization)
-
-      sign_out @current_user
-      flash[:warning] = t("layouts.notifications.can_not_login_with_private_user")
-      redirect_to login_path
-    end
-  end
-
-  def set_default_url_for_mailer
-    url = @current_community ? "#{@current_community.full_domain}" : "www.#{APP_CONFIG.domain}"
-    ActionMailer::Base.default_url_options = {:host => url}
-    if APP_CONFIG.always_use_ssl
-      ActionMailer::Base.default_url_options[:protocol] = "https"
-    end
-  end
-
   def fetch_community_admin_status
-    @is_current_community_admin = @current_user && @current_user.has_admin_rights?
+    @is_current_community_admin = (@current_user && @current_user.has_admin_rights?(@current_community))
   end
 
   def fetch_community_plan_expiration_status
-    Maybe(@current_community).id.each { |community_id|
-      @current_plan = PlanService::API::Api.plans.get_current(community_id: community_id).data
-    }
+    @current_plan = request.env[:current_plan]
   end
 
   # Before filter for PayPal, shows notification if user is not ready for payments
   def warn_about_missing_payment_info
-    if @current_user && @current_community
-      if PaypalHelper.open_listings_with_missing_payment_info?(@current_user.id, @current_community.id)
-        settings_link = view_context.link_to(t("paypal_accounts.from_your_payment_settings_link_text"),
-          payment_settings_path(:paypal, @current_user), target: "_blank")
-        warning = t("paypal_accounts.missing", settings_link: settings_link)
-        flash.now[:warning] = warning.html_safe
-      end
+    if @current_user && PaypalHelper.open_listings_with_missing_payment_info?(@current_user.id, @current_community.id)
+      settings_link = view_context.link_to(t("paypal_accounts.from_your_payment_settings_link_text"),
+        paypal_account_settings_payment_path(@current_user), target: "_blank")
+      warning = t("paypal_accounts.missing", settings_link: settings_link)
+      flash.now[:warning] = warning.html_safe
     end
-  end
-
-  def report_queue_size
-    MonitoringService::Monitoring.report_queue_size
   end
 
   def maintenance_warning
@@ -441,40 +372,46 @@ class ApplicationController < ActionController::Base
     @minutes_to_maintenance = NextMaintenance.minutes_to(now)
   end
 
+  # This hook will be called by Devise after successful Facebook
+  # login.
+  #
+  # Return path where you want the user to be redirected to.
+  #
+  def after_sign_in_path_for(resourse)
+    return_to_path = session[:return_to] || session[:return_to_content]
+
+    if return_to_path
+      flash[:notice] = flash.alert if flash.alert # Devise sets flash.alert in case already logged in
+      session[:return_to] = nil
+      session[:return_to_content] = nil
+      return_to_path
+    else
+      search_path
+    end
+  end
+
+  def set_display_expiration_notice
+    ext_service_active = PlanService::API::Api.plans.active?
+    is_expired = Maybe(@current_plan)[:expired].or_else(false)
+
+    @display_expiration_notice = ext_service_active && is_expired
+  end
+
   private
 
-  # Override basic instrumentation and provide additional info for lograge to consume
-  # These are further configured in environment configs
+  # Override basic instrumentation and provide additional info for
+  # lograge to consume. These are pulled and logged in environment
+  # configs.
   def append_info_to_payload(payload)
     super
-    payload[:host] = request.host
     payload[:community_id] = Maybe(@current_community).id.or_else("")
     payload[:current_user_id] = Maybe(@current_user).id.or_else("")
-    payload[:request_uuid] = request.uuid
+
+    ControllerLogging.append_request_info_to_payload!(request, payload)
   end
 
   def date_equals?(date, comp)
     date && date.to_date.eql?(comp)
-  end
-
-  def session_unauthorized
-    # For some reason, ASI session is no longer valid => log the user out
-    clear_user_session
-    flash[:error] = t("layouts.notifications.error_with_session")
-    ApplicationHelper.send_error_notification("ASI session was unauthorized. This may be normal, if session just expired, but if this occurs frequently something is wrong.", "ASI session error", params)
-    redirect_to search_path and return
-  end
-
-  def clear_user_session
-    @current_user = session[:person_id] = nil
-  end
-
-  # this generates the event_id that will be used in
-  # requests to cos during this Sharetribe-page view only
-  def generate_event_id
-    RestHelper.event_id = "#{EventIdHelper.generate_event_id(params)}_#{Time.now.to_f}"
-    # The event id is generated here and stored for the duration of this request.
-    # The option above stores it to thread which should work fine on mongrel
   end
 
   def ensure_is_admin
@@ -549,23 +486,6 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def feature_flags
-    @feature_flags ||= fetch_feature_flags
-  end
-
-  def fetch_feature_flags
-    flags_from_service = FeatureFlagService::API::Api.features.get(community_id: @current_community.id).maybe[:features].or_else(Set.new)
-
-    is_admin = Maybe(@current_user).is_admin?.or_else(false)
-    temp_flags = ApplicationController.fetch_temp_flags(is_admin, params, session)
-
-    session[:feature_flags] = temp_flags
-
-    flags_from_service.union(temp_flags)
-  end
-
-  helper_method :fetch_feature_flags # Make this method available for FeatureFlagHelper
-
   def logger
     if @logger.nil?
       metadata = [:marketplace_id, :marketplace_ident, :user_id, :username, :request_uuid]
@@ -593,7 +513,7 @@ class ApplicationController < ActionController::Base
     return true if @current_user.is_admin?
 
     # Show for admins if their status is accepted
-    @current_user.is_marketplace_admin? &&
+    @current_user.is_marketplace_admin?(@current_community) &&
       @current_user.community_membership.accepted?
   end
 
@@ -613,20 +533,36 @@ class ApplicationController < ActionController::Base
   def topbar_props
     TopbarHelper.topbar_props(
       community: @current_community,
-      user: @current_user,
-      community_locales: available_locales(),
       path_after_locale_change: @return_to,
-      locale_param: params[:locale])
+      user: @current_user,
+      search_placeholder: @community_customization&.search_placeholder,
+      current_path: request.fullpath,
+      locale_param: params[:locale],
+      host_with_port: request.host_with_port)
   end
 
   helper_method :topbar_props
+
+  def notifications_to_react
+    # Different way to display flash messages on React pages
+    if (params[:controller] == "homepage" && params[:action] == "index" && FeatureFlagHelper.feature_enabled?(:searchpage_v1))
+      notifications = [:notice, :warning, :error].each_with_object({}) do |level, acc|
+        if flash[level]
+          acc[level] = flash[level]
+          flash.delete(level)
+        end
+      end.compact
+    end
+  end
+
+  helper_method :notifications_to_react
 
   def header_props
     user = Maybe(@current_user).map { |u|
       {
         unread_count: MarketplaceService::Inbox::Query.notification_count(u.id, @current_community.id),
         avatar_url: u.image.present? ? u.image.url(:thumb) : view_context.image_path("profile_image/thumb/missing.png"),
-        current_user_name: u.name(@current_community),
+        current_user_name: PersonViewUtils.person_display_name(u, @current_community),
         inbox_path: person_inbox_path(u),
         profile_path: person_path(u),
         manage_listings_path: person_path(u, show_closed: true),
@@ -635,15 +571,23 @@ class ApplicationController < ActionController::Base
       }
     }.or_else({})
 
+    locale_change_links = available_locales.map { |(title, locale_code)|
+      {
+        url: PathHelpers.change_locale_path(is_logged_in: @current_user.present?,
+                                            locale: locale_code,
+                                            redirect_uri: @return_to),
+        title: title
+      }
+    }
+
     common = {
       logged_in: @current_user.present?,
       homepage_path: @homepage_path,
-      return_after_locale_change: @return_to,
       current_locale_name: get_full_locale_name(I18n.locale),
       sign_up_path: sign_up_path,
       login_path: login_path,
       new_listing_path: new_listing_path,
-      available_locales: available_locales,
+      locale_change_links: locale_change_links,
       icons: pick_icons(
         APP_CONFIG.icon_pack,
         [
@@ -671,34 +615,6 @@ class ApplicationController < ActionController::Base
 
   def get_full_locale_name(locale)
     Maybe(Sharetribe::AVAILABLE_LOCALES.find { |l| l[:ident] == locale.to_s })[:name].or_else(locale).to_s
-  end
-
-
-  # Fetch temporary flags from params and session
-  def self.fetch_temp_flags(is_admin, params, session)
-    return Set.new unless is_admin
-
-    from_session = Maybe(session)[:feature_flags].or_else(Set.new)
-    from_params = Maybe(params)[:enable_feature].map { |feature| [feature.to_sym] }.to_set.or_else(Set.new)
-
-    from_session.union(from_params)
-  end
-
-  def ensure_feature_enabled(feature_name)
-    raise FeatureFlagNotEnabledError unless feature_flags.include?(feature_name)
-  end
-
-  # Handy before_filter shorthand.
-  #
-  # Usage:
-  #
-  # class YourController < ApplicationController
-  #   ensure_feature_enabled :shipping, only: [:new_shipping, :edit_shipping]
-  #   ...
-  #  end
-  #
-  def self.ensure_feature_enabled(feature_name, options = {})
-    before_filter(options) { ensure_feature_enabled(feature_name) }
   end
 
   def render_not_found!(msg = "Not found")

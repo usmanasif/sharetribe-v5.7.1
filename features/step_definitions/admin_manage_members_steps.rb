@@ -4,20 +4,27 @@ module AdminManageMembersSteps
   REMOVE_USER_CHECKBOX_SELECTOR = ".admin-members-remove-user"
 
   def find_row_for_person(full_name)
-    email_div = find(".admin-members-full-name", :text => "#{full_name}")
+    expect(page).to have_css(".admin-members-full-name", :text => full_name)
+    email_div = find(".admin-members-full-name", :text => full_name)
     email_row = email_div.first(:xpath, ".//..")
   end
 
+  def find_element_for_person(full_name, selector)
+    row = find_row_for_person(full_name)
+    expect(row).to have_css(selector)
+    row.find(selector)
+  end
+
   def find_posting_allowed_checkbox_for_person(full_name)
-    find_row_for_person(full_name).find(POSTING_ALLOWED_CHECKBOX_SELECTOR)
+    find_element_for_person(full_name, POSTING_ALLOWED_CHECKBOX_SELECTOR)
   end
 
   def find_admin_checkbox_for_person(full_name)
-    find_row_for_person(full_name).find(IS_ADMIN_CHECKBOX_SELECTOR)
+    find_element_for_person(full_name, IS_ADMIN_CHECKBOX_SELECTOR)
   end
 
   def find_remove_link_for_person(full_name)
-    find_row_for_person(full_name).find(REMOVE_USER_CHECKBOX_SELECTOR)
+    find_element_for_person(full_name, REMOVE_USER_CHECKBOX_SELECTOR)
   end
 
 end
@@ -99,9 +106,9 @@ end
 
 Then(/^I should be able to send a message to admin$/) do
   steps %Q{
-    When I fill in "What would you like to tell us?" with "I sad that I have been banned."
-    And I press "Send feedback"
-    Then I should see "Thanks a lot for your feedback!" within ".flash-notifications"
+    When I fill in "feedback_content" with "I sad that I have been banned."
+    And I press "Send message"
+    Then I should see "Thanks a lot for your message!" within ".flash-notifications"
   }
 end
 

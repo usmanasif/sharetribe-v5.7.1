@@ -1,6 +1,3 @@
-/* TODO: unify with Topbar breakpoints */
-@custom-media --AddNewListingButton_tablet (min-width: 40rem);
-
 .button {
   position: relative;
   display: inline-block;
@@ -20,6 +17,8 @@
   }
 }
 
+.responsiveLayout {} /* stylelint-disable-line block-no-empty */
+
 .backgroundContainer {
   display: none;
   position: absolute;
@@ -28,10 +27,13 @@
   bottom: 0;
   left: 0;
   border-radius: calc(var(--AddNewListingButton_height) / 2);
-  transition: filter 100ms ease-in;
+  transition: filter 100ms ease-in, background-color 100ms ease-in;
+  will-change: filter;
 
-  @media (--AddNewListingButton_tablet) {
-    display: block;
+  @nest .responsiveLayout & {
+    @media (--medium-viewport) {
+      display: block;
+    }
   }
 }
 
@@ -39,8 +41,6 @@
 .desktop {
   position: relative;
   padding: 0 var(--AddNewListingButton_textPadding);
-  height: var(--AddNewListingButton_height);
-  line-height: calc(var(--AddNewListingButton_height) - 1px);
   max-width: var(--AddNewListingButton_maxTextWidth);
   white-space: nowrap;
   overflow: hidden;
@@ -48,6 +48,8 @@
 }
 
 .mobile {
+  height: var(--AddNewListingButton_tabletHeight);
+  line-height: var(--AddNewListingButton_tabletHeight);
   display: block;
   transition: filter 100ms ease-in;
 
@@ -59,16 +61,28 @@
     filter: brightness(70%);
   }
 
-  @media (--AddNewListingButton_tablet) {
-    display: none;
+  @nest .responsiveLayout & {
+    @media (--medium-viewport) {
+      display: none;
+    }
   }
 }
 
 .desktop {
   display: none;
   color: var(--AddNewListingButton_textColor);
+  height: var(--AddNewListingButton_tabletHeight);
+  line-height: calc(var(--AddNewListingButton_tabletHeight) - 1px);
 
-  @media (--AddNewListingButton_tablet) {
-    display: block;
+  @nest .responsiveLayout & {
+    @media (--medium-viewport) {
+      display: block;
+    }
+  }
+
+  @media (--large-viewport) {
+    height: var(--AddNewListingButton_height);
+    line-height: calc(var(--AddNewListingButton_height) - 1px);
+    font-size: var(--AddNewListingButton_textSize);
   }
 }

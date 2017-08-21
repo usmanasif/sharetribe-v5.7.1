@@ -11,7 +11,7 @@ da-DK:
   devise:
     failure:
       already_authenticated: "Du er allerede logget ind."
-      unauthenticated: "Du skal logge ind eller oprette en konto for at fortsætte."
+      unauthenticated: "Du skal logge ind eller tilmelde dig for at fortsætte."
       unconfirmed: "Du skal bekræfte din konto for at fortsætte."
       locked: "Din konto er låst."
       invalid: "Email eller password er ikke gyldig."
@@ -38,7 +38,7 @@ da-DK:
         inactive: Passiv
         unconfirmed: "Ikke bekræftet"
         locked: låst
-      update_needs_confirmation: "Din konto er blevet opdateret, men vi er nødt til at bekræfte din nye email. Tjek din mail og klik på bekræftelseslinket."
+      update_needs_confirmation: "Din konto er blevet opdateret. Tjek din mail for at bekræfte din nye email."
       signed_up: "Velkommen! Du er nu logget på."
       updated: "Din konto er nu opdateret."
       destroyed: "Tak for denne gang! Din konto er nu lukket. Vi håber at se dig igen snart."
@@ -51,7 +51,7 @@ da-DK:
       failure: "Kunne ikke godkende dig fra %{kind} fordi \"%{reason}\"."
     mailer:
       confirmation_instructions:
-        subject: Bekræftelsesinstruktioner
+        subject: "Instruktioner for bekræftelse ved tilmelding til %{service_name}"
       reset_password_instructions:
         subject: "Nulstil adgangskode"
       unlock_instructions:

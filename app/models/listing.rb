@@ -4,6 +4,7 @@
 # Table name: listings
 #
 #  id                              :integer          not null, primary key
+#  uuid                            :binary(16)       not null
 #  community_id                    :integer          not null
 #  author_id                       :string(255)
 #  category_old                    :string(255)
@@ -33,7 +34,6 @@
 #  transaction_process_id          :integer
 #  shape_name_tr_key               :string(255)
 #  action_button_tr_key            :string(255)
-#  organization_id                 :integer
 #  price_cents                     :integer
 #  currency                        :string(255)
 #  quantity                        :string(255)
@@ -46,7 +46,7 @@
 #  pickup_enabled                  :boolean          default(FALSE)
 #  shipping_price_cents            :integer
 #  shipping_price_additional_cents :integer
-#  featured                        :boolean          default(FALSE)
+#  availability                    :string(32)       default("none")
 #
 # Indexes
 #
@@ -57,11 +57,12 @@
 #  index_listings_on_listing_shape_id  (listing_shape_id)
 #  index_listings_on_new_category_id   (category_id)
 #  index_listings_on_open              (open)
+#  index_listings_on_uuid              (uuid) UNIQUE
 #  person_listings                     (community_id,author_id)
 #  updates_email_listings              (community_id,open,updates_email_at)
 #
 
-class Listing < ActiveRecord::Base
+class Listing < ApplicationRecord
 
   include ApplicationHelper
   include ActionView::Helpers::TranslationHelper
@@ -69,7 +70,7 @@ class Listing < ActiveRecord::Base
 
   belongs_to :author, :class_name => "Person", :foreign_key => "author_id"
 
-  has_many :listing_images, -> { where("error IS NULL") }, :dependent => :destroy
+  has_many :listing_images, -> { where("error IS NULL").order("position") }, :dependent => :destroy
 
   has_many :conversations
   has_many :comments, :dependent => :destroy
@@ -105,6 +106,23 @@ class Listing < ActiveRecord::Base
     self.updates_email_at ||= Time.now
   end
 
+  def uuid_object
+    if self[:uuid].nil?
+      nil
+    else
+      UUIDUtils.parse_raw(self[:uuid])
+    end
+  end
+
+  def uuid_object=(uuid)
+    self.uuid = UUIDUtils.raw(uuid)
+  end
+
+  before_create :add_uuid
+  def add_uuid
+    self.uuid ||= UUIDUtils.create_raw
+  end
+
   before_validation do
     # Normalize browser line-breaks.
     # Reason: Some browsers send line-break as \r\n which counts for 2 characters making the
@@ -130,6 +148,13 @@ class Listing < ActiveRecord::Base
   end
 
   def visible_to?(current_user, current_community)
+    # DEPRECATED
+    #
+    # Consider removing the `visible_to?` method.
+    #
+    # Reason: Authorization logic should be in the controller layer (filters etc.),
+    # not in the model layer.
+    #
     ListingVisibilityGuard.new(self, current_community, current_user).visible?
   end
 
@@ -142,11 +167,11 @@ class Listing < ActiveRecord::Base
 
   # Overrides the to_param method to implement clean URLs
   def to_param
-    "#{id}-#{title.to_url}"
+    self.class.to_param(id, title)
   end
 
-  def self.columns
-    super.reject { |c| c.name == "transaction_type_id" || c.name == "visibility"}
+  def self.to_param(id, title)
+    "#{id}-#{title.to_url}"
   end
 
   def self.find_by_category_and_subcategory(category)
@@ -206,10 +231,6 @@ class Listing < ActiveRecord::Base
 
   def answer_for(custom_field)
     custom_field_values.find { |value| value.custom_field_id == custom_field.id }
-  end
-
-  def payment_required_at?(community)
-    price && price > 0 && community.payments_in_use?
   end
 
   def unit_type

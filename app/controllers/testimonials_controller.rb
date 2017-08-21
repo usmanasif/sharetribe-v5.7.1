@@ -1,14 +1,14 @@
 class TestimonialsController < ApplicationController
 
-  before_filter :except => :index do |controller|
+  before_action :except => :index do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_give_feedback")
   end
 
-  before_filter :ensure_authorized_to_give_feedback, :except => :index
-  before_filter :ensure_feedback_not_given, :except => :index
+  before_action :ensure_authorized_to_give_feedback, :except => :index
+  before_action :ensure_feedback_not_given, :except => :index
 
   # Skip auth token check as current jQuery doesn't provide it automatically
-  skip_before_filter :verify_authenticity_token, :only => [:skip]
+  skip_before_action :verify_authenticity_token, :only => [:skip]
 
   def index
     username = params[:person_id]
@@ -41,8 +41,8 @@ class TestimonialsController < ApplicationController
     @testimonial = @transaction.testimonials.build(testimonial_params)
 
     if @testimonial.save
-      Delayed::Job.enqueue(TestimonialGivenJob.new(@testimonial.id, @current_community))
-      flash[:notice] = t("layouts.notifications.feedback_sent_to", :target_person => view_context.link_to(@transaction.other_party(@current_user).given_name_or_username, @transaction.other_party(@current_user))).html_safe
+      Delayed::Job.enqueue(TestimonialGivenJob.new(@testimonial.id, @current_community.id))
+      flash[:notice] = t("layouts.notifications.feedback_sent_to", :target_person => view_context.link_to(PersonViewUtils.person_display_name_for_type(@transaction.other_party(@current_user), "first_name_only"), @transaction.other_party(@current_user))).html_safe
       redirect_to person_transaction_path(:person_id => @current_user.id, :id => @transaction.id)
     else
       render :action => new

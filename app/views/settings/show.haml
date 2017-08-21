@@ -2,9 +2,10 @@
   initialize_update_profile_info_form("#{I18n.locale}","#{target_user.id.to_s}", #{@current_community.real_name_required?});
 
 - content_for :extra_javascript do
-  - maps_key = @current_community.google_maps_key
+  - maps_key = MarketplaceHelper.google_maps_key(@current_community.id)
   - key_param = maps_key ? "?key=#{maps_key}" : ""
-  = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}"
+  - needs_maps = !FeatureFlagHelper.feature_enabled?(:topbar_v1) || search_mode == :keyword
+  = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}" if needs_maps
 
 - content_for :title_header do
   %h1= t("layouts.no_tribe.settings")
@@ -17,24 +18,34 @@
     = link_to(t("settings.profile.profile_page"), target_user) + "."
 
   = form_for target_user do |form|
-    - unless target_user.is_organization
-      = form.label :given_name, t("settings.profile.given_name")
-      = form.text_field :given_name, :class => "text_field", :maxlength => "30"
-      .inline-label-container
-        = form.label :family_name, t("settings.profile.family_name"), :class => "inline"
-        %small
-          - if ["first_name_with_initial", "first_name_only"].include? @current_community.name_display_type
-            = t("settings.profile.#{@current_community.name_display_type}")
-      = form.text_field :family_name, :class => "text_field", :maxlength => "30"
+    = form.label :given_name, t("settings.profile.given_name")
+    = form.text_field :given_name, :class => "text_field", :maxlength => "30"
+    .inline-label-container
+      = form.label :family_name, t("settings.profile.family_name"), :class => "inline"
+      %small
+        - if ["first_name_with_initial", "first_name_only"].include? @current_community.name_display_type
+          = t("settings.profile.#{@current_community.name_display_type}")
+    = form.text_field :family_name, :class => "text_field", :maxlength => "30"
+
+    -# Display name
+    .inline-label-container
+      = form.label :display_name, t("settings.profile.display_name"), class: "inline"
+    %span.alert-box-icon
+      = icon_tag("information", ["icon-fix"])
+    %small
+      = t("settings.profile.display_name_description")
+    = form.text_field :display_name, class: "text_field", :maxlength => "30"
 
     -# Location
     .inline-label-container
       = form.label :street_address, t("settings.profile.street_address"), :class => "inline"
       %small
         = t('settings.profile.default_in_listing')
-    = form.text_field :street_address, :class => "text_field", :onkeyup => "timed_input(this)"
+    %span.alert-box-icon
+      = icon_tag("information", ["icon-fix"])
     %small
       = t("settings.profile.location_description")
+    = form.text_field :street_address, :class => "text_field", :onkeyup => "timed_input(this)"
     #settings_map_canvas.map
       - content_for :extra_javascript do
         :javascript

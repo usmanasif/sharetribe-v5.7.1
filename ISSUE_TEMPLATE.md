@@ -1,3 +1,5 @@
+_Please add only one problem per Issue. If you are facing multiple problems, add multiple Issues._
+
 ##### Sharetribe Version:
 
 _Share the git commit hash of the version of Sharetribe that you are using. You can find it by running `git rev-parse HEAD` in your Sharetribe directory._
@@ -5,6 +7,13 @@ _Share the git commit hash of the version of Sharetribe that you are using. You 
 ##### Environment:
 
 _What's your environment? Mac OS X, Heroku, or something else?_
+
+_What's your node version? Run the following commands and copy the result here:_
+
+```
+> node -v
+> npm -v
+```
 
 ##### Server mode:
 

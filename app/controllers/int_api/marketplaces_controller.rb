@@ -1,32 +1,30 @@
 class IntApi::MarketplacesController < ApplicationController
 
-  skip_before_filter  :verify_authenticity_token, only: [:is_register]
-  
-  before_filter :set_access_control_headers
-
-  skip_before_filter :check_http_auth,
+  skip_before_action :check_http_auth,
     :check_auth_token,
     :fetch_community,
     :fetch_community_plan_expiration_status,
     :perform_redirect,
     :fetch_logged_in_user,
+    :initialize_feature_flags,
     :save_current_host_with_port,
     :fetch_community_membership,
     :redirect_removed_locale,
     :set_locale,
     :redirect_locale_param,
-    :generate_event_id,
-    :set_default_url_for_mailer,
     :fetch_community_admin_status,
     :warn_about_missing_payment_info,
     :set_homepage_path,
-    :report_queue_size,
     :maintenance_warning,
     :cannot_access_if_banned,
     :cannot_access_without_confirmation,
     :ensure_consent_given,
     :ensure_user_belongs_to_community,
-    :can_access_only_organizations_communities, :only => [:login]
+    :set_display_expiration_notice,
+    :verify_authenticity_token
+
+
+  before_action :set_access_control_headers
 
   NewMarketplaceForm = Form::NewMarketplace
 
@@ -70,10 +68,16 @@ class IntApi::MarketplacesController < ApplicationController
         locale: params[:marketplace_language]},
         marketplace[:id]).data
 
-    auth_token = UserService::API::AuthTokens.create_login_token(user[:id])
-    url = URLUtils.append_query_param(marketplace[:url], "auth", auth_token[:token])
+    base_url = URI(marketplace[:url])
+    url = admin_getting_started_guide_url(host: base_url.host, port: base_url.port)
 
-    assign_onboarding_feature_flag(community_id: marketplace[:id])
+    # make the marketplace creator be logged in via Auth Token
+    auth_token = UserService::API::AuthTokens.create_login_token(user[:id])
+    url = URLUtils.append_query_param(url, "auth", auth_token[:token])
+
+    # Enable specific features for all new trials
+    FeatureFlagService::API::Api.features.enable(community_id: marketplace[:id], person_id: user[:id], features: [:topbar_v1])
+    FeatureFlagService::API::Api.features.enable(community_id: marketplace[:id], features: [:topbar_v1])
 
     # TODO handle error cases with proper response
 
@@ -105,19 +109,16 @@ class IntApi::MarketplacesController < ApplicationController
   def signup
     if params.present?
       @current_community = Community.first
-      puts "*"*500 , params , "*"*500
+      puts "!"*500 , params.inspect , "!"*500
       # Make person a member of the current community
-      @person = UserService::API::Users.create_user({
+      person = UserService::API::Users.create_user({
           given_name: params[:first_name],
           family_name: params[:last_name],
           email: params[:email].downcase,
           password: params[:password],
           locale: params[:marketplace_language]},
           1 )
-      puts '*'*50 , @person.inspect
-      puts '*'*50 , @person.data[:id]
-      puts '*'*50 , Person.find_by(family_name: params[:last_name]).inspect
-      puts '*'*50 , Person.find_by(family_name: params[:last_name]).community_membership.update(status: 'accepted')
+      puts '*'*50 , Person.find_by_id(person.data[:id]).community_membership.update(status: 'accepted')
       
       render status: 200 , json: { "status" => true } 
     else
@@ -150,11 +151,4 @@ class IntApi::MarketplacesController < ApplicationController
     # TODO change this to more strict setting when done testing
     headers['Access-Control-Allow-Origin'] = '*'
   end
-
-  def assign_onboarding_feature_flag(community_id:)
-    if(rand < 0.5)
-      FeatureFlagService::API::Api.features.enable(community_id: community_id, features: [:onboarding_redesign_v1])
-    end
-  end
-
 end

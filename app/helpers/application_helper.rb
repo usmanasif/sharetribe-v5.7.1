@@ -16,22 +16,22 @@ module ApplicationHelper
     to_time = to_time.to_time if to_time.respond_to?(:to_time)
     distance_in_minutes = (((to_time - from_time).abs)/60).round
     distance_in_seconds = ((to_time - from_time).abs).round
-    case distance_in_minutes
-      when 0..1           then time = (distance_in_seconds < 60) ? t('timestamps.seconds_ago', :count => distance_in_seconds) : t('timestamps.minute_ago', :count => 1)
-      when 2..59          then time = t('timestamps.minutes_ago', :count => distance_in_minutes)
-      when 60..90         then time = t('timestamps.hour_ago', :count => 1)
-      when 90..1440       then time = t('timestamps.hours_ago', :count => (distance_in_minutes.to_f / 60.0).round)
-      when 1440..2160     then time = t('timestamps.day_ago', :count => 1) # 1-1.5 days
-      when 2160..2880     then time = t('timestamps.days_ago', :count => (distance_in_minutes.to_f / 1440.0).round) # 1.5-2 days
-      #else time = from_time.strftime(t('date.formats.default'))
+    time = case distance_in_minutes
+      when 0..1           then (distance_in_seconds < 60) ? t('timestamps.seconds_ago', :count => distance_in_seconds) : t('timestamps.minute_ago', :count => 1)
+      when 2..59          then t('timestamps.minutes_ago', :count => distance_in_minutes)
+      when 60..90         then t('timestamps.hour_ago', :count => 1)
+      when 90..1440       then t('timestamps.hours_ago', :count => (distance_in_minutes.to_f / 60.0).round)
+      when 1440..2160     then t('timestamps.day_ago', :count => 1) # 1-1.5 days
+      when 2160..2880     then t('timestamps.days_ago', :count => (distance_in_minutes.to_f / 1440.0).round) # 1.5-2 days
+      #else from_time.strftime(t('date.formats.default'))
     end
     if distance_in_minutes > 2880
       distance_in_days = (distance_in_minutes/1440.0).round
-      case distance_in_days
-        when 0..30    then time = t('timestamps.days_ago', :count => distance_in_days)
-        when 31..50   then time = t('timestamps.month_ago', :count => 1)
-        when 51..364  then time = t('timestamps.months_ago', :count => (distance_in_days.to_f / 30.0).round)
-        else               time = t('timestamps.years_ago', :count => (distance_in_days.to_f / 365.24).round)
+      time = case distance_in_days
+        when 0..30    then t('timestamps.days_ago', :count => distance_in_days)
+        when 31..50   then t('timestamps.month_ago', :count => 1)
+        when 51..364  then t('timestamps.months_ago', :count => (distance_in_days.to_f / 30.0).round)
+        else               t('timestamps.years_ago', :count => (distance_in_days.to_f / 365.24).round)
       end
     end
 
@@ -45,19 +45,6 @@ module ApplicationHelper
   # used to escape strings to URL friendly format
   def self.escape_for_url(str)
      URI.escape(str, Regexp.new("[^-_!~*()a-zA-Z\\d]"))
-  end
-
-  def self.shorten_url(url)
-    if APP_CONFIG.bitly_username && APP_CONFIG.bitly_key
-      begin
-        bit_ly_query = "http://api.bit.ly/shorten/?version=2.0.1&login=#{APP_CONFIG.bitly_username}&longUrl=#{escape_for_url(url)}&apiKey=#{APP_CONFIG.bitly_key}"
-        return JSON.parse(RestClient.get(bit_ly_query))["results"][url]["shortUrl"]
-      rescue => e
-        return url
-      end
-    else
-      return url
-    end
   end
 
   # Changes line breaks to <br>-tags and transforms URLs to links
@@ -94,7 +81,7 @@ module ApplicationHelper
   def large_avatar_thumb(person, options={})
     image_url = person.image.present? ? person.image.url(:medium) : missing_avatar(:medium)
 
-    image_tag image_url, { :alt => person.name(@current_community) }.merge(options)
+    image_tag image_url, { :alt => PersonViewUtils.person_display_name(person, @current_community) }.merge(options)
   end
 
   def huge_avatar_thumb(person, options={})
@@ -102,7 +89,7 @@ module ApplicationHelper
 
     image_url = person.image.present? ? person.image.url(:medium) : missing_avatar(:medium)
 
-    image_tag image_url, { :alt => person.name(@current_community) }.merge(options)
+    image_tag image_url, { :alt => PersonViewUtils.person_display_name(person, @current_community) }.merge(options)
   end
 
   def missing_avatar(size = :medium)
@@ -117,9 +104,10 @@ module ApplicationHelper
     end
   end
 
-  def pageless(total_pages, target_id, url=nil, loader_message='Loading more results')
+  def pageless(total_pages, target_id, url=nil, loader_message='Loading more results', current_page = 1)
 
     opts = {
+      :currentPage => current_page,
       :totalPages => total_pages,
       :url        => url,
       :loaderMsg  => loader_message,
@@ -194,11 +182,10 @@ module ApplicationHelper
 
   def service_name
     if @current_community
-      service_name = @current_community.name(I18n.locale)
+      @current_community.name(I18n.locale)
     else
-      service_name = APP_CONFIG.global_service_name || "Sharetribe"
+      APP_CONFIG.global_service_name || "Sharetribe"
     end
-    return service_name
   end
 
   def email_not_accepted_message
@@ -320,15 +307,23 @@ module ApplicationHelper
         :text => t("admin.communities.getting_started.getting_started"),
         :icon_class => icon_class("openbook"),
         :path => admin_getting_started_guide_path,
-        :name => "getting_started"
+        :name => "getting_started_guide"
       },
       {
+        :id => "admin-help-center-link",
         :topic => :general,
-        :text => t("admin.left_hand_navigation.support"),
+        :text => t("admin.left_hand_navigation.help_center"),
         :icon_class => icon_class("help"),
-        :path => "mailto:#{APP_CONFIG.support_email}",
-        :name => "support",
-        :data_uv_trigger => "contact"
+        :path => "#{APP_CONFIG.knowledge_base_url}/?utm_source=marketplaceadminpanel&utm_medium=referral&utm_campaign=leftnavi",
+        :name => "help_center"
+      },
+      {
+        :id => "admin-academy-link",
+        :topic => :general,
+        :text => t("admin.left_hand_navigation.academy"),
+        :icon_class => icon_class("academy"),
+        :path => "https://www.sharetribe.com/academy/?utm_source=marketplaceadminpanel&utm_medium=referral&utm_campaign=leftnavi",
+        :name => "academy"
       }
     ]
 
@@ -346,7 +341,7 @@ module ApplicationHelper
       :topic => :general,
       :text => t("admin.left_hand_navigation.preview"),
       :icon_class => icon_class("eye"),
-      :path => search_path(big_cover_photo: true),
+      :path => homepage_without_locale_path(big_cover_photo: true, locale: nil),
       :name => "preview",
     }
 
@@ -395,18 +390,41 @@ module ApplicationHelper
       },
       {
         :topic => :configure,
-        :text => "Featured Slider",
+        :text => t("admin.communities.edit_details.community_featured_slider"),
         :icon_class => icon_class("coins"),
-        :path => admin_edit_featured_slider_path,
+        :path => admin_featured_slider_edit_path,
         :name => "tribe_featured_slider"
       },
       {
         :topic => :configure,
-        :text => t("admin.communities.menu_links.menu_links"),
-        :icon_class => icon_class("link"),
-        :path => menu_links_admin_community_path(@current_community),
-        :name => "menu_links"
-      },
+        :text => t("admin.communities.new_layout.new_layout"),
+        :icon_class => icon_class("layout"),
+        :path => admin_new_layout_path,
+        :name => "new_layout"
+      }
+    ]
+
+    links += [
+      {
+        :topic => :configure,
+        :text => t("admin.communities.topbar.topbar"),
+        :icon_class => icon_class("topbar_menu"),
+        :path => admin_topbar_edit_path,
+        :name => "topbar"
+      }
+    ]
+
+    if APP_CONFIG.show_landing_page_admin
+      links << {
+        :topic => :configure,
+        :text => t("admin.landing_page.landing_page"),
+        :icon_class => icon_class("home"),
+        :path => admin_landing_page_path,
+        :name => "landing_page",
+      }
+    end
+
+    links += [
       {
         :topic => :configure,
         :text => t("admin.categories.index.listing_categories"),
@@ -423,17 +441,13 @@ module ApplicationHelper
       }
     ]
 
-    # Disabled for Braintree and Checkout
-    gw = PaymentGateway.where(community_id: @current_community.id).first
-    unless gw
-      links << {
-        :topic => :configure,
-        :text => t("admin.listing_shapes.index.listing_shapes"),
-        :icon_class => icon_class("order_types"),
-        :path => admin_listing_shapes_path,
-        :name => "listing_shapes"
-      }
-    end
+    links << {
+      :topic => :configure,
+      :text => t("admin.listing_shapes.index.listing_shapes"),
+      :icon_class => icon_class("order_types"),
+      :path => admin_listing_shapes_path,
+      :name => "listing_shapes"
+    }
 
     if PaypalHelper.paypal_active?(@current_community.id)
       links << {
@@ -442,16 +456,6 @@ module ApplicationHelper
         :icon_class => icon_class("payments"),
         :path => admin_paypal_preferences_path(),
         :name => "paypal_account"
-      }
-    end
-
-    if Maybe(@current_user).is_admin?.or_else { false }
-      links << {
-        :topic => :configure,
-        :text => t("admin.communities.braintree_payment_gateway.braintree_payment_gateway"),
-        :icon_class => icon_class("payments"),
-        :path => payment_gateways_admin_community_path(@current_community),
-        :name => "payment_gateways"
       }
     end
 
@@ -527,47 +531,17 @@ module ApplicationHelper
 
     if payment_type.present?
 
-      path = payment_settings_path(payment_type, @current_user)
-
       links << {
         :id => "settings-tab-payments",
         :text => t("layouts.settings.payments"),
         :icon_class => icon_class("payments"),
-        :path => path,
+        :path => paypal_account_settings_payment_path(@current_user),
         :name => "payments"
       }
 
     end
 
     return links
-  end
-
-  def payment_settings_path(gateway_type, person)
-    if gateway_type == :braintree
-      show_braintree_settings_payment_path(person)
-    elsif gateway_type == :checkout
-      person_checkout_account_path(person)
-    elsif gateway_type == :paypal
-      paypal_account_settings_payment_path(person)
-    end
-  end
-
-  def payment_settings_url(gateway_type, person, url_params)
-    if gateway_type == :braintree
-      show_braintree_settings_payment_url(person, url_params.merge(locale: person.locale))
-    elsif gateway_type == :checkout
-      person_checkout_account_url(person, url_params.merge(locale: person.locale))
-    elsif gateway_type == :paypal
-      paypal_account_settings_payment_url(person, url_params.merge(locale: person.locale))
-    end
-  end
-
-  def display_expiration_notice?
-    ext_service_active = PlanService::API::Api.plans.active?
-    is_admin = Maybe(@current_user).has_admin_rights?.or_else(false)
-    is_expired = Maybe(@current_plan)[:expired].or_else(false)
-
-    ext_service_active && is_admin && is_expired
   end
 
   # returns either "http://" or "https://" based on configuration settings
@@ -640,42 +614,15 @@ module ApplicationHelper
 
   # Return a link to the listing author
   def author_link(listing)
-    link_to(listing.author.name(@current_community), listing.author, {:title => listing.author.name(@current_community)})
+    link_to(PersonViewUtils.person_display_name(listing.author, @current_community),
+            listing.author,
+            {:title => PersonViewUtils.person_display_name(listing.author, @current_community)})
   end
 
   def with_invite_link(&block)
-    if @current_user && (@current_user.has_admin_rights? || @current_community.users_can_invite_new_users)
+    if @current_user && (@current_user.has_admin_rights?(@current_community) || @current_community.users_can_invite_new_users)
       block.call()
     end
-  end
-
-  def is_uri?(s)
-    s.match /^https?:\/\//
-  end
-
-  def with_stylesheet_url(community, &block)
-    stylesheet_url = if community.has_custom_stylesheet?
-      stylesheet = community.custom_stylesheet_url
-      is_uri?(stylesheet)  ? stylesheet : "/assets/#{stylesheet}"
-    else
-      'application'
-    end
-
-    block.call(stylesheet_url)
-  end
-
-  # Render block only if big cover photo should be shown
-  def with_big_cover_photo(&block)
-    block.call if show_big_cover_photo?
-  end
-
-  # Render block only if small cover photo should be shown
-  def with_small_cover_photo(&block)
-    block.call unless show_big_cover_photo?
-  end
-
-  def show_big_cover_photo?
-    @homepage && ((!@current_user && !CustomLandingPage::LandingPageStore.enabled?(@current_community.id)) || params[:big_cover_photo])
   end
 
   def sort_link_direction(column)
@@ -683,11 +630,12 @@ module ApplicationHelper
   end
 
   def search_path(opts = {})
+    current_marketplace = request.env[:current_marketplace]
     PathHelpers.search_path(
-      community_id: @current_community.id,
+      community_id: current_marketplace.id,
       logged_in: @current_user.present?,
       locale_param: params[:locale],
-      default_locale: @current_community.default_locale,
+      default_locale: current_marketplace.default_locale,
       opts: opts)
   end
 
@@ -695,6 +643,10 @@ module ApplicationHelper
     PathHelpers.search_url(
       community_id: @current_community.id,
       opts: opts)
+  end
+
+  def search_mode
+    FeatureFlagHelper.location_search_available ? MarketplaceService::API::Api.configurations.get(community_id: @current_community.id).data[:main_search] : :keyword
   end
 
   def landing_page_path

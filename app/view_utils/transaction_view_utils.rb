@@ -22,7 +22,8 @@ module TransactionViewUtils
     [:subtotal, :money],
     [:total, :money],
     [:shipping_price, :money],
-    [:total_label, :string])
+    [:total_label, :string],
+    [:unit_type, :symbol])
 
 
   module_function
@@ -37,9 +38,19 @@ module TransactionViewUtils
   def create_messages_from_actions(transitions, author, starter, payment_sum)
     return [] if transitions.blank?
 
-    ignored_transitions = ["free", "pending", "initiated", "pending_ext", "errored"] # Transitions that should not generate auto-message
+    ignored_transitions = [
+      "free",
+      "pending", # Deprecated
+      "initiated",
+      "pending_ext",
+      "errored"
+    ] # Transitions that should not generate auto-message
 
     previous_states = [nil] + transitions.map { |transition| transition[:to_state] }
+
+    if transitions.map { |t| t[:to_state] }.include?("pending")
+      ActiveSupport::Deprecation.warn("Transaction state 'pending' is deprecated and will be removed in the future.")
+    end
 
     transitions
       .zip(previous_states)
@@ -90,6 +101,7 @@ module TransactionViewUtils
         mood: :positive
       }
     when "accepted"
+      ActiveSupport::Deprecation.warn("Transaction state 'accepted' is deprecated and will be removed in the future.")
       {
         sender: author,
         mood: :positive
@@ -105,6 +117,7 @@ module TransactionViewUtils
         mood: :positive
       }
     when post_pay_accepted
+      ActiveSupport::Deprecation.warn("Transaction state 'paid' without previous state is deprecated and will be removed in the future.")
       {
         sender: starter,
         mood: :positive
@@ -139,15 +152,17 @@ module TransactionViewUtils
 
     message = case state
     when "preauthorized"
-      t("conversations.message.payment_preauthorized", sum: humanized_money_with_symbol(payment_sum))
+      t("conversations.message.payment_preauthorized", sum: MoneyViewUtils.to_humanized(payment_sum))
     when "accepted"
+      ActiveSupport::Deprecation.warn("Transaction state 'accepted' is deprecated and will be removed in the future.")
       t("conversations.message.accepted_request")
     when "rejected"
       t("conversations.message.rejected_request")
     when preauthorize_accepted
-      t("conversations.message.received_payment", sum: humanized_money_with_symbol(payment_sum))
+      t("conversations.message.received_payment", sum: MoneyViewUtils.to_humanized(payment_sum))
     when post_pay_accepted
-      t("conversations.message.paid", sum: humanized_money_with_symbol(payment_sum))
+      ActiveSupport::Deprecation.warn("Transaction state 'paid' without previous state is deprecated and will be removed in the future.")
+      t("conversations.message.paid", sum: MoneyViewUtils.to_humanized(payment_sum))
     when "canceled"
       t("conversations.message.canceled_request")
     when "confirmed"

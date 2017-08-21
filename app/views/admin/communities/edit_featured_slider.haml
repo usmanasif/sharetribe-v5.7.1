@@ -10,7 +10,7 @@
 
 #new_news_item_form.left-navi-section
   %h2 Edit marketplace "#{@community.name(I18n.locale)}" landing page slider
-  = form_for @community, :url => admin_edit_featured_slider_path, :method => :put, multipart: true do |form|
+  = form_for @community, :url => admin_featured_slider_update_path, :method => :put, multipart: true do |form|
     .row
       .col-12
         = form.label :Upload_image_for_slider, :class => "input"
@@ -24,7 +24,7 @@
   /   -@slider_images.each do |image|
   /     - s_i = show_slider_image(image.listing_id)
   /     %img{:alt => "Slider_image", :height => "150", :src => s_i.image.url(:original), :width => "250"}
-  - if @slider_images.any?
+  - unless @slider_images.empty?
     - @slider_images.each do |image|
       - if image.image_for == 1
         .slider-holder.slider1
@@ -37,6 +37,13 @@
           = select_tag(:slider[image.id], options_for_select(@states , image.image_status) ,class: 'slider_menu form-select', id: "id_#{image.id}", style: " width: 100%") 
           .br
           %img{:alt => "Slider_image", :height => "150",src: image.image.url(:medium), :width => "100%"}/
+
+      - if image.image_for == 3
+        .slider-holder
+          = select_tag(:slider[image.id], options_for_select(@states , image.image_status) ,class: 'slider_menu form-select', id: "id_#{image.id}", style: " width: 100%") 
+          .br
+          %img{:alt => "Slider_image", :height => "150",src: image.image.url(:medium), :width => "100%"}/
+
 
       - if image.image_for == 0
         .slider-holder
@@ -51,6 +58,10 @@
       $("#"+obj_id).parent().addClass('slider1');
     }
     if(option_selected == '2'){
+      $("#"+obj_id).parent().removeClass('slider1');
+      $("#"+obj_id).parent().addClass('slider2');
+    }
+    if(option_selected == '3'){
       $("#"+obj_id).parent().removeClass('slider1');
       $("#"+obj_id).parent().addClass('slider2');
     }

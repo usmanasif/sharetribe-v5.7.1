@@ -1,9 +1,10 @@
 class FeedbacksController < ApplicationController
 
-  skip_filter :cannot_access_if_banned
-  skip_filter :cannot_access_without_confirmation
-  skip_filter :ensure_consent_given
-  skip_filter :ensure_user_belongs_to_community
+  skip_before_action :cannot_access_if_banned
+  skip_before_action :cannot_access_without_confirmation
+  skip_before_action :ensure_consent_given
+  skip_before_action :ensure_user_belongs_to_community
+  skip_before_action :set_display_expiration_notice
 
   FeedbackForm = FormUtils.define_form("Feedback",
                                        :content,
@@ -47,7 +48,9 @@ class FeedbacksController < ApplicationController
   private
 
   def render_form(form = nil)
-    render action: :new, locals: feedback_locals(form)
+    render action: :new, locals: feedback_locals(form).merge({
+      has_admin_rights: @current_user && @current_user.has_admin_rights?(@current_community)
+    })
   end
 
   def feedback_locals(feedback_form)

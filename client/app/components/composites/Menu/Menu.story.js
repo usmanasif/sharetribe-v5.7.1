@@ -1,13 +1,13 @@
 import r from 'r-dom';
-import { storiesOf } from '@kadira/storybook';
 import { storify, defaultRailsContext } from '../../Styleguide/withProps';
 
 import Menu from './Menu';
 
+const { storiesOf } = storybookFacade;
 const containerStyle = { style: { minWidth: '100px', background: 'white' } };
 
-storiesOf('Menu')
-  .add('Menu closed', () => (
+storiesOf('Top bar')
+  .add('Menu: basic desktop', () => (
       r(storify(
         r(Menu, Object.assign({},
           {
@@ -39,7 +39,7 @@ storiesOf('Menu')
             ],
           },
           {
-            railsContext: defaultRailsContext,
+            marketplaceContext: defaultRailsContext,
           }
         )),
         containerStyle

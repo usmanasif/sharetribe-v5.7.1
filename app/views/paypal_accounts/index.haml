@@ -16,6 +16,7 @@
         upgrade_paypal_account_link: upgrade_paypal_link,
         paypal_account_linked: next_action != :ask_order_permission,
         receive_funds_info_label_tr_key: receive_funds_info_label_tr_key,
+        receive_funds_info_tr_key: receive_funds_info_tr_key,
         commission_required: commission_type != :none }
 
     - if next_action == :ask_order_permission
@@ -71,7 +72,7 @@
                 - if commission_type == :both # TODO: Tweak copy
                   = render :partial => "layouts/info_text", :locals => {text: t("paypal_accounts.new.paypal_account_billing_agreement_info_both",
                     commission_from_seller: commission_from_seller,
-                    minimum_commission: humanized_money_with_symbol(minimum_commission),
+                    minimum_commission: MoneyViewUtils.to_humanized(minimum_commission),
                     paypal_info_link: paypal_info_link).html_safe }
                 - elsif commission_type == :relative
                   = render :partial => "layouts/info_text", :locals => {text: t("paypal_accounts.new.paypal_account_billing_agreement_info_relative",
@@ -79,7 +80,7 @@
                     paypal_info_link: paypal_info_link).html_safe }
                 - elsif commission_type == :fixed
                   = render :partial => "layouts/info_text", :locals => {text: t("paypal_accounts.new.paypal_account_billing_agreement_info_fixed",
-                    minimum_commission: humanized_money_with_symbol(minimum_commission),
+                    minimum_commission: MoneyViewUtils.to_humanized(minimum_commission),
                     paypal_info_link: paypal_info_link).html_safe }
                 - else # no commission fee
                   = render :partial => "layouts/info_text", :locals => {text: t("paypal_accounts.new.paypal_account_billing_agreement_info_none",

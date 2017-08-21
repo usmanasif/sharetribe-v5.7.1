@@ -1,8 +1,5 @@
 /* eslint-env node */
 
-const Promise = require('es6-promise');
-Promise.polyfill();
-
 const path = require('path');
 const webpack = require('webpack');
 const cssnext = require('postcss-cssnext');
@@ -21,9 +18,8 @@ module.exports = {
 
     // See use of 'vendor' in the CommonsChunkPlugin inclusion below.
     vendor: [
-      'babel-polyfill',
-      'es5-shim/es5-shim',
-      'es5-shim/es5-sham',
+      'es6-shim',
+      'whatwg-fetch',
     ],
 
     // This will contain the app entry points
@@ -61,6 +57,6 @@ module.exports = {
     mixins({ mixinsFiles: path.join(__dirname, 'app/assets/styles/mixins.css') }),
     customMedia({ extensions: mediaQueries }),
     customProperties({ variables: cssVariables }),
-    cssnext({ browsers: ['last 2 versions', 'not ie < 11', 'not ie_mob < 11', 'ie >= 11'] }),
+    cssnext({ browsers: ['last 2 versions', 'not ie < 11', 'not ie_mob < 11', 'ie >= 11', 'iOS >= 8'] }),
   ],
 };

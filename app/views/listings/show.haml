@@ -1,221 +1,131 @@
-.container-fluid.padding-0
-  .three-columns
-    .single-product.row
-      .slider-block.col-md-5.col-sm-5.col-xs-5
-        .slideshow
-          .slider-holder
-            .slideset
-              -@listing.listing_images.each_with_index do |ls_img , i|
-                .slide
-                  %img.img-responsive{:alt => "item image", :src => asset_path(ls_img.image.url(:original)) }
-          .static-block
-            %a.btn-prev{:href => "#"}
-              %i.fa.fa-5x.fa-angle-left
-            %a.btn-next{:href => "#"}
-              %i.fa.fa-5x.fa-angle-right
-            .pagination
-              %ul
-                -@listing.listing_images.each_with_index do |ls_img , i|
-                  %li
-                    %a{:href => "#"}
-                      %img{:alt => "item image", :src => asset_path(ls_img.image.url(:thumb)) }
-      .qty-block.col-md-7.col-sm-7.col-xs-7
-        .single_head      
-          %h1
-            %span#listing-title.listing-title= @listing.title
-        .row
-          .col-md-7.col-sm-7.col-xs-7
-            .row
-              %ul.product-info
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    / - @listing.custom_field_values.each do |custom_field_value|
-                    /   .row
-                    /     .col-12
-                    /       - custom_field_value.with_type do |question_type|
-                    /         / = custom_field_value.inspect
-                    /         / =question_type
-                    /         = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
-                    %span Item Condition:
+/ <<<<<<< HEAD
+/ .container-fluid.padding-0
+/   .three-columns
+/     .single-product.row
+/       .slider-block.col-md-5.col-sm-5.col-xs-5
+/         .slideshow
+/           .slider-holder
+/             .slideset
+/               -@listing.listing_images.each_with_index do |ls_img , i|
+/                 .slide
+/                   %img.img-responsive{:alt => "item image", :src => asset_path(ls_img.image.url(:original)) }
+/           .static-block
+/             %a.btn-prev{:href => "#"}
+/               %i.fa.fa-5x.fa-angle-left
+/             %a.btn-next{:href => "#"}
+/               %i.fa.fa-5x.fa-angle-right
+/             .pagination
+/               %ul
+/                 -@listing.listing_images.each_with_index do |ls_img , i|
+/                   %li
+/                     %a{:href => "#"}
+/                       %img{:alt => "item image", :src => asset_path(ls_img.image.url(:thumb)) }
+/       .qty-block.col-md-7.col-sm-7.col-xs-7
+/         .single_head      
+/           %h1
+/             %span#listing-title.listing-title= @listing.title
+/         .row
+/           .col-md-7.col-sm-7.col-xs-7
+/             .row
+/               %ul.product-info
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     / - @listing.custom_field_values.each do |custom_field_value|
+/                     /   .row
+/                     /     .col-12
+/                     /       - custom_field_value.with_type do |question_type|
+/                     /         / = custom_field_value.inspect
+/                     /         / =question_type
+/                     /         = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
+/                     %span Item Condition:
                     
-                  .col-md-9.col-sm-9.col-xs-9
-                    %span #{@listing.item_condition}
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Qty:
-                  .col-md-3.col-sm-3.col-xs-3
-                    .qty
-                      %input.form-control{:id => "qty" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
-                      %lable.min-order
-                        Min Order: #{@listing.min_order}
-                  .col-md-6.col-sm-6.col-xs-6 
-                    .available     
-                      #{@listing.available} available /  0 sold  
-                %li
-                  .price-area
-                    .col-md-1.col-sm-1.col-xs-1.padding-right-0
-                      %i.fa.fa-money{"aria-hidden" => "true"}
-                    .col-md-3.col-sm-3.col-xs-3.padding-0
-                      %span Price
-                    .col-md-4.col-sm-4.col-xs-4.padding-0
-                      .listing-price
-                        %span.listing-price-amount
-                          %span#price_span
-                            = humanized_money_with_symbol(@listing.price).upcase
-                    .col-md-4.col-sm-4.col-xs-4                      
-                    .col-md-12.col-sm-12.col-xs-12.row.delivery-method
-                      #listing-message-links
-                        = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %span #{@listing.item_condition}
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Qty:
+/                   .col-md-3.col-sm-3.col-xs-3
+/                     .qty
+/                       %input.form-control{:id => "qty" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
+/                       %lable.min-order
+/                         Min Order: #{@listing.min_order}
+/                   .col-md-6.col-sm-6.col-xs-6 
+/                     .available     
+/                       #{@listing.available} available /  0 sold  
+/                 %li
+/                   .price-area
+/                     .col-md-1.col-sm-1.col-xs-1.padding-right-0
+/                       %i.fa.fa-money{"aria-hidden" => "true"}
+/                     .col-md-3.col-sm-3.col-xs-3.padding-0
+/                       %span Price
+/                     .col-md-4.col-sm-4.col-xs-4.padding-0
+/                       .listing-price
+/                         %span.listing-price-amount
+/                           %span#price_span
+/                             = humanized_money_with_symbol(@listing.price).upcase
+/                     .col-md-4.col-sm-4.col-xs-4                      
+/                     .col-md-12.col-sm-12.col-xs-12.row.delivery-method
+/                       #listing-message-links
+/                         = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
 
-                    .col-md-12.col-sm-12.col-xs-12.cards-image-holder
-                      %img{:alt => "Cards", :src => asset_path("braintree_cards.png") }
+/                     .col-md-12.col-sm-12.col-xs-12.cards-image-holder
+/                       %img{:alt => "Cards", :src => asset_path("braintree_cards.png") }
 
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Pickup Address:
-                  .col-md-9.col-sm-9.col-xs-9
-                    %p
-                      = @listing.origin
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Shipping info:
-                  .col-md-9.col-sm-9.col-xs-9
-                    %p
-                      May not ship to USA - Read item description or contact seller for shipping options. 
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Delivery:
-                  .col-md-9.col-sm-9.col-xs-9
-                    %p
-                      Varies
-          .col-md-5.col-sm-5.col-xs-5
-            .row-with-divider
-              .col-12
-                .author-box
-                  .listing-author
-                    .listing-author-avatar
-                      = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
-                    .listing-author-details
-                      .listing-author-name
-                        = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
-                        %ul.author_details-list
-                          %li
-                            %span Total listings 
-                            = count_active_listings_for(@listing.author)
-                          %li
-                            %span Ships items quickly
-                          %li
-                            %span Has earned a track record of excellent service
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Pickup Address:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       = @listing.origin
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Shipping info:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       May not ship to USA - Read item description or contact seller for shipping options. 
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Delivery:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       Varies
+/           .col-md-5.col-sm-5.col-xs-5
+/             .row-with-divider
+/               .col-12
+/                 .author-box
+/                   .listing-author
+/                     .listing-author-avatar
+/                       = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
+/                     .listing-author-details
+/                       .listing-author-name
+/                         = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+/                         %ul.author_details-list
+/                           %li
+/                             %span Total listings 
+/                             = count_active_listings_for(@listing.author)
+/                           %li
+/                             %span Ships items quickly
+/                           %li
+/                             %span Has earned a track record of excellent service
 
-              %img.img-responsive{:src => asset_path('index/single_prodect.jpg')}
-.container
-  .row
-    .description-block.col-md-12.col-sm-12.col-xs-12
-      .row
-        .col-md-12
-          %div
-            / Nav tabs
-            %ul.nav.nav-tabs{:role => "tablist"}
-              %li.active{:role => "presentation"}
-                %a{"aria-controls" => "home", "data-toggle" => "tab", :href => "#home", :role => "tab"} Description
-              %li{:role => "presentation"}
-                %a{"aria-controls" => "profile", "data-toggle" => "tab", :href => "#profile", :role => "tab"} Most Recent Reviews
-            / Tab panes
-            .tab-content
-              #home.tab-pane.active{:role => "tabpanel"}
-                .reviews-blocks
-                  .reviews-holder
-                    - if @listing.description && !@listing.description.blank?
-                      - text_with_line_breaks do
-                        = @listing.description
-                      - if(youtube_link_ids.present?)
-                        - youtube_link_ids.each do |youtube_id|
-                          .listing-description-youtube-wrapper
-                            %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
-              #profile.tab-pane{:role => "tabpanel"}
-                - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
-                  .view-item
-                    #comments.discussion.overflow-allowed.comment-form-vendor
-                      %h2
-                        = icon_tag("chat_bubble", ["icon-with_text"])
-                        .text-with-icon
-                          = t(".comments")
-                          %span#comment_count= "(#{@listing.comments_count})"
-                      #follow-links.follow-links
-                        = render :partial => "follow_links"
-                      #comment-list
-                        = render :partial => "comment", :collection => @listing.comments
-                      #comment-form
-                        = render :partial => "comment_form"
-
-
-
-:javascript
-  $("#qty").on('keyup paste', function () {
-    ApplyFilter();
-  });
-
-  function ApplyFilter() {
-    var value = $("#qty").val();
-    if( value < #{@listing.min_order} ){
-      $("#qty").val(#{@listing.min_order});
-    }
-    if( value > #{@listing.available} ){
-      $("#qty").val(#{@listing.available});
-    }
-  }
-  
-  $(document).ready(function(){
-    cal_price()
-  })
-
-  $("#qty").change(function(){
-   cal_price()
-  })
-
-  function cal_price(){
-    var q = parseFloat($("#qty").val())
-    var p = parseFloat(#{humanized_money(@listing.price)})
-    $("#price_span").text("$" + q * p );
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/               %img.img-responsive{:src => asset_path('index/single_prodect.jpg')}
+/ .container
+/   .row
+/     .description-block.col-md-12.col-sm-12.col-xs-12
+/ =======
 / - content_for :javascript do
 /   initialize_listing_view('#{I18n.locale}');
 
 / - content_for :extra_javascript do
 /   :javascript
 /     window.ST.listing();
-/   - maps_key = @current_community.google_maps_key
+/   - maps_key = MarketplaceHelper.google_maps_key(@current_community.id)
 /   - key_param = maps_key ? "?key=#{maps_key}" : ""
-/   = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}"
+/   - needs_maps = !FeatureFlagHelper.feature_enabled?(:topbar_v1) || search_mode == :keyword
+/   = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}" if needs_maps
 
 / - content_for :title, raw(@listing.title)
-/ - content_for :meta_author, @listing.author.name(@current_community)
+/ - content_for :meta_author, PersonViewUtils.person_display_name(@listing.author, @current_community)
 / - content_for :meta_description, StringUtils.first_words(@listing.description, 15)
 / - content_for :meta_image, @listing.listing_images.first.image.url(:medium) if !@listing.listing_images.empty?
 / - dimensions = @listing.listing_images.first.get_dimensions_for_style(:medium) if !@listing.listing_images.empty?
@@ -251,11 +161,11 @@
 /               #listing-image-frame
 
 /               - if @prev_image_id && @next_image_id
-/                 = link_to params.merge(image: @prev_image_id), class: "listing-image-navi listing-image-navi-left", id: "listing-image-navi-left" do
+/                 = link_to params.permit(:id, :locale).merge(image: @prev_image_id), class: "listing-image-navi listing-image-navi-left", id: "listing-image-navi-left" do
 /                   .listing-image-navi-arrow-container
 /                     .listing-image-arrow-icon-container.left
 /                       = icon_tag("directleft", ["navigate-icon-fix", "listing-image-navi-arrow"])
-/                 = link_to params.merge(image: @next_image_id), class: "listing-image-navi listing-image-navi-right", id: "listing-image-navi-right" do
+/                 = link_to params.permit(:id, :locale).merge(image: @next_image_id), class: "listing-image-navi listing-image-navi-right", id: "listing-image-navi-right" do
 /                   .listing-image-navi-arrow-container
 /                     .listing-image-arrow-icon-container.right
 /                       = icon_tag("directright", ["navigate-icon-fix", "listing-image-navi-arrow"])
@@ -263,7 +173,7 @@
 
 /             - content_for :extra_javascript do
 /               :javascript
-/                 var listingImages = #{listing_images.map { |image| ListingImageJSAdapter.new(image) }.to_json }
+/                 var listingImages = #{raw listing_images.map { |image| ListingImageJSAdapter.new(image) }.to_json }
 /                 var currentImage = #{params[:image].present? ? params[:image].to_i : listing_images.first.id};
 /                 ST.listingImages(listingImages, currentImage);
 /           - else
@@ -310,7 +220,8 @@
 /             .listing-fb-like-button
 /               = facebook_like(current_user?(@listing.author))
 /             .listing-tweet-button
-/               = link_to("", "https://twitter.com/share", :class => "twitter-share-button", "data" => {count: "horizontal", via: (@current_community.twitter_handle || "Sharetribe"), text: @listing.title })
+/               - twitter_params =  {count: "horizontal", via: (@current_community.twitter_handle), text: @listing.title }.compact
+/               = link_to("", "https://twitter.com/share", :class => "twitter-share-button", "data" => twitter_params)
 /               - content_for :extra_javascript do
 /                 :javascript
 /                   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
@@ -336,15 +247,15 @@
 /         .col-12
 /           .listing-price
 /             %span.listing-price-amount
-/               = humanized_money_with_symbol(@listing.price).upcase
-/             - with_quantity_and_vat_text(@current_community, @listing) do |text|
+/               = MoneyViewUtils.to_humanized(@listing.price)
+/             - with_quantity_text(@current_community, @listing) do |text|
 /               %span.listing-price-quantity
 /                 = text
 
 /     .row-with-divider
 /       .col-12
 /         #listing-message-links
-/           = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
+/           = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code, blocked_dates_end_on: blocked_dates_end_on, blocked_dates_result: blocked_dates_result, manage_availability_props: manage_availability_props, availability_enabled: availability_enabled, currency_opts: currency_opts }
 
 /     .row-with-divider
 /       .col-12
@@ -353,14 +264,14 @@
 /             = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
 /           .listing-author-details
 /             .listing-author-name
-/               = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+/               = link_to PersonViewUtils.person_display_name(@listing.author, @current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{PersonViewUtils.person_display_name(@listing.author, @current_community)}"
 /             - if @listing.author != @current_user
 /               .listing-author-contact
 /                 %a#listing-contact{href: contact_to_listing_path(:listing_id => @listing.id.to_s), :class => "listing-author-contact-button"}
 /                   .content
 /                     = t(".contact")
 
-/     - if @current_community.testimonials_in_use && received_testimonials.size > 0
+/     - if received_testimonials.size > 0
 /       .row-with-divider.listing-author-activity
 /         .col-12
 /           %i.listing-author-activity-icon{:class => icon_class("testimonial")}
@@ -376,8 +287,274 @@
 /               = t(".feedback")
 
 /     - if @listing.origin_loc && @listing.origin_loc.address != ""
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
 /       .row
-/         .col-12
-/           #googlemap
-/             = render :partial => "googlemap", :locals => { :listing => @listing}
-/             = render :partial => "origin", :locals => { :origin_loc => @listing.origin_loc }
+/         .col-md-12
+/           %div
+/             / Nav tabs
+/             %ul.nav.nav-tabs{:role => "tablist"}
+/               %li.active{:role => "presentation"}
+/                 %a{"aria-controls" => "home", "data-toggle" => "tab", :href => "#home", :role => "tab"} Description
+/               %li{:role => "presentation"}
+/                 %a{"aria-controls" => "profile", "data-toggle" => "tab", :href => "#profile", :role => "tab"} Most Recent Reviews
+/             / Tab panes
+/             .tab-content
+/               #home.tab-pane.active{:role => "tabpanel"}
+/                 .reviews-blocks
+/                   .reviews-holder
+/                     - if @listing.description && !@listing.description.blank?
+/                       - text_with_line_breaks do
+/                         = @listing.description
+/                       - if(youtube_link_ids.present?)
+/                         - youtube_link_ids.each do |youtube_id|
+/                           .listing-description-youtube-wrapper
+/                             %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
+/               #profile.tab-pane{:role => "tabpanel"}
+/                 - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
+/                   .view-item
+/                     #comments.discussion.overflow-allowed.comment-form-vendor
+/                       %h2
+/                         = icon_tag("chat_bubble", ["icon-with_text"])
+/                         .text-with-icon
+/                           = t(".comments")
+/                           %span#comment_count= "(#{@listing.comments_count})"
+/                       #follow-links.follow-links
+/                         = render :partial => "follow_links"
+/                       #comment-list
+/                         = render :partial => "comment", :collection => @listing.comments
+/                       #comment-form
+/                         = render :partial => "comment_form"
+
+
+
+/ :javascript
+/   $("#qty").on('keyup paste', function () {
+/     ApplyFilter();
+/   });
+
+/   function ApplyFilter() {
+/     var value = $("#qty").val();
+/     if( value < #{@listing.min_order} ){
+/       $("#qty").val(#{@listing.min_order});
+/     }
+/     if( value > #{@listing.available} ){
+/       $("#qty").val(#{@listing.available});
+/     }
+/   }
+  
+/   $(document).ready(function(){
+/     cal_price()
+/   })
+
+/   $("#qty").change(function(){
+/    cal_price()
+/   })
+
+/   function cal_price(){
+/     var q = parseFloat($("#qty").val())
+/     var p = parseFloat(#{humanized_money(@listing.price)})
+/     $("#price_span").text("$" + q * p );
+/   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ / - content_for :javascript do
+/ /   initialize_listing_view('#{I18n.locale}');
+
+/ / - content_for :extra_javascript do
+/ /   :javascript
+/ /     window.ST.listing();
+/ /   - maps_key = @current_community.google_maps_key
+/ /   - key_param = maps_key ? "?key=#{maps_key}" : ""
+/ /   = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}"
+
+/ / - content_for :title, raw(@listing.title)
+/ / - content_for :meta_author, @listing.author.name(@current_community)
+/ / - content_for :meta_description, StringUtils.first_words(@listing.description, 15)
+/ / - content_for :meta_image, @listing.listing_images.first.image.url(:medium) if !@listing.listing_images.empty?
+/ / - dimensions = @listing.listing_images.first.get_dimensions_for_style(:medium) if !@listing.listing_images.empty?
+/ / - content_for :meta_image_width, dimensions[:width].to_s if !@listing.listing_images.empty?
+/ / - content_for :meta_image_height, dimensions[:height].to_s if !@listing.listing_images.empty?
+/ / - content_for :keywords, StringUtils.keywords(@listing.title)
+
+/ / - content_for :title_header do
+/ /   %h1
+/ /     %span#listing-title.listing-title= @listing.title
+
+/ / %script{type: "text/template", class: "template", id: "image-frame-template"}
+/ /   .listing-image-frame
+/ /     #listing-image-link.listing-image-frame-content
+/ /       .listing-image-vertical-centering{:class => "${aspectRatioClass}" }
+/ /         %img{:src => "${url}", :alt => @listing.title, :class => "listing-image ${aspectRatioClass}"}
+
+/ / %script{type: "text/template", class: "template", id: "image-thumbnail-template"}
+/ /   .listing-image-thumbnail-container
+/ /     %img.listing-image-thumbnail{src: "${url}"}
+/ /     .fade
+
+/ / - if local_assigns[:show_onboarding_popup]
+/ /   = render :layout => "layouts/lightbox", :partial => "layouts/onboarding_popup", locals: {title: t(popup_title_key), body: t(popup_body_key), action_label: t(popup_button_key), action_link: popup_action_link, image: asset_path(popup_image), id: "onboarding-popup" }
+
+/ / .row
+/ /   .col-8.listing-details-container
+/ /     .row
+/ /       .col-12
+/ /         - with_image_frame(@listing) do |reason, listing_images|
+/ /           - if reason == :images_ok
+/ /             .listing-image-carousel
+/ /               #listing-image-frame
+
+/ /               - if @prev_image_id && @next_image_id
+/ /                 = link_to params.merge(image: @prev_image_id), class: "listing-image-navi listing-image-navi-left", id: "listing-image-navi-left" do
+/ /                   .listing-image-navi-arrow-container
+/ /                     .listing-image-arrow-icon-container.left
+/ /                       = icon_tag("directleft", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/ /                 = link_to params.merge(image: @next_image_id), class: "listing-image-navi listing-image-navi-right", id: "listing-image-navi-right" do
+/ /                   .listing-image-navi-arrow-container
+/ /                     .listing-image-arrow-icon-container.right
+/ /                       = icon_tag("directright", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/ /             #thumbnail-stripe.listing-image-thumbnail-stripe
+
+/ /             - content_for :extra_javascript do
+/ /               :javascript
+/ /                 var listingImages = #{listing_images.map { |image| ListingImageJSAdapter.new(image) }.to_json }
+/ /                 var currentImage = #{params[:image].present? ? params[:image].to_i : listing_images.first.id};
+/ /                 ST.listingImages(listingImages, currentImage);
+/ /           - else
+/ /             .listing-image-text-container
+/ /               .listing-image-frame
+/ /                 .listing-image-frame-content
+/ /                   .listing-image-vertical-centering
+/ /                     .listing-no-image
+/ /                       - if reason == :images_processing
+/ /                         = t("listings.show.processing_uploaded_image")
+/ /                       - else
+/ /                         = t(".no_description")
+
+/ /     .row
+/ /       .col-12
+/ /         - if @listing.description && !@listing.description.blank?
+/ /           - text_with_line_breaks do
+/ /             = @listing.description
+/ /           - if(youtube_link_ids.present?)
+/ /             - youtube_link_ids.each do |youtube_id|
+/ /               .listing-description-youtube-wrapper
+/ /                 %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
+
+/ /     - @listing.custom_field_values.each do |custom_field_value|
+/ /       .row
+/ /         .col-12
+/ /           - custom_field_value.with_type do |question_type|
+/ /             = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
+
+/ /     - if @current_community.show_listing_publishing_date?
+/ /       .row
+/ /         .col-12
+/ /           .icon-with-text-container
+/ /             = icon_tag("calendar", ["icon-part"])
+/ /             .text-part
+/ /               %b
+/ /                 = t(".listing_created_at")
+/ /                 = l @listing.created_at, :format => :short_date
+
+/ /     - if !@current_community.private?
+/ /       .row
+/ /         .col-12
+/ /           .listing-social
+/ /             .listing-fb-like-button
+/ /               = facebook_like(current_user?(@listing.author))
+/ /             .listing-tweet-button
+/ /               = link_to("", "https://twitter.com/share", :class => "twitter-share-button", "data" => {count: "horizontal", via: (@current_community.twitter_handle || "Sharetribe"), text: @listing.title })
+/ /               - content_for :extra_javascript do
+/ /                 :javascript
+/ /                   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+
+/ /     - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
+/ /       .view-item
+/ /         #comments.discussion.overflow-allowed
+/ /           %h2
+/ /             = icon_tag("chat_bubble", ["icon-with_text"])
+/ /             .text-with-icon
+/ /               = t(".comments")
+/ /               %span#comment_count= "(#{@listing.comments_count})"
+/ /           #follow-links.follow-links
+/ /             = render :partial => "follow_links"
+/ /           #comment-list
+/ /             = render :partial => "comment", :collection => @listing.comments
+/ /           #comment-form
+/ /             = render :partial => "comment_form"
+
+/ /   %aside.col-4
+/ /     - if @listing.price
+/ /       .row
+/ /         .col-12
+/ /           .listing-price
+/ /             %span.listing-price-amount
+/ /               = humanized_money_with_symbol(@listing.price).upcase
+/ /             - with_quantity_and_vat_text(@current_community, @listing) do |text|
+/ /               %span.listing-price-quantity
+/ /                 = text
+
+/ /     .row-with-divider
+/ /       .col-12
+/ /         #listing-message-links
+/ /           = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
+
+/ /     .row-with-divider
+/ /       .col-12
+/ /         .listing-author
+/ /           .listing-author-avatar
+/ /             = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
+/ /           .listing-author-details
+/ /             .listing-author-name
+/ /               = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+/ /             - if @listing.author != @current_user
+/ /               .listing-author-contact
+/ /                 %a#listing-contact{href: contact_to_listing_path(:listing_id => @listing.id.to_s), :class => "listing-author-contact-button"}
+/ /                   .content
+/ /                     = t(".contact")
+
+/ /     - if @current_community.testimonials_in_use && received_testimonials.size > 0
+/ /       .row-with-divider.listing-author-activity
+/ /         .col-12
+/ /           %i.listing-author-activity-icon{:class => icon_class("testimonial")}
+/ /           .listing-author-activity-item
+/ /             .listing-author-activity-value
+/ /               - if received_testimonials.size > 0
+/ /                 = feedback_positive_percentage.to_s + "%"
+/ /                 = t("people.show.positive")
+/ /                 = "(#{received_positive_testimonials.size}/#{received_testimonials.size})"
+/ /               - else
+/ /                 = t(".no_reviews")
+/ /             .listing-author-activity-description
+/ /               = t(".feedback")
+
+/ /     - if @listing.origin_loc && @listing.origin_loc.address != ""
+/ /       .row
+/ /         .col-12
+/ /           #googlemap
+/ /             = render :partial => "googlemap", :locals => { :listing => @listing}
+/ /             = render :partial => "origin", :locals => { :origin_loc => @listing.origin_loc }

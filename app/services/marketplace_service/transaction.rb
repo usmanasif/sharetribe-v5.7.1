@@ -3,10 +3,14 @@ module MarketplaceService
     TransactionModel = ::Transaction
     ParticipationModel = ::Participation
 
+    class BookingStateChangeError < StandardError
+    end
+
     module Entity
       Transaction = EntityUtils.define_entity(
         :id,
         :community_id,
+        :community_uuid,
         :last_transition,
         :last_transition_at,
         :listing,
@@ -15,6 +19,9 @@ module MarketplaceService
         :author_skipped_feedback,
         :starter_skipped_feedback,
         :starter_id,
+        :starter_uuid,
+        :listing_author_id,
+        :listing_author_uuid,
         :testimonials,
         :transitions,
         :payment_total,
@@ -23,6 +30,8 @@ module MarketplaceService
         :conversation,
         :booking,
         :created_at,
+        :availability,
+        :booking_uuid,
         :__model
       )
 
@@ -59,17 +68,17 @@ module MarketplaceService
       # - max_date_at (max date, e.g. booking ending)
       def preauth_expires_at(gateway_expires_at, max_date_at=nil)
         [gateway_expires_at,
-         Maybe(max_date_at).map {|d| (d + 2.day).to_time(:utc)}.or_else(nil)
+         Maybe(max_date_at).map {|d| (d + 2.days).to_time(:utc)}.or_else(nil)
         ].compact.min
       end
 
       def authorization_expiration_period(payment_type)
-        # TODO These configs should be moved to Paypal/Braintree services
+        # TODO These configs should be moved to Paypal services
         case payment_type
-        when :braintree
-          APP_CONFIG.braintree_expiration_period.to_i
         when :paypal
           APP_CONFIG.paypal_expiration_period.to_i
+        else
+          raise ArgumentError.new("Unknown payment_type: '#{payment_type}'")
         end
       end
 
@@ -96,6 +105,11 @@ module MarketplaceService
           },
           payment_total: calculate_total(transaction_model),
           booking: transaction_model.booking,
+          availability: transaction_model.availability.to_sym,
+          booking_uuid: transaction_model.booking_uuid_object,
+          community_uuid: transaction_model.community_uuid_object,
+          starter_uuid: transaction_model.starter_uuid_object,
+          listing_author_uuid: transaction_model.listing_author_uuid_object,
           __model: transaction_model
         })]
       end
@@ -325,8 +339,13 @@ module MarketplaceService
       module_function
 
       def handle_transition(transaction, payment_type, old_status, new_status)
-        if new_status == :preauthorized
+        case new_status
+        when :preauthorized
           preauthorized(transaction, payment_type)
+        when :paid
+          paid(transaction)
+        when :rejected
+          rejected(transaction)
         end
       end
 
@@ -335,15 +354,15 @@ module MarketplaceService
       def preauthorized(transaction, payment_type)
         expiration_period = Entity.authorization_expiration_period(payment_type)
         gateway_expires_at = case payment_type
-                              when :braintree
-                                expiration_period.days.from_now
-                              when :paypal
-                                # expiration period in PayPal is an estimate,
-                                # which should be quite accurate. We can get
-                                # the exact time from Paypal through IPN notification. In this case,
-                                # we take the 3 days estimate and add 10 minute buffer
-                                expiration_period.days.from_now - 10.minutes
-                              end
+                             when :paypal
+                               # expiration period in PayPal is an estimate,
+                               # which should be quite accurate. We can get
+                               # the exact time from Paypal through IPN notification. In this case,
+                               # we take the 3 days estimate and add 10 minute buffer
+                               expiration_period.days.from_now - 10.minutes
+                             else
+                               raise ArgumentError.new("Unknown payment_type: '#{payment_type}'")
+                             end
 
         booking_ends_on = Maybe(transaction)[:booking][:end_on].or_else(nil)
         expire_at = Entity.preauth_expires_at(gateway_expires_at, booking_ends_on)
@@ -352,6 +371,64 @@ module MarketplaceService
         Delayed::Job.enqueue(AutomaticallyRejectPreauthorizedTransactionJob.new(transaction[:id]), priority: 8, run_at: expire_at)
 
         setup_preauthorize_reminder(transaction[:id], expire_at)
+      end
+
+      def paid(transaction)
+        return unless transaction[:availability].to_sym == :booking
+
+        auth_context = {
+          marketplace_id: transaction[:community_uuid],
+          actor_id: transaction[:listing_author_uuid]
+        }
+
+        HarmonyClient.post(
+          :accept_booking,
+          params: {
+            id: transaction[:booking_uuid]
+          },
+          body: {
+            actorId: transaction[:listing_author_uuid],
+            reason: :provider_accepted
+          },
+          opts: {
+            max_attempts: 3,
+            auth_context: auth_context
+          }).on_error { |error_msg, data|
+          log_and_notify_harmony_error!("Failed to accept booking",
+                                        :failed_accept_booking,
+                                        transaction.slice(:community_id, :id).merge(error_msg: error_msg))
+        }
+      end
+
+      def rejected(transaction)
+        return unless transaction[:availability].to_sym == :booking
+
+        auth_context = {
+          marketplace_id: transaction[:community_uuid],
+          actor_id: transaction[:listing_author_uuid]
+        }
+
+        HarmonyClient.post(
+          :reject_booking,
+          params: {
+            id: transaction[:booking_uuid]
+          },
+          body: {
+            actorId: transaction[:listing_author_uuid],
+
+            # Passing the reason to the event handler is a bit
+            # cumbersome. We decided to skip it for now. That's why
+            # we always set the reason to "unknown"
+            reason: :unknown
+          },
+          opts: {
+            max_attempts: 3,
+            auth_context: auth_context
+          }).on_error { |error_msg, data|
+          log_and_notify_harmony_error!("Failed to reject booking",
+                                        :failed_reject_booking,
+                                        transaction.slice(:community_id, :id).merge(error_msg: error_msg))
+        }
       end
 
       # "private" helpers
@@ -365,6 +442,16 @@ module MarketplaceService
         if send_reminder
           Delayed::Job.enqueue(TransactionPreauthorizedReminderJob.new(transaction_id), priority: 9, :run_at => reminder_at)
         end
+      end
+
+      def log_and_notify_harmony_error!(error_msg, error_code, data)
+        logger.error(error_msg, error_code, data)
+
+        Airbrake.notify(BookingStateChangeError.new("#{error_msg}: #{data}")) if APP_CONFIG.use_airbrake
+      end
+
+      def logger
+        SharetribeLogger.new(:transaction_transition_events)
       end
     end
   end

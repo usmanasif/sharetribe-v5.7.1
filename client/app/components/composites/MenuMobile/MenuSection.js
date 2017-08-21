@@ -29,15 +29,17 @@ class MenuSection extends Component {
       }) :
       [];
 
-    return div({
-      className: `MenuSection ${css.menuSection}`,
-    }, [
-      div({ className: `MenuSection_title ${css.menuSectionTitle}` }, this.props.name),
-    ].concat(links));
+    return links.length > 0 ?
+      div({
+        className: `MenuSection ${css.menuSection}`,
+      }, [
+        div({ className: `MenuSection_title ${css.menuSectionTitle}` }, this.props.name),
+      ].concat(links)) :
+      null;
   }
 }
 
-const { arrayOf, bool, string } = PropTypes;
+const { arrayOf, bool, node, oneOfType, string } = PropTypes;
 
 MenuSection.propTypes = {
   name: string.isRequired,
@@ -46,9 +48,13 @@ MenuSection.propTypes = {
     PropTypes.shape({
       active: bool.isRequired,
       activeColor: string.isRequired,
-      content: string.isRequired,
+      content: oneOfType([
+        arrayOf(node),
+        node,
+      ]).isRequired,
       href: string.isRequired,
       type: string.isRequired,
+      external: bool,
     })
   ),
 };

@@ -28,13 +28,17 @@ config.module.loaders.push(
     loader: ExtractTextPlugin.extract(
       'style-loader',
       'css-loader?modules&localIdentName=[name]__[local]__[hash:base64:5]' + // eslint-disable-line prefer-template
-        (devBuild ? '' : '&minimize') +
+        (devBuild ? '' : '&minimize&-autoprefixer') +
         '!postcss-loader'
     ),
   },
   {
+    test: /\.scss$/,
+    loaders: ['style-loader', 'css-loader', 'sass-loader'],
+  },
+  {
     test: require.resolve('react'),
-    loader: 'imports?shim=es5-shim/es5-shim&sham=es5-shim/es5-sham',
+    loader: 'imports',
   },
   {
     test: /\.(woff2?)$/,
@@ -47,6 +51,10 @@ config.module.loaders.push(
   {
     test: /\.(jpe?g|png|gif|ico)$/,
     loader: `customfile-loader?limit=10000&name=[name]-[hash].[ext]${assetHost}`,
+  },
+  {
+    test: /\.json$/,
+    loader: 'json-loader',
   },
   {
     test: /\.svg$/,

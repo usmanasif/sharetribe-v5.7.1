@@ -21,11 +21,12 @@
 //
 //= require jquery
 //= require jquery-ui-1.9.2.custom
+//= require jquery-ui-1.9.2.sortable
+//= require jquery.ui.touch-punch.min.js
 //= require jquery_ujs
 //= require jquery.form
 //= require jquery.validate
 //= require jquery.pageless
-//= require jquery.autosize-min
 //= require jquery.lightbox_me
 //= require jquery.transit.min
 //= require jquery.ui.widget
@@ -35,6 +36,7 @@
 //= require jquery.fileupload-process
 //= require jquery.fileupload-validate
 //= require jquery.fileupload-image
+//= require autosize
 
 
 //= require selectize-standalone.js
@@ -66,7 +68,7 @@
 //= require admin/custom_fields
 //= require admin/categories
 //= require admin/manage_members
-//= require admin/menu_links
+//= require admin/topbar_menu
 //= require admin/community_customizations
 //= require admin/listing_shapes
 //= require admin/settings.js
@@ -88,4 +90,5 @@
 //= require transaction
 //= require listing_form
 //= require radio_buttons
+//= require new_layout
 //= require_self

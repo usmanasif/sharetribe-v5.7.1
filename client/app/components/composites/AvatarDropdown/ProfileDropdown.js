@@ -1,5 +1,5 @@
 import { Component, PropTypes } from 'react';
-import r, { div } from 'r-dom';
+import r, { a, div, span } from 'r-dom';
 import classNames from 'classnames';
 
 import css from './ProfileDropdown.css';
@@ -8,43 +8,58 @@ import profileIcon from './images/profileIcon.svg';
 import settingsIcon from './images/settingsIcon.svg';
 import { className } from '../../../utils/PropTypes';
 
-class ProfileActionCard extends Component {
-  render() {
-    return div({ className: css.profileAction, onClick: this.props.action }, [
-      div({ className: css.profileActionIcon, dangerouslySetInnerHTML: { __html: this.props.icon } }),
-      div({ className: css.profileActionLabel }, this.props.label),
-    ]);
-  }
-}
+const actionProps = function actionProps(action) {
+  return (typeof action) === 'function' ?
+    { onClick: action } :
+    { href: action };
+};
+
+const ProfileActionCard = function ProfileActionCard({ icon, label, action, notificationCount }) {
+  const notificationCountInArray = notificationCount > 0 ? [span({ className: css.notificationCount }, notificationCount)] : [];
+  return a({ ...actionProps(action), className: css.profileAction }, [
+    div({ className: css.profileActionIconWrapper }, [
+      div({ className: css.profileActionIcon, dangerouslySetInnerHTML: { __html: icon } }),
+    ].concat(notificationCountInArray)),
+    div({ className: css.profileActionLabel }, label),
+  ]);
+};
+
+const eitherStringOrFunc = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.func,
+]);
 
 ProfileActionCard.propTypes = {
   icon: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  action: PropTypes.func.isRequired,
+  action: eitherStringOrFunc.isRequired,
+  notificationCount: PropTypes.number,
 };
 
 class ProfileDropdown extends Component {
   render() {
     return div({
-      className: classNames(css.profileDropdown, this.props.className),
+      className: classNames(this.props.classNames),
+      ref: this.props.profileDropdownRef,
     }, [
-      div({ className: css.rootArrow }),
+      div({ className: css.rootArrowTop }),
+      div({ className: css.rootArrowBelow }),
       div({ className: css.box }, [
         div({ className: css.profileActions }, [
-          r(ProfileActionCard, { label: 'Inbox', icon: inboxEmptyIcon, action: this.props.actions.inboxAction }),
-          r(ProfileActionCard, { label: 'Profile', icon: profileIcon, action: this.props.actions.profileAction }),
-          r(ProfileActionCard, { label: 'Settings', icon: settingsIcon, action: this.props.actions.settingsAction }),
+          r(ProfileActionCard, { label: this.props.translations.inbox, icon: inboxEmptyIcon, action: this.props.actions.inboxAction, notificationCount: this.props.notificationCount }),
+          r(ProfileActionCard, { label: this.props.translations.profile, icon: profileIcon, action: this.props.actions.profileAction }),
+          r(ProfileActionCard, { label: this.props.translations.settings, icon: settingsIcon, action: this.props.actions.settingsAction }),
         ]),
         div({ className: css.logoutArea }, [
-          div({
+          this.props.isAdmin ? a({
             className: css.adminLink,
             style: { color: this.props.customColor },
-            onClick: this.props.actions.adminDashboardAction,
-          }, 'Admin dashboard'),
-          div({
+            ...actionProps(this.props.actions.adminDashboardAction),
+          }, this.props.translations.adminDashboard) : null,
+          a({
             className: css.logoutLink,
-            onClick: this.props.actions.logoutAction,
-          }, 'Logout'),
+            ...actionProps(this.props.actions.logoutAction),
+          }, this.props.translations.logout),
         ]),
       ]),
     ]);
@@ -53,14 +68,24 @@ class ProfileDropdown extends Component {
 
 ProfileDropdown.propTypes = {
   actions: PropTypes.shape({
-    inboxAction: PropTypes.func.isRequired,
-    profileAction: PropTypes.func.isRequired,
-    settingsAction: PropTypes.func.isRequired,
-    adminDashboardAction: PropTypes.func.isRequired,
-    logoutAction: PropTypes.func.isRequired,
+    inboxAction: eitherStringOrFunc.isRequired,
+    profileAction: eitherStringOrFunc.isRequired,
+    settingsAction: eitherStringOrFunc.isRequired,
+    adminDashboardAction: eitherStringOrFunc.isRequired,
+    logoutAction: eitherStringOrFunc.isRequired,
   }).isRequired,
+  translations: PropTypes.shape({
+    inbox: PropTypes.string.isRequired,
+    profile: PropTypes.string.isRequired,
+    settings: PropTypes.string.isRequired,
+    adminDashboard: PropTypes.string.isRequired,
+    logout: PropTypes.string.isRequired,
+  }),
   customColor: PropTypes.string.isRequired,
-  className,
+  isAdmin: PropTypes.bool.isRequired,
+  classNames: PropTypes.arrayOf(className).isRequired,
+  notificationCount: PropTypes.number,
+  profileDropdownRef: PropTypes.func.isRequired,
 };
 
 export default ProfileDropdown;

@@ -21,6 +21,7 @@ ICON_MAP = {
       "redirect" => "ss-redirect",
       "mail" => "ss-mail",
       "notifications" => "ss-earth",
+      "layout" => "ss-layout",
       "login" => "ss-login",
       "logout" => "ss-logout",
       "feedback" => "ss-megaphone",
@@ -68,6 +69,7 @@ ICON_MAP = {
       "order_types" => "ss-cart",
       "download" => "ss-download",
       "credit_card" => "ss-creditcard",
+      "academy" => "ss-bookmark",
 
 
       # Default category & share type icons
@@ -154,6 +156,7 @@ ICON_MAP = {
       "work_spot" => "ss-briefcase",
       "cars" => "ss-car",
       "raclette_grill" => "ss-cookingutensils",
+      "topbar_menu" => "ss-signpost",
     },
     "font-awesome" => {
       "map" => "icon-map-marker",
@@ -176,6 +179,7 @@ ICON_MAP = {
       "redirect" => "icon-share",
       "mail" => "icon-envelope",
       "notifications" => "icon-globe",
+      "layout" => "icon-desktop",
       "login" => "icon-signin",
       "logout" => "icon-signout",
       "feedback" => "icon-bullhorn",
@@ -242,6 +246,7 @@ ICON_MAP = {
       "lock" => "icon-lock",
       "unlock" => "icon-unlock",
       "edit" => "icon-edit",
-      "reply" => "icon-reply"
+      "reply" => "icon-reply",
+      "topbar_menu" => "icon-minus",
     }
   }

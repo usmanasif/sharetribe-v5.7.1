@@ -13,15 +13,14 @@ def env_to_bool(var_name, default)
   end
 end
 
-# Usage example: Deploy to production without migrations, with css compile
+# Usage example: Deploy to production without migrations
 #
-# > rake deploy_to[production] migrations=false css=true
+# > rake deploy_to[production] migrations=false
 #
 task :deploy_to, [:destination] do |t, args|
   deploy(
     :destination => args[:destination],
     :migrations => env_to_bool('migrations', nil),
-    :css => env_to_bool('css', nil),
     :clear_cache => env_to_bool('clear_cache', nil)
   )
 end
@@ -47,7 +46,6 @@ def deploy(params)
   puts "Deploying from: #{@branch}"
   puts "Deploying to:   #{@destination}"
   puts "Deploy options:"
-  puts "  css:         #{params[:css]}"
   puts "  migrations:  #{params[:migrations]}"
   puts "  clear cache: #{params[:clear_cache]}"
 
@@ -55,20 +53,31 @@ def deploy(params)
 
   set_app(@destination)
 
-  fetch_remote_heroku_branch if params[:migrations] != false || params[:css].nil?
-  migrations = params[:migrations] == false ? [] : ask_local_migrations_to_run
-  abort_if_css_modifications if params[:css].nil?
+  fetch_remote_heroku_branch if params[:migrations] != false
+  local_migrations = fetch_local_migrations()
+
+  if local_migrations.present?
+    update_data_export_script_reminder!(@destination)
+  end
+
+  migrations_to_run = params[:migrations] == false ? [] : ask_local_migrations_to_run(local_migrations)
 
   deploy_to_server
 
   clear_cache if params[:clear_cache]
 
-  unless migrations.empty?
-    run_migrations(migrations)
+  if migrations_to_run.present?
+    run_migrations(migrations_to_run)
     restart
   end
-  if params[:css]
-    generate_custom_css
+end
+
+def update_data_export_script_reminder!(destination)
+  if destination == "production"
+    puts ""
+    puts "Did you remember to update the data export script? (y/n)"
+    response = STDIN.gets.strip
+    exit if response != 'y' && response != 'Y'
   end
 end
 
@@ -80,24 +89,16 @@ def ask_confirmations!(destination, branch, params)
     exit if response != 'y' && response != 'Y'
   end
 
-  if params[:migrations] == false
+  if local_css_modifications?
     puts ""
-    puts "Skipping migrations, really? (y/n)"
+    puts "You are deploying CSS changes. Did you remember to run 'sharetribe:cs_extract' task? (y/n)"
     response = STDIN.gets.strip
     exit if response != 'y' && response != 'Y'
   end
 
-  if params[:css] == false
+  if params[:migrations] == false
     puts ""
-    puts "Skipping css compiling, really? (y/n)"
-
-    response = STDIN.gets.strip
-    exit if response != 'y' && response != 'Y'
-  elsif params[:css] == true
-    puts ""
-    puts "Remember to add workers to compile the stylesheets!"
-    puts "Continue? (y/n)"
-
+    puts "Skipping migrations, really? (y/n)"
     response = STDIN.gets.strip
     exit if response != 'y' && response != 'Y'
   end
@@ -121,17 +122,6 @@ def migrate_up(versions)
 
   versions.each do |version|
     ActiveRecord::Migrator.run(:up, ActiveRecord::Migrator.migrations_paths, version)
-  end
-end
-
-def abort_if_css_modifications
-  if local_css_modifications?
-    puts ""
-    puts "You have local changes to css files."
-    puts "Run css compile with: bundle exec rake deploy_to[#{@destination}] css=true"
-    puts "If you know what you are doing, skip with css=false"
-    puts "Aborting deploy process."
-    exit
   end
 end
 
@@ -162,21 +152,18 @@ def restart
   heroku("restart --app #{@app}")
 end
 
-def generate_custom_css
-  puts 'Generating custom CSS for tribes who use it ...'
-  heroku("run rake sharetribe:generate_customization_stylesheets --app #{@app}")
-end
-
 def fetch_remote_heroku_branch
-  puts "Fetching heroku remote branch for checking migration and css statuses ..."
+  puts "Fetching heroku remote branch for checking migration status ..."
   `git fetch #{@destination} master`
 end
 
-def ask_local_migrations_to_run
+def fetch_local_migrations
   # List of files added to db/migrate dir
   new_files = `git diff --name-only --diff-filter=A #{@destination}/master..#{@branch} db/migrate`
-  migrations = select_down_migrations(parse_added_migration_files(new_files))
+  select_down_migrations(parse_added_migration_files(new_files))
+end
 
+def ask_local_migrations_to_run(migrations)
   if migrations.empty?
     []
   else

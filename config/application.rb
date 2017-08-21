@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require File.expand_path('../boot', __FILE__)
+require_relative 'boot'
 
 require 'rails/all'
 
@@ -8,6 +8,8 @@ require 'rails/all'
 require File.expand_path('../config_loader', __FILE__)
 
 require File.expand_path('../available_locales', __FILE__)
+
+require File.expand_path('../facebook_sdk_version', __FILE__)
 
 # Load the logger
 require File.expand_path('../../lib/sharetribe_logger', __FILE__)
@@ -19,8 +21,21 @@ require File.expand_path('../../lib/method_deprecator', __FILE__)
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Require Transit. This needs to be done manually, because the gem name
+# (transit-ruby) doesn't match to the module name (Transit) and that's
+# why Bundler doesn't know how to autoload it
+require 'transit'
+
+
+require File.expand_path('../../lib/sharetribe_middleware', __FILE__)
+
 module Kassi
   class Application < Rails::Application
+    # Initialize configuration defaults for originally generated Rails version.
+    # and thus class const
+    config.load_defaults 5.1
+    config.active_record.belongs_to_required_by_default = false
+
     # This is a little cubersome, but this needs to be shared with the StylesheetCompiler,
     # and thus class const
     VENDOR_CSS_PATH = Rails.root.join("vendor", "assets", "stylesheets")
@@ -39,6 +54,9 @@ module Kassi
     config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOWALL"
     #config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOWALL"
     #config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOW-FROM https://"
+
+    # Fakepal
+    config.autoload_paths += Dir[Rails.root.join('lib', 'services')]
 
     # Load also Jobs that are used by migrations
     config.autoload_paths += Dir[Rails.root.join('db', 'migrate_jobs', '**/')]
@@ -70,6 +88,8 @@ module Kassi
       'jquery-1.7.js',
       'i18n/*.js',
       'app-bundle.css',
+      'app-bundle.js',
+      'vendor-bundle.js',
     ]
 
     # Read the config from the config.yml
@@ -79,16 +99,22 @@ module Kassi
     #Consider enabling, and other actions described in http://blog.gingerlime.com/2012/rails-ip-spoofing-vulnerabilities-and-protection
     config.action_dispatch.ip_spoofing_check = false
 
+    # HealthCheck endpoint
+    config.middleware.insert_before Rack::Sendfile, ::HealthCheck
+
     # Manually redirect http to https, if config option always_use_ssl is set to true
     # This needs to be done before routing: conditional routes break if this is done later
     # Enabling HSTS and secure cookies is not a possiblity because of potential reuse of domains without HTTPS
-    config.middleware.insert_before Rack::Sendfile, "EnforceSsl"
+    config.middleware.insert_before Rack::Sendfile, ::EnforceSsl
 
     # Handle cookies with old key
-    config.middleware.insert_before ActionDispatch::Cookies, "CustomCookieRenamer"
+    config.middleware.use Rack::MethodOverride
+
+    config.middleware.insert_before ActionDispatch::Cookies, ::CustomCookieRenamer
 
     # Resolve current marketplace and append it to env
-    config.middleware.use "CurrentMarketplaceAppender"
+    config.middleware.use ::MarketplaceLookup
+    config.middleware.use ::SessionContextMiddleware
 
     # Map of removed locales and their fallbacks
     config.REMOVED_LOCALE_FALLBACKS = Sharetribe::REMOVED_LOCALE_FALLBACKS
@@ -123,7 +149,7 @@ module Kassi
 
     # Speed up schema loading. No need to use rake when creating database schema
     # from SQL dump.
-    config.active_record.schema_format = :ruby
+    config.active_record.schema_format = :sql
 
     # Configure generators values. Many other options are available, be sure to check the documentation.
     # config.generators do |g|
@@ -135,11 +161,6 @@ module Kassi
     # Configure the default encoding used in templates for Ruby 1.9.
     config.encoding = "utf-8"
 
-    # Configure sensitive parameters which will be filtered from the log file.
-    config.filter_parameters += [:password, :password2, :account_number, :routing_number, :address_street_address,
-                                 :image, :wide_logo, :logo, :cover_photo, :small_cover_photo, :favicon,
-                                 :"date_of_birth(3i)", :"date_of_birth(2i)", :"date_of_birth(1i)"]
-
     # ActiveRecord should be in UTC timezone.
     config.time_zone = 'UTC'
 
@@ -149,18 +170,47 @@ module Kassi
           :url => "/system/:attachment/:id/:style/:filename"
     }
 
+    if APP_CONFIG.user_asset_host
+      paperclip_options[:url] = "#{APP_CONFIG.user_asset_host}#{paperclip_options[:url]}"
+    end
+
     if (APP_CONFIG.s3_bucket_name && APP_CONFIG.aws_access_key_id && APP_CONFIG.aws_secret_access_key)
+      # S3 is in use for uploaded images
+      s3_domain = "amazonaws.com"
+      # us-east-1 has special S3 endpoint, see http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+      s3_host_name = if APP_CONFIG.s3_region == "us-east-1"
+                       "s3.#{s3_domain}"
+                     else
+                       "s3-#{APP_CONFIG.s3_region}.#{s3_domain}"
+                     end
       paperclip_options.merge!({
         :path => "images/:class/:attachment/:id/:style/:filename",
         :url => ":s3_domain_url",
         :storage => :s3,
+        :s3_region => APP_CONFIG.s3_region,
         :s3_protocol => 'https',
+        :s3_host_name => s3_host_name,
+        :s3_headers => {
+            "cache-control" => "public, max-age=#{APP_CONFIG.s3_cache_max_age}",
+            "expires" => APP_CONFIG.s3_cache_max_age.to_i.seconds.from_now.httpdate,
+        },
         :s3_credentials => {
               :bucket            => APP_CONFIG.s3_bucket_name,
               :access_key_id     => APP_CONFIG.aws_access_key_id,
               :secret_access_key => APP_CONFIG.aws_secret_access_key
         }
       })
+
+      if APP_CONFIG.user_asset_host
+        # CDN in use in front of S3
+        _, assets_proto, assets_host = *APP_CONFIG.user_asset_host.match(/^(https?):\/\/(.*)$/)
+
+        paperclip_options.merge!({
+          :s3_host_alias => assets_host,
+          :s3_protocol => assets_proto,
+          :url => ":s3_alias_url",
+        })
+      end
     end
     config.paperclip_defaults = paperclip_options
 
@@ -174,29 +224,17 @@ module Kassi
 
     # Map custom errors to error pages
     config.action_dispatch.rescue_responses["PeopleController::PersonDeleted"] = :gone
+    config.action_dispatch.rescue_responses["PeopleController::PersonBanned"] = :gone
     config.action_dispatch.rescue_responses["ListingsController::ListingDeleted"] = :gone
     config.action_dispatch.rescue_responses["ApplicationController::FeatureFlagNotEnabledError"] = :not_found
 
     config.exceptions_app = self.routes
-
-    # TODO Remove this when upgrading to Rails 5 START
-    #
-    # Rails 4.2 shows a warning about errors being swallowed
-    # in transactional callbacks.
-    #
-    # This config will turn that off, so that errors will be raised.
-    # This is the desired behavior.
-    #
-    # This config will be removed from future Rails versions and
-    # `true` value will be enforced.
-    #
-    config.active_record.raise_in_transactional_callbacks = true
-    # TODO Remove this when upgrading to RAILS 5 END
 
     config.active_job.queue_adapter = :delayed_job
 
     # TODO remove deprecation warnings when removing legacy analytics
     ActiveSupport::Deprecation.warn("Support for Kissmetrics is deprecated, please use Google Tag Manager instead") if APP_CONFIG.use_kissmetrics.to_s == "true"
     ActiveSupport::Deprecation.warn("Support for Google Analytics is deprecated, please use Google Tag Manager instead") if APP_CONFIG.use_google_analytics.to_s == "true"
+
   end
 end

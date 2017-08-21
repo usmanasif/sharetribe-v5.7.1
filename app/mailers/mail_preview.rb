@@ -3,28 +3,8 @@
 class MailPreview < MailView
   include MailViewTestData
 
-  def new_payment
-    PersonMailer.new_payment(checkout_payment, checkout_community)
-  end
-
   def payment_settings_reminder
     PersonMailer.payment_settings_reminder(listing, member, community)
-  end
-
-  def payment_reminder
-    PersonMailer.payment_reminder(conversation, member, community)
-  end
-
-  def receipt_to_payer
-    PersonMailer.receipt_to_payer(checkout_payment, checkout_community)
-  end
-
-  def braintree_receipt_to_payer
-    TransactionMailer.braintree_receipt_to_payer(payment, community)
-  end
-
-  def braintree_new_payment
-    TransactionMailer.braintree_new_payment(transaction.payment, community)
   end
 
   def paypal_receipt_to_payer
@@ -79,23 +59,8 @@ class MailPreview < MailView
     TransactionMailer.paypal_new_payment(transaction, seller_model, buyer_model, community)
   end
 
-  def escrow_canceled
-    PersonMailer.escrow_canceled(conversation, community)
-  end
-
   def confirm_reminder
-    # Show different template if hold_in_escrow is true
-    conversation.community.payment_gateway = nil
     PersonMailer.confirm_reminder(conversation, conversation.buyer, conversation.community, 4)
-  end
-
-  def confirm_reminder_escrow
-    # Show different template if hold_in_escrow is true
-    PersonMailer.confirm_reminder(conversation, conversation.buyer, conversation.community, 5)
-  end
-
-  def admin_escrow_canceled
-    PersonMailer.admin_escrow_canceled(conversation, community)
   end
 
   def transaction_confirmed
@@ -113,21 +78,12 @@ class MailPreview < MailView
     PersonMailer.booking_transaction_automatically_confirmed(conversation, community)
   end
 
-  def conversation_status_changed
-    change_conversation_status_to!("accepted")
-    PersonMailer.conversation_status_changed(conversation, community)
-  end
-
   def community_updates
     CommunityMailer.community_updates(member, community, [listing])
   end
 
   def welcome_email
     PersonMailer.welcome_email(member, community)
-  end
-
-  def transaction_created
-    TransactionMailer.transaction_created(transaction)
   end
 
   def transaction_preauthorized

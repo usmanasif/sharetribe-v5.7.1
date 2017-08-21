@@ -12,7 +12,6 @@ When updating, always run the following commands to update gem set, database str
 bundle install
 npm install
 RAILS_ENV=production rake db:migrate
-RAILS_ENV=production rake sharetribe:generate_customization_stylesheets_immediately
 
 # if running on local instance (localhost), you need to precompile assets using once update is done:
 rake assets:precompile
@@ -33,6 +32,83 @@ heroku config:set next_maintenance_at="2016-04-29 17:15:00 +0000" --app=<your ap
 See instructions how to set application in [maintenance mode in Heroku](https://devcenter.heroku.com/articles/maintenance-mode).
 
 ## Unreleased
+
+## Upgrade from 6.4.0 to 7.0.0
+
+Make sure you have node 7.8 installed.
+
+Then follow the [#general-update-instructions].
+
+if foreman causes trouble with an error message:
+`'method_missing': undefined method 'this'`
+it's an issue with rubygems itself. Can be solved by updating rubygems with:
+`gem update --system`
+
+## Upgrade from 6.3.0 to 6.4.0
+
+Nothing special. See the [#general-update-instructions].
+
+## Upgrade from 6.2.0 to 6.3.0
+
+### Migration from database session store to cookie-based session store
+
+This release migrates from database session store to cookie-based session store. The migration is done seamlessly without users being logged out.
+
+Make sure that you are using a cache store that can share cache between processes (such as FileStore, MemCacheStore or Redis) if you are running multiple server processes. The new session implementation caches user session data and if the cache is not shared between all server processes they will get out of sync and actions such as logout will only log out the user from one process but not from all processes. See this [Rails Guides](http://guides.rubyonrails.org/caching_with_rails.html#cache-stores) article to read more about Cache Stores in Rails.
+
+Add a new scheduled task to clean up expired tokens. Run it once per day:
+
+```
+bundle exec rails runner ActiveSessionsHelper.cleanup
+```
+
+To read more, see [Scheduled tasks](docs/scheduled_tasks.md).
+
+## Upgrade from 6.1.0 to 6.2.0
+
+NPM packages are updated, run `npm install` to get the latest packages.
+
+## Upgrade from 6.0.0 to 6.1.0
+
+In this release we are introducing layout changes that require new image styles. Therefore, a migration is added to reprocess all images from open listings into new styles. This does not require any precautions, but if your marketplace has a lot of open listings the time required for image reprocessing can be reduced by increasing the number of workers until all `CreateSquareImagesJob` jobs have been processed.
+
+This release updates Node.js to the latest LTS (long term support) version 6.9. You should update your local Node.js to the same version and run `npm install` to update the NPM packages. There is now a strict enforcement for the Node.js version, and building the frontend bundles fail when using an unsupported version of Node.js.
+
+Alongside the updated NPM packages, also the `react_on_rails` gem is updated to match the NPM package version, and requires running `bundle install` to install the latest version.
+
+## Upgrade from 5.12.0 to 6.0.0
+
+Release 6.0.0 drops official support for MySQL server version 5.6. Please upgrade to 5.7 when upgrading Sharetribe. See the upgrade notes from release 5.12.0 below for more information.
+
+## Upgrade from 5.11.0 to 5.12.0
+
+**IMPORTANT:** This release deprecates use of MySQL server version 5.6.x. Please, consider upgrading to MySQL 5.7. Support for MySQL 5.6 will be dropped with the next release of Sharetribe. From this point onward, versions other than 5.7 might work, but are not guaranteed to work with Sharetribe. Make sure to back up your database before upgrading MySQL server. For general upgrade instructions, see [the official MySQL upgrade instructions](http://dev.mysql.com/doc/refman/5.7/en/upgrading.html).
+
+If you are using S3 and are using an AWS region other than `us-east-1`, you need to update your `config.yml` file and set the `s3_region` configuration option to the AWS region you are using. As with all configuration options, you can also pass it as an environment variable.
+
+## Upgrade from 5.10.0 to 5.11.0
+
+This version is the second phase of removing support for Braintree payments. Old payment data for Braintree transactions will be removed in the migrations. If you want to save this data, you should take a backup before updating.
+
+After the upgrade to 5.10.0 no new transactions could be started with Braintree anymore, and before upgrading to this version you should make sure that there are no ongoing Braintree transactions. You can check the status of each transaction in the transaction view in the admin panel. All transaction statuses should be either Conversation, Confirmed, Canceled, or Rejected.
+
+## Upgrade from 5.9.0 to 5.10.0
+
+This version starts the two step process of disabling Braintree payments. In the first phase new payments are disabled with Braintree. The main purpose of this version is to ensure that there will be no new Braintree transactions. Existing transactions can be completed still after this update.
+
+This version changes existing transaction processes, so taking a backup before upgrading is recommended.
+
+Reasoning behind removing Braintree support can be seen in the [Community forum post](https://www.sharetribe.com/community/t/braintree-integration-will-be-removed-from-sharetribe/225).
+
+## Upgrade from 5.8.0 to 5.9.0
+
+This release removes the need to run CSS compilation workers. There is no CSS compilation per marketplace anymore. The `Procfile` has been updated, so if you run on Heroku, the `css_compile` worker should disappear after deployment.
+
+NPM packages have been updated, run `npm install` to ensure you have the correct versions installed.
+
+## Upgrade from 5.7.1 to 5.8.0
+
+This release doesn't require any extra actions.
 
 ## Upgrade from 5.7.0 to 5.7.1
 

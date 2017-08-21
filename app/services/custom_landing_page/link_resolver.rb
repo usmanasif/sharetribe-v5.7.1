@@ -20,8 +20,9 @@ module CustomLandingPage
     end
 
     class MarketplaceDataResolver
-      def initialize(data)
+      def initialize(data, cta)
         @_data = data
+        @_cta = cta
       end
 
       def call(type, id, _)
@@ -29,18 +30,34 @@ module CustomLandingPage
           raise LinkResolvingError.new("Unknown marketplace data value '#{id}'.")
         end
 
-        value = @_data[id]
+        value =
+          case id
+          when "search_type"
+            search_type
+          else
+            value = @_data[id]
+          end
+
         { "id" => id, "type" => type, "value" => value }
+      end
+
+      def search_type
+        case @_cta
+        when "signup"
+          "private"
+        else
+          @_data["search_type"]
+        end
       end
     end
 
     class AssetResolver
-      def initialize(asset_host, sitename)
+      def initialize(asset_url, sitename)
         unless sitename.present?
           raise CustomLandingPage::LandingPageConfigurationError.new("Missing sitename.")
         end
 
-        @_asset_host = asset_host
+        @_asset_url = asset_url
         @_sitename = sitename
       end
 
@@ -58,12 +75,10 @@ module CustomLandingPage
       private
 
       def append_asset_path(asset)
-        if @_asset_host.present?
-          asset.merge("src" => [@_asset_host, @_sitename, asset["src"]].join("/"))
-        else
-          # If asset_host is not configured serve assets locally
-          asset.merge("src" => ["landing_page", asset["src"]].join("/"))
-        end
+        host = @_asset_url || ""
+        src = URLUtils.join(@_asset_url, asset["src"]).sub("%{sitename}", @_sitename)
+
+        asset.merge("src" => src)
       end
     end
 
@@ -76,6 +91,7 @@ module CustomLandingPage
         translation_keys = {
           "search_button" => "landing_page.hero.search",
           "signup_button" => "landing_page.hero.signup",
+          "no_listing_image" => "landing_page.listings.no_listing_image"
         }
 
         key = translation_keys[id]
@@ -93,24 +109,33 @@ module CustomLandingPage
     end
 
     class CategoryResolver
-      def initialize(cid, locale, build_category_path)
-        @_cid = cid
-        @_locale = locale
-        @_build_category_path = build_category_path
+      def initialize(data)
+        @_data = data
       end
 
       def call(type, id, _)
-        Maybe(categories.find { |c| c.id == id }).map { |c|
-          {
-            "title" => c.display_name(@_locale),
-            "path" => @_build_category_path.call(c.url)
-          }
-        }.or_else(nil)
+        if @_data.key?(id)
+          @_data[id].merge("id" => id, "type" => type)
+        end
+      end
+    end
+
+    class ListingResolver
+      def initialize(cid, landing_page_locale, locale_param, name_display_type)
+        @_cid = cid
+        @_landing_page_locale = landing_page_locale
+        @_locale_param = locale_param
+        @_name_display_type = name_display_type
       end
 
-      def categories
-        @_categories ||= Category.where(community_id: @_cid).to_a
+      def call(type, id, _)
+        ListingStore.listing(id: id,
+                             community_id: @_cid,
+                             landing_page_locale: @_landing_page_locale,
+                             locale_param: @_locale_param,
+                             name_display_type: @_name_display_type)
       end
+
     end
   end
 end
