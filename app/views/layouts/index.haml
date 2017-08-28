@@ -19,16 +19,24 @@
                   -if @current_user
                     - conversations = @current_community.conversations.for_person(@current_user)
                     - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
-                    %li
+                    - Maybe(@current_user).each do |user|
+                      %li
+                        = link_to new_listing_path do
+                          %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                            Post New Listing
+                      %li
+                        = link_to person_path(user, :show_closed => true) do
+                          %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                            Manage Listings
+                    %li{:style => "margin-left: 400px;"}
                       = link_to person_inbox_path(@current_user) do
                         = icon_tag("mail", ["icon-with-text"])
                         - if unread_count > 0
                           .mobile-badge{:class => get_badge_class(unread_count)}
                             = unread_count
-                    %li{:style => "margin-right: 262px;"}
+                    %li
                       .dropdown.login-admin-profile
                         %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                          %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
                           %span.admin-text
                             = @current_user.name(@current_community)
                             %i.icon-caret-down.icon-dropdown
@@ -47,7 +55,7 @@
                               %li
                                 = link_to person_path(user) do
                                   = icon_tag("user", ["icon-with-text"])
-                                  = t("header.profile")                        
+                                  = t("header.profile")
                               %li
                                 = link_to person_settings_path(user) do
                                   = icon_tag("settings", ["icon-with-text"])
@@ -57,9 +65,9 @@
                               /     = icon_tag("logout", ["icon-with-text"])
                               /     = t("layouts.logged_in.logout")
 
-                    
+
                     %li
-                      .dropdown.login-menu 
+                      .dropdown.login-menu
                         %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                           Menu
                         %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -92,16 +100,7 @@
                                 = icon_tag("admin", ["icon-with-text"])
                                 = t("layouts.logged_in.admin")
 
-                    - Maybe(@current_user).each do |user|
-                      %li
-                        = link_to person_path(user, :show_closed => true) do
-                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                            Manage Listings                      
-                    
-                      %li{:style => "margin-right: 20px;"}
-                        = link_to new_listing_path do
-                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                            Post New Listing
+
 
 
     .container
@@ -128,9 +127,9 @@
             .input-group.col-sm-10
               %input.form-control{:name => "q", :placeholder => "Search", :type => "text", :value => ""}
                 .input-group-btn.select-drop-head
-                  .search-form-input.categorices-select.btn.btn-default.dropdown-toggle 
+                  .search-form-input.categorices-select.btn.btn-default.dropdown-toggle
                     %span.caret.caret-icon
-                    = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories") 
+                    = select_tag(:category,  options_from_collection_for_select(@main_categories, :url, "category_name" ) , class: 'categor-dropdown' , include_blank: "All Categories")
                   / /btn-group
             %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
         .col-md-1.col-sm-1.col-xs-1.header-p-0
@@ -158,18 +157,12 @@
                   %a{:href => "#"} Cleaning Supplies
                 %li
                   %a{:href => "#"} Building Materials
-                %li
-                  %a{:href => "#"} Collectibles & Art
-                %li
-                  %a{:href => "#"} Home & Garden
-                %li
-                  %a{:href => "#"} Sporting Goods
 
             / /.navbar-collapse
           / /.container-fluid
         / Banner
 
-                  
+
 
     = yield
 
@@ -178,7 +171,7 @@
   ul{
     list-style-type: none;
   }
-  .mobile-badge{  
+  .mobile-badge{
     position: relative;
     top: -11px;
     left: 12px;
@@ -314,13 +307,13 @@
 /   .left-navarea .dropdown-menu{
 /     top: 39px;
 /   }
-  
+
 /   .header-p-5 .form-control {
 /     height: 38px;
 /     border-right: 0;
 /     box-shadow: none;
 /   }
-        
+
 /   @media (min-width: 768px){
 /     .input-group-btn.select-drop-head {
 /       width: 25% !important;

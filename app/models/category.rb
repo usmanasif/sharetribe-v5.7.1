@@ -151,4 +151,8 @@ class Category < ApplicationRecord
   def self.find_by_url_or_id(url_or_id)
     self.find_by_url(url_or_id) || self.find_by_id(url_or_id)
   end
+
+  def category_name
+    url.humanize
+  end
 end

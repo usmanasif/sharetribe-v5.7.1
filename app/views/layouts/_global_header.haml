@@ -1,113 +1,94 @@
 -# Hide header in map view if mobile
-%header.header
-  .header-wrapper
-    - if logged_in
-      .header-right{:style => "margin-right: -60px;"}
+%header.panel-wrap
+  .header-panel
+    .header-left
+      - if logged_in
         = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
-      .header-right
         = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
-    .header-right.visible-tablet
+
+      - if logged_in
+        .no_margin_va{:style => "margin-left: 400px;"}
+          = render :partial => "layouts/header_user_menu", locals: {unread_count: unread_count, inbox_path: inbox_path, profile_path: profile_path, manage_listings_path: manage_listings_path, settings_path: settings_path, logout_path: logout_path, icons: icons}
+          = render :partial => "layouts/header_anchors", locals: {avatar_url: avatar_url, current_user_name: current_user_name, icons: icons}
+
+        = render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, inbox_path: inbox_path, icons: icons}
+
+      - if available_locales.size > 1
+        .visible-desktop
+          #header-locales-menu.toggle.header-hover{data: {toggle: '#header-locales-toggle-menu', 'toggle-position' => 'absolute'}}
+            %span.header-text-link.abc
+              = current_locale_name
+              = icon_map_tag(icons, "dropdown", ["icon-dropdown"])
+          #header-locales-toggle-menu.toggle-menu.header-toggle-menu-language.hidden
+            - locale_change_links.each do |locale_change_link|
+              %a{href: locale_change_link[:url]}
+                = locale_change_link[:title]
+      / - unless logged_in
+      /   .header-right
+      /     = link_to sign_up_path, class: "header-text-link header-hover" do
+      /       = t("header.signup")
+      /   .header-right
+      /     = link_to login_path, class: "header-text-link header-hover", id: "header-login-link" do
+      /       = t("header.login")
+
+      / - unless logged_in
+      /   .header-right
+      /     = link_to login_path, class: "header-text-link header-hover", id: "header-login-link" do
+      /       = t("header.login")
+      /   .header-right
+      /     = link_to sign_up_path, class: "header-text-link header-hover" do
+      /       = t("header.signup")
+      .hidden-tablet
+        .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
+          #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container.nav-header
+            = icon_map_tag(icons, "rows", ["header-menu-icon"])
+            %span.visible-tablet-inline.btn-menu
+              = t("header.menu")
+
+      = render :partial => "layouts/header_menu", locals: { locale_change_links: locale_change_links, icons: icons}
+      .header-right
       #header-menu-desktop-anchor.header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-
-    - if logged_in
-      .header-right.no_margin_va{:style => "margin-right: 254px;"}
-        = render :partial => "layouts/header_anchors", locals: {avatar_url: avatar_url, current_user_name: current_user_name, icons: icons}
-        = render :partial => "layouts/header_user_menu", locals: {unread_count: unread_count, inbox_path: inbox_path, profile_path: profile_path, manage_listings_path: manage_listings_path, settings_path: settings_path, logout_path: logout_path, icons: icons}
-
-      = render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, inbox_path: inbox_path, icons: icons}
-
-    - if available_locales.size > 1
-      .header-right.visible-desktop
-        #header-locales-menu.toggle.header-hover{data: {toggle: '#header-locales-toggle-menu', 'toggle-position' => 'absolute'}}
-          %span.header-text-link
-            = current_locale_name
-            = icon_map_tag(icons, "dropdown", ["icon-dropdown"])
-        #header-locales-toggle-menu.toggle-menu.header-toggle-menu-language.hidden
-          - locale_change_links.each do |locale_change_link|
-            %a{href: locale_change_link[:url]}
-              = locale_change_link[:title]
-
-    / - unless logged_in
-    /   .header-right
-    /     = link_to sign_up_path, class: "header-text-link header-hover" do
-    /       = t("header.signup")
-    /   .header-right
-    /     = link_to login_path, class: "header-text-link header-hover", id: "header-login-link" do
-    /       = t("header.login")
-    
-    / - unless logged_in
-    /   .header-right
-    /     = link_to login_path, class: "header-text-link header-hover", id: "header-login-link" do
-    /       = t("header.login")
-    /   .header-right
-    /     = link_to sign_up_path, class: "header-text-link header-hover" do
-    /       = t("header.signup")
-
-
-    .header-left.hidden-tablet
-      .header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
-        #header-menu-mobile-anchor.header-menu-toggle-container.toggle-header-container.nav-header
-          = icon_map_tag(icons, "rows", ["header-menu-icon"])
-          %span.visible-tablet-inline.btn-menu
-            = t("header.menu")
-
-    = render :partial => "layouts/header_menu", locals: { locale_change_links: locale_change_links, icons: icons}
-
-    / -#
-    /   If necessary, the buttons will overlap with the logo. Buttons should be on top, that's
-    /   keep the logo here after buttons
-    / .header-left.header-logo-container
-    /   = link_to landing_page_path, :class => "header-logo", :id => "header-logo" do
-    /     - if @current_community.logo.present?
-    /       %i.header-square-logo.hidden-tablet
-    /         -# Logo is here, it's a CSS background
-    /     - else
-    /       %span.header-square-logo-text.hidden-tablet
-    /         = @current_community.name(I18n.locale)[0]
-    /     - if @current_community.wide_logo.present?
-    /       %i.header-wide-logo.visible-tablet
-    /         -# Logo is here, it's a CSS background
-    /     - else
-    /       %span.header-wide-logo-text.visible-tablet
-    /         = @current_community.name(I18n.locale)
-
-
-
+      / -#
+      /   If necessary, the buttons will overlap with the logo. Buttons should be on top, that's
+      /   keep the logo here after buttons
+      / .header-left.header-logo-containeram
+      /   = link_to landing_page_path, :class => "header-logo", :id => "header-logo" do
+      /     - if @current_community.logo.present?
+      /       %i.header-square-logo.hidden-tablet
+      /         -# Logo is here, it's a CSS background
+      /     - else
+      /       %span.header-square-logo-text.hidden-tablet
+      /         = @current_community.name(I18n.locale)[0]
+      /     - if @current_community.wide_logo.present?
+      /       %i.header-wide-logo.visible-tablet
+      /         -# Logo is here, it's a CSS background
+      /     - else
+      /       %span.header-wide-logo-text.visible-tablet
+      /         = @current_community.name(I18n.locale)
 
 :css
   .vA_h_simulator{
-    background: #00a26c; !important  
+    background: #00a26c; !important
   }
   .header.header-inbox-link{
     margin: -2px 0 0; !important
-  }  
+  }
   .header.header-text-link {
     height: auto;
     line-height: 27px;
   }
   .va_h_image{
     height: 31px;
-    margin-top: 13px;
+    margin-top:5px;
   }
   .no_margin_va{
-    margin-top: -15px;
+    display: inline-block !important;
+    vertical-align: top;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  .header-text-link {
+    height: auto;
+    line-height: 31px !important;
+  }
 
 / -# Hide header in map view if mobile
 / %header.header
@@ -172,6 +153,37 @@
 
 
 :css
+  .email-link {
+    line-height: 26px !important
+  }
+  .panel-wrap{
+    background-color: none;
+    border-bottom: 1px solid #ccc;
+    width: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    padding: 6px 0 0;
+    height: 39px;
+    background: #eee;
+    -webkit-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
+    margin: 0 0 2px;
+  }
+  .header-panel {
+    width: 1170px;
+    overflow: hidden;
+    background: none;
+    padding: 0 15px;
+    margin: 0 auto;
+  }
+  .header-panel:after {
+    display: block;
+    content: '';
+    clear: both;
+
+  }
   .nav-header:hover,
   .nav-header {
     background: none;
@@ -182,7 +194,8 @@
 
   }
   .header-menu-container {
-    display: block;
+    display: inline-block;
+    vertical-align: middle;
     padding: 0;
     height: auto;
   }
@@ -205,16 +218,20 @@
     color: #000;
   }
   .new-listing-link {
-    background: #eee;
     color: #000;
-    padding: 3px 10px;
-    margin: 0 2px;
+    padding: 3px 12px;
+    margin: 0 5px 0 0;
     border: 1px solid #000;
     color: #000;
-    font-size: 16px;
     line-height: 1.42857143;
     border-radius: 4px;
     height: auto;
+    display: inline-block;
+    vertical-align: middle;
+    background: #eee;
+    border: 1px solid black !important;
+    font-size: 16px;
+    height: 29px;
   }
   .header{
     height: 37px; important

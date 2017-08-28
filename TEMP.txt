@@ -18,7 +18,7 @@
                 %li{:style => "margin-right: 262px;"}
                   .dropdown.login-admin-profile
                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                      %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+                      %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"}
                       %span.admin-text
                         = "Ali Ahmad Saleem"
                         /= @current_user.name(@current_community)
@@ -38,7 +38,7 @@
                           %li
                             = link_to person_path(user) do
                               / = icon_tag"user", ["icon-with-text"])
-                              = t("header.profile")                        
+                              = t("header.profile")
                           %li
                             = link_to person_settings_path(user) do
                               / = icon_tag"settings", ["icon-with-text"])
@@ -49,7 +49,7 @@
                           /     = t("layouts.logged_in.logout")
 
               %li
-                .dropdown.login-menu 
+                .dropdown.login-menu
                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                     Menu
                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -85,8 +85,8 @@
                 %li
                   = link_to person_path(user, :show_closed => true) do
                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                      Manage Listings                      
-              
+                      Manage Listings
+
                 %li{:style => "margin-right: 20px;"}
                   = link_to new_listing_path do
                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
@@ -111,7 +111,7 @@
                 -if i == 0
                   .item.active
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
+                -else
                   .item
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
             -else
@@ -140,7 +140,7 @@
                 -if i == 0
                   .item.active
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
+                -else
                   .item
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
             -if !@second_slider_images.present?
@@ -182,7 +182,7 @@
                       - if list.fourth
                         %li
                           %a{:href => listing_path(set_path(listing.id))}
-                            %img.img-responsive{:alt => "", :src => list.fourth}/    
+                            %img.img-responsive{:alt => "", :src => list.fourth}/
               .col-md-12.col-sm-12.col-xs-12
                 .row
                   .padding-left-0.col-md-9.col-sm-9.col-xs-9
@@ -192,13 +192,13 @@
 
                   .padding-right-0.col-md-3.col-sm-3.col-xs-3
                     %ul.details
-                      %li 
+                      %li
                         - if listing.author
                           %a{:href => person_path(listing.author.username)} #{listing.author.username}
                       %li US #{listing.price}$
                       %li
                         %a{:href => listing_path(set_path(listing.id)) } Show now
-                        
+
 / - @listings.each do |listing|
 /   = render :partial => "layouts/grid_item_listing_image", :locals => {:listing => listing, :modifier_class => ""}
 /   = listing.inspect
@@ -216,7 +216,7 @@
     /         .col-md-12.col-sm-12.col-xs-12
     /           %nav.cart-area.admin-menu-panel
     /             %ul
-    /               - if @current_user  
+    /               - if @current_user
     /                 - conversations = @current_community.conversations.for_person(@current_user)
     /                 - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
     /                 %li
@@ -228,7 +228,7 @@
     /                 %li{:style => "margin-right: 262px;"}
     /                   .dropdown.login-admin-profile
     /                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-    /                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+    /                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"}
     /                       %span.admin-text
     /                         = "Ali Ahmad Saleem"
     /                         /= @current_user.name(@current_community)
@@ -248,7 +248,7 @@
     /                           %li
     /                             = link_to person_path(user) do
     /                               = icon_tag("user", ["icon-with-text"])
-    /                               = t("header.profile")                        
+    /                               = t("header.profile")
     /                           %li
     /                             = link_to person_settings_path(user) do
     /                               = icon_tag("settings", ["icon-with-text"])
@@ -259,7 +259,7 @@
     /                           /     = t("layouts.logged_in.logout")
 
     /               %li
-    /                 .dropdown.login-menu 
+    /                 .dropdown.login-menu
     /                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
     /                     Menu
     /                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -295,13 +295,13 @@
     /                 %li
     /                   = link_to person_path(user, :show_closed => true) do
     /                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-    /                       Manage Listings                      
-                  
+    /                       Manage Listings
+
     /                 %li{:style => "margin-right: 20px;"}
     /                   / = link_to new_listing_path do
     /                   /   %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
     /                   /     Post a new listing
-                  
+
     / .container
     /   .header-content
     /     / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -326,9 +326,9 @@
     /         .input-group.col-sm-10
     /           %input.form-control{:name => "q", :placeholder => "Search", :type => "text", :value => ""}
     /             .input-group-btn.select-drop-head
-    /               .search-form-input.categorices-select.btn.btn-default.dropdown-toggle 
+    /               .search-form-input.categorices-select.btn.btn-default.dropdown-toggle
     /                 %span.caret.caret-icon
-    /                 = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories") 
+    /                 = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories")
     /               / /btn-group
     /         %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
     /     .col-md-1.col-sm-1.col-xs-1.header-p-0
@@ -366,7 +366,7 @@
     /         / /.navbar-collapse
     /       / /.container-fluid
     /     / Banner
-  
+
     / = yield
 
 /////////////////////////////////////////////////////////people#show///////////////////////////////////////
@@ -396,22 +396,22 @@
               %a.title{:href => "#"} #{@person}
               ( #{listings.count} )
               %span.feed-back-text
-                
+
             .col-md-3.col-sm-3.col-xs-3.pull-right.text-right
               -if !current_user?(@person)
                 %a.fa.fa-envelope-o{:href => new_person_person_message_path(@person)}
                 %a{:href => new_person_person_message_path(@person)}
                   %span Contact me
           .row
-            .col-md-4.col-sm-4.col-xs-4      
+            .col-md-4.col-sm-4.col-xs-4
               - if @current_community.follow_in_use? && @current_user && !current_user?(@person)
                 - if @current_user.follows?(@person)
                   = link_to person_follower_path(@person, @current_user), :method => "delete", :remote => true, :id => "followButton" , :class => "following_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       Following
                 - else
                   = link_to [ @person, :followers ], :method => "post", :remote => true, :id => "followButton" , :class => "follow_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       %i.fa.fa-plus
                         Follow
             .col-md-8.col-sm-8.col-xs-8.follow_caption
@@ -423,7 +423,7 @@
                   .icon-with-text-container
                     .ss-chat.icon-part
                     .ss.text-part= t(".add_description")
-                          
+
   .col-md-12.col-sm-12.col-xs-12.see-all-feeback-block
     .row
       .col-md-6.col-sm-6.col-xs-6
@@ -474,7 +474,7 @@
 / >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
     .row
       .col-md-4.col-sm-4.col-xs-4.feedback-border-right
-       
+
         %ul.ratinglist-detail.row
           %li
             .col-md-4.col-sm-4.col-xs-4
@@ -485,7 +485,7 @@
             .col-md-5.col-sm-5.col-xs-5
               %span
                 Item as described
-      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right                                                 
+      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right
         .col-md-4.col-sm-4.col-xs-4
           %p
             %span
@@ -512,7 +512,7 @@
             Negative
       .col-md-4.col-sm-4.col-xs-4
         #rating-carousel
-          -received_testimonials.each do |testimonial| 
+          -received_testimonials.each do |testimonial|
             - listing = testimonial.tx.listing
             .item
               .row
@@ -521,48 +521,48 @@
                   -if testimonial.grade <= 0.25
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade == 0.5
                     %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star-half-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade >= 0.5
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
+                    %i.fa.fa-star{"aria-hidden" => "true"}
+                    %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star{"aria-hidden" => "true"}
                 .col-md-8.col-sm-8.col-xs-8
                   .item-caption
                     - text_with_line_breaks do
-                      #{testimonial.text} 
-                  %span        
+                      #{testimonial.text}
+                  %span
                     .testimonial-author
                       = link_to_unless testimonial.author.deleted?, PersonViewUtils.person_display_name(testimonial.author, @current_community), testimonial.author
                       = t("testimonials.testimonial.about_listing")
                       = link_to listing.title, listing
-                  %span    
+                  %span
                     = time_ago(testimonial.created_at) + "."
                 / .testimonial-icon{:class => testimonial.grade > 0.25 ? 'positive' : 'negative'}
                 /   - if testimonial.grade > 0.25
                 /     = icon_tag("like", ["positive"])
                 /   - else
                 /     = icon_tag("dislike", ["negative"])
-              
 
- 
+
+
 .container.collections-slider
   %h1
     Collections by #{@person.username} (#{listings.count})
   #collections-carousel
     -if listings.count > 0
       -listings.each do |listing|
-        .item 
+        .item
           .collections-items
             .collections-items-head
-              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}          
+              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}
             .colletions-img-slider
               %a.items-title{:href => listing_path(set_path(listing.id))}
                 = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
-            %ul.collections-img-list 
+            %ul.collections-img-list
               %li
                 %a.items-title{:href => listing_path(set_path(listing.id))}
                   = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
@@ -581,7 +581,7 @@
   %ul.following-members-list
     %li.row
       .col-md-3.col-sm-3.col-xs-3
-        
+
       .col-md-9.col-sm-9.col-xs-9
         %a.following-members{:href => "#"} Members
         %span #{listings.count} collections.
@@ -598,11 +598,11 @@
           %p #{person.followers.count} Followers
 
   %ul.following-images-list
-    - grade = 0 
+    - grade = 0
     -if received_testimonials.size > 0
       -received_testimonials.each do |r_t|
         -grade = grade + r_t.grade
-      - grade = ( grade / received_testimonials.size ) * 5 
+      - grade = ( grade / received_testimonials.size ) * 5
 
 
 - content_for :extra_javascript do
@@ -652,9 +652,9 @@
       var c = parseFloat(( a / b ) * 100).toFixed(2)
       $(".feed-back-text").text(c+"% positive feedback")
    }
-   $(function() { 
-      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); }); 
-      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); }); 
+   $(function() {
+      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); });
+      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); });
     });
   });
 
@@ -764,3 +764,1015 @@
 / - content_for :extra_javascript do
 /   :javascript
 /     window.ST.initializeFollowButtons();
+//////////////////////////////////////////////////listing show///////////////////////////////////////////////////
+
+/ <<<<<<< HEAD
+/ .container-fluid.padding-0
+/   .three-columns
+/     .single-product.row
+/       .slider-block.col-md-5.col-sm-5.col-xs-5
+/         .slideshow
+/           .slider-holder
+/             .slideset
+/               -@listing.listing_images.each_with_index do |ls_img , i|
+/                 .slide
+/                   %img.img-responsive{:alt => "item image", :src => asset_path(ls_img.image.url(:original)) }
+/           .static-block
+/             %a.btn-prev{:href => "#"}
+/               %i.fa.fa-5x.fa-angle-left
+/             %a.btn-next{:href => "#"}
+/               %i.fa.fa-5x.fa-angle-right
+/             .pagination
+/               %ul
+/                 -@listing.listing_images.each_with_index do |ls_img , i|
+/                   %li
+/                     %a{:href => "#"}
+/                       %img{:alt => "item image", :src => asset_path(ls_img.image.url(:thumb)) }
+/       .qty-block.col-md-7.col-sm-7.col-xs-7
+/         .single_head
+/           %h1
+/             %span#listing-title.listing-title= @listing.title
+/         .row
+/           .col-md-7.col-sm-7.col-xs-7
+/             .row
+/               %ul.product-info
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     / - @listing.custom_field_values.each do |custom_field_value|
+/                     /   .row
+/                     /     .col-12
+/                     /       - custom_field_value.with_type do |question_type|
+/                     /         / = custom_field_value.inspect
+/                     /         / =question_type
+/                     /         = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
+/                     %span Item Condition:
+
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %span #{@listing.item_condition}
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Qty:
+/                   .col-md-3.col-sm-3.col-xs-3
+/                     .qty
+/                       %input.form-control{:id => "qty" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
+/                       %lable.min-order
+/                         Min Order: #{@listing.min_order}
+/                   .col-md-6.col-sm-6.col-xs-6
+/                     .available
+/                       #{@listing.available} available /  0 sold
+/                 %li
+/                   .price-area
+/                     .col-md-1.col-sm-1.col-xs-1.padding-right-0
+/                       %i.fa.fa-money{"aria-hidden" => "true"}
+/                     .col-md-3.col-sm-3.col-xs-3.padding-0
+/                       %span Price
+/                     .col-md-4.col-sm-4.col-xs-4.padding-0
+/                       .listing-price
+/                         %span.listing-price-amount
+/                           %span#price_span
+/                             = humanized_money_with_symbol(@listing.price).upcase
+/                     .col-md-4.col-sm-4.col-xs-4
+/                     .col-md-12.col-sm-12.col-xs-12.row.delivery-method
+/                       #listing-message-links
+/                         = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
+
+/                     .col-md-12.col-sm-12.col-xs-12.cards-image-holder
+/                       %img{:alt => "Cards", :src => asset_path("braintree_cards.png") }
+
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Pickup Address:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       = @listing.origin
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Shipping info:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       May not ship to USA - Read item description or contact seller for shipping options.
+/                 %li
+/                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+/                     %span Delivery:
+/                   .col-md-9.col-sm-9.col-xs-9
+/                     %p
+/                       Varies
+/           .col-md-5.col-sm-5.col-xs-5
+/             .row-with-divider
+/               .col-12
+/                 .author-box
+/                   .listing-author
+/                     .listing-author-avatar
+/                       = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
+/                     .listing-author-details
+/                       .listing-author-name
+/                         = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+/                         %ul.author_details-list
+/                           %li
+/                             %span Total listings
+/                             = count_active_listings_for(@listing.author)
+/                           %li
+/                             %span Ships items quickly
+/                           %li
+/                             %span Has earned a track record of excellent service
+
+/               %img.img-responsive{:src => asset_path('index/single_prodect.jpg')}
+/ .container
+/   .row
+/     .description-block.col-md-12.col-sm-12.col-xs-12
+/ =======
+/ - content_for :javascript do
+/   initialize_listing_view('#{I18n.locale}');
+
+/ - content_for :extra_javascript do
+/   :javascript
+/     window.ST.listing();
+/   - maps_key = MarketplaceHelper.google_maps_key(@current_community.id)
+/   - key_param = maps_key ? "?key=#{maps_key}" : ""
+/   - needs_maps = !FeatureFlagHelper.feature_enabled?(:topbar_v1) || search_mode == :keyword
+/   = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}" if needs_maps
+
+/ - content_for :title, raw(@listing.title)
+/ - content_for :meta_author, PersonViewUtils.person_display_name(@listing.author, @current_community)
+/ - content_for :meta_description, StringUtils.first_words(@listing.description, 15)
+/ - content_for :meta_image, @listing.listing_images.first.image.url(:medium) if !@listing.listing_images.empty?
+/ - dimensions = @listing.listing_images.first.get_dimensions_for_style(:medium) if !@listing.listing_images.empty?
+/ - content_for :meta_image_width, dimensions[:width].to_s if !@listing.listing_images.empty?
+/ - content_for :meta_image_height, dimensions[:height].to_s if !@listing.listing_images.empty?
+/ - content_for :keywords, StringUtils.keywords(@listing.title)
+
+/ - content_for :title_header do
+/   %h1
+/     %span#listing-title.listing-title= @listing.title
+
+/ %script{type: "text/template", class: "template", id: "image-frame-template"}
+/   .listing-image-frame
+/     #listing-image-link.listing-image-frame-content
+/       .listing-image-vertical-centering{:class => "${aspectRatioClass}" }
+/         %img{:src => "${url}", :alt => @listing.title, :class => "listing-image ${aspectRatioClass}"}
+
+/ %script{type: "text/template", class: "template", id: "image-thumbnail-template"}
+/   .listing-image-thumbnail-container
+/     %img.listing-image-thumbnail{src: "${url}"}
+/     .fade
+
+/ - if local_assigns[:show_onboarding_popup]
+/   = render :layout => "layouts/lightbox", :partial => "layouts/onboarding_popup", locals: {title: t(popup_title_key), body: t(popup_body_key), action_label: t(popup_button_key), action_link: popup_action_link, image: asset_path(popup_image), id: "onboarding-popup" }
+
+/ .row
+/   .col-8.listing-details-container
+/     .row
+/       .col-12
+/         - with_image_frame(@listing) do |reason, listing_images|
+/           - if reason == :images_ok
+/             .listing-image-carousel
+/               #listing-image-frame
+
+/               - if @prev_image_id && @next_image_id
+/                 = link_to params.permit(:id, :locale).merge(image: @prev_image_id), class: "listing-image-navi listing-image-navi-left", id: "listing-image-navi-left" do
+/                   .listing-image-navi-arrow-container
+/                     .listing-image-arrow-icon-container.left
+/                       = icon_tag("directleft", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/                 = link_to params.permit(:id, :locale).merge(image: @next_image_id), class: "listing-image-navi listing-image-navi-right", id: "listing-image-navi-right" do
+/                   .listing-image-navi-arrow-container
+/                     .listing-image-arrow-icon-container.right
+/                       = icon_tag("directright", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/             #thumbnail-stripe.listing-image-thumbnail-stripe
+
+/             - content_for :extra_javascript do
+/               :javascript
+/                 var listingImages = #{raw listing_images.map { |image| ListingImageJSAdapter.new(image) }.to_json }
+/                 var currentImage = #{params[:image].present? ? params[:image].to_i : listing_images.first.id};
+/                 ST.listingImages(listingImages, currentImage);
+/           - else
+/             .listing-image-text-container
+/               .listing-image-frame
+/                 .listing-image-frame-content
+/                   .listing-image-vertical-centering
+/                     .listing-no-image
+/                       - if reason == :images_processing
+/                         = t("listings.show.processing_uploaded_image")
+/                       - else
+/                         = t(".no_description")
+
+/     .row
+/       .col-12
+/         - if @listing.description && !@listing.description.blank?
+/           - text_with_line_breaks do
+/             = @listing.description
+/           - if(youtube_link_ids.present?)
+/             - youtube_link_ids.each do |youtube_id|
+/               .listing-description-youtube-wrapper
+/                 %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
+
+/     - @listing.custom_field_values.each do |custom_field_value|
+/       .row
+/         .col-12
+/           - custom_field_value.with_type do |question_type|
+/             = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
+
+/     - if @current_community.show_listing_publishing_date?
+/       .row
+/         .col-12
+/           .icon-with-text-container
+/             = icon_tag("calendar", ["icon-part"])
+/             .text-part
+/               %b
+/                 = t(".listing_created_at")
+/                 = l @listing.created_at, :format => :short_date
+
+/     - if !@current_community.private?
+/       .row
+/         .col-12
+/           .listing-social
+/             .listing-fb-like-button
+/               = facebook_like(current_user?(@listing.author))
+/             .listing-tweet-button
+/               - twitter_params =  {count: "horizontal", via: (@current_community.twitter_handle), text: @listing.title }.compact
+/               = link_to("", "https://twitter.com/share", :class => "twitter-share-button", "data" => twitter_params)
+/               - content_for :extra_javascript do
+/                 :javascript
+/                   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+
+/     - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
+/       .view-item
+/         #comments.discussion.overflow-allowed
+/           %h2
+/             = icon_tag("chat_bubble", ["icon-with_text"])
+/             .text-with-icon
+/               = t(".comments")
+/               %span#comment_count= "(#{@listing.comments_count})"
+/           #follow-links.follow-links
+/             = render :partial => "follow_links"
+/           #comment-list
+/             = render :partial => "comment", :collection => @listing.comments
+/           #comment-form
+/             = render :partial => "comment_form"
+
+/   %aside.col-4
+/     - if @listing.price
+/       .row
+/         .col-12
+/           .listing-price
+/             %span.listing-price-amount
+/               = MoneyViewUtils.to_humanized(@listing.price)
+/             - with_quantity_text(@current_community, @listing) do |text|
+/               %span.listing-price-quantity
+/                 = text
+
+/     .row-with-divider
+/       .col-12
+/         #listing-message-links
+/           = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code, blocked_dates_end_on: blocked_dates_end_on, blocked_dates_result: blocked_dates_result, manage_availability_props: manage_availability_props, availability_enabled: availability_enabled, currency_opts: currency_opts }
+
+/     .row-with-divider
+/       .col-12
+/         .listing-author
+/           .listing-author-avatar
+/             = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
+/           .listing-author-details
+/             .listing-author-name
+/               = link_to PersonViewUtils.person_display_name(@listing.author, @current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{PersonViewUtils.person_display_name(@listing.author, @current_community)}"
+/             - if @listing.author != @current_user
+/               .listing-author-contact
+/                 %a#listing-contact{href: contact_to_listing_path(:listing_id => @listing.id.to_s), :class => "listing-author-contact-button"}
+/                   .content
+/                     = t(".contact")
+
+/     - if received_testimonials.size > 0
+/       .row-with-divider.listing-author-activity
+/         .col-12
+/           %i.listing-author-activity-icon{:class => icon_class("testimonial")}
+/           .listing-author-activity-item
+/             .listing-author-activity-value
+/               - if received_testimonials.size > 0
+/                 = feedback_positive_percentage.to_s + "%"
+/                 = t("people.show.positive")
+/                 = "(#{received_positive_testimonials.size}/#{received_testimonials.size})"
+/               - else
+/                 = t(".no_reviews")
+/             .listing-author-activity-description
+/               = t(".feedback")
+
+/     - if @listing.origin_loc && @listing.origin_loc.address != ""
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+/       .row
+/         .col-md-12
+/           %div
+/             / Nav tabs
+/             %ul.nav.nav-tabs{:role => "tablist"}
+/               %li.active{:role => "presentation"}
+/                 %a{"aria-controls" => "home", "data-toggle" => "tab", :href => "#home", :role => "tab"} Description
+/               %li{:role => "presentation"}
+/                 %a{"aria-controls" => "profile", "data-toggle" => "tab", :href => "#profile", :role => "tab"} Most Recent Reviews
+/             / Tab panes
+/             .tab-content
+/               #home.tab-pane.active{:role => "tabpanel"}
+/                 .reviews-blocks
+/                   .reviews-holder
+/                     - if @listing.description && !@listing.description.blank?
+/                       - text_with_line_breaks do
+/                         = @listing.description
+/                       - if(youtube_link_ids.present?)
+/                         - youtube_link_ids.each do |youtube_id|
+/                           .listing-description-youtube-wrapper
+/                             %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
+/               #profile.tab-pane{:role => "tabpanel"}
+/                 - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
+/                   .view-item
+/                     #comments.discussion.overflow-allowed.comment-form-vendor
+/                       %h2
+/                         = icon_tag("chat_bubble", ["icon-with_text"])
+/                         .text-with-icon
+/                           = t(".comments")
+/                           %span#comment_count= "(#{@listing.comments_count})"
+/                       #follow-links.follow-links
+/                         = render :partial => "follow_links"
+/                       #comment-list
+/                         = render :partial => "comment", :collection => @listing.comments
+/                       #comment-form
+/                         = render :partial => "comment_form"
+
+
+
+/ :javascript
+/   $("#qty").on('keyup paste', function () {
+/     ApplyFilter();
+/   });
+
+/   function ApplyFilter() {
+/     var value = $("#qty").val();
+/     if( value < #{@listing.min_order} ){
+/       $("#qty").val(#{@listing.min_order});
+/     }
+/     if( value > #{@listing.available} ){
+/       $("#qty").val(#{@listing.available});
+/     }
+/   }
+
+/   $(document).ready(function(){
+/     cal_price()
+/   })
+
+/   $("#qty").change(function(){
+/    cal_price()
+/   })
+
+/   function cal_price(){
+/     var q = parseFloat($("#qty").val())
+/     var p = parseFloat(#{humanized_money(@listing.price)})
+/     $("#price_span").text("$" + q * p );
+/   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ / - content_for :javascript do
+/ /   initialize_listing_view('#{I18n.locale}');
+
+/ / - content_for :extra_javascript do
+/ /   :javascript
+/ /     window.ST.listing();
+/ /   - maps_key = @current_community.google_maps_key
+/ /   - key_param = maps_key ? "?key=#{maps_key}" : ""
+/ /   = javascript_include_tag "https://maps.googleapis.com/maps/api/js#{key_param}"
+
+/ / - content_for :title, raw(@listing.title)
+/ / - content_for :meta_author, @listing.author.name(@current_community)
+/ / - content_for :meta_description, StringUtils.first_words(@listing.description, 15)
+/ / - content_for :meta_image, @listing.listing_images.first.image.url(:medium) if !@listing.listing_images.empty?
+/ / - dimensions = @listing.listing_images.first.get_dimensions_for_style(:medium) if !@listing.listing_images.empty?
+/ / - content_for :meta_image_width, dimensions[:width].to_s if !@listing.listing_images.empty?
+/ / - content_for :meta_image_height, dimensions[:height].to_s if !@listing.listing_images.empty?
+/ / - content_for :keywords, StringUtils.keywords(@listing.title)
+
+/ / - content_for :title_header do
+/ /   %h1
+/ /     %span#listing-title.listing-title= @listing.title
+
+/ / %script{type: "text/template", class: "template", id: "image-frame-template"}
+/ /   .listing-image-frame
+/ /     #listing-image-link.listing-image-frame-content
+/ /       .listing-image-vertical-centering{:class => "${aspectRatioClass}" }
+/ /         %img{:src => "${url}", :alt => @listing.title, :class => "listing-image ${aspectRatioClass}"}
+
+/ / %script{type: "text/template", class: "template", id: "image-thumbnail-template"}
+/ /   .listing-image-thumbnail-container
+/ /     %img.listing-image-thumbnail{src: "${url}"}
+/ /     .fade
+
+/ / - if local_assigns[:show_onboarding_popup]
+/ /   = render :layout => "layouts/lightbox", :partial => "layouts/onboarding_popup", locals: {title: t(popup_title_key), body: t(popup_body_key), action_label: t(popup_button_key), action_link: popup_action_link, image: asset_path(popup_image), id: "onboarding-popup" }
+
+/ / .row
+/ /   .col-8.listing-details-container
+/ /     .row
+/ /       .col-12
+/ /         - with_image_frame(@listing) do |reason, listing_images|
+/ /           - if reason == :images_ok
+/ /             .listing-image-carousel
+/ /               #listing-image-frame
+
+/ /               - if @prev_image_id && @next_image_id
+/ /                 = link_to params.merge(image: @prev_image_id), class: "listing-image-navi listing-image-navi-left", id: "listing-image-navi-left" do
+/ /                   .listing-image-navi-arrow-container
+/ /                     .listing-image-arrow-icon-container.left
+/ /                       = icon_tag("directleft", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/ /                 = link_to params.merge(image: @next_image_id), class: "listing-image-navi listing-image-navi-right", id: "listing-image-navi-right" do
+/ /                   .listing-image-navi-arrow-container
+/ /                     .listing-image-arrow-icon-container.right
+/ /                       = icon_tag("directright", ["navigate-icon-fix", "listing-image-navi-arrow"])
+/ /             #thumbnail-stripe.listing-image-thumbnail-stripe
+
+/ /             - content_for :extra_javascript do
+/ /               :javascript
+/ /                 var listingImages = #{listing_images.map { |image| ListingImageJSAdapter.new(image) }.to_json }
+/ /                 var currentImage = #{params[:image].present? ? params[:image].to_i : listing_images.first.id};
+/ /                 ST.listingImages(listingImages, currentImage);
+/ /           - else
+/ /             .listing-image-text-container
+/ /               .listing-image-frame
+/ /                 .listing-image-frame-content
+/ /                   .listing-image-vertical-centering
+/ /                     .listing-no-image
+/ /                       - if reason == :images_processing
+/ /                         = t("listings.show.processing_uploaded_image")
+/ /                       - else
+/ /                         = t(".no_description")
+
+/ /     .row
+/ /       .col-12
+/ /         - if @listing.description && !@listing.description.blank?
+/ /           - text_with_line_breaks do
+/ /             = @listing.description
+/ /           - if(youtube_link_ids.present?)
+/ /             - youtube_link_ids.each do |youtube_id|
+/ /               .listing-description-youtube-wrapper
+/ /                 %iframe.listing-description-youtube-iframe{ title: t("listings.show.youtube_video_player"), width: 640, height:390, src: "//www.youtube.com/embed/#{ youtube_id }", frameborder: 0, allowfullscreen: true}
+
+/ /     - @listing.custom_field_values.each do |custom_field_value|
+/ /       .row
+/ /         .col-12
+/ /           - custom_field_value.with_type do |question_type|
+/ /             = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
+
+/ /     - if @current_community.show_listing_publishing_date?
+/ /       .row
+/ /         .col-12
+/ /           .icon-with-text-container
+/ /             = icon_tag("calendar", ["icon-part"])
+/ /             .text-part
+/ /               %b
+/ /                 = t(".listing_created_at")
+/ /                 = l @listing.created_at, :format => :short_date
+
+/ /     - if !@current_community.private?
+/ /       .row
+/ /         .col-12
+/ /           .listing-social
+/ /             .listing-fb-like-button
+/ /               = facebook_like(current_user?(@listing.author))
+/ /             .listing-tweet-button
+/ /               = link_to("", "https://twitter.com/share", :class => "twitter-share-button", "data" => {count: "horizontal", via: (@current_community.twitter_handle || "Sharetribe"), text: @listing.title })
+/ /               - content_for :extra_javascript do
+/ /                 :javascript
+/ /                   !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+
+/ /     - unless (@listing.closed? && !current_user?(@listing.author)) || !@current_community.listing_comments_in_use
+/ /       .view-item
+/ /         #comments.discussion.overflow-allowed
+/ /           %h2
+/ /             = icon_tag("chat_bubble", ["icon-with_text"])
+/ /             .text-with-icon
+/ /               = t(".comments")
+/ /               %span#comment_count= "(#{@listing.comments_count})"
+/ /           #follow-links.follow-links
+/ /             = render :partial => "follow_links"
+/ /           #comment-list
+/ /             = render :partial => "comment", :collection => @listing.comments
+/ /           #comment-form
+/ /             = render :partial => "comment_form"
+
+/ /   %aside.col-4
+/ /     - if @listing.price
+/ /       .row
+/ /         .col-12
+/ /           .listing-price
+/ /             %span.listing-price-amount
+/ /               = humanized_money_with_symbol(@listing.price).upcase
+/ /             - with_quantity_and_vat_text(@current_community, @listing) do |text|
+/ /               %span.listing-price-quantity
+/ /                 = text
+
+/ /     .row-with-divider
+/ /       .col-12
+/ /         #listing-message-links
+/ /           = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
+
+/ /     .row-with-divider
+/ /       .col-12
+/ /         .listing-author
+/ /           .listing-author-avatar
+/ /             = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
+/ /           .listing-author-details
+/ /             .listing-author-name
+/ /               = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+/ /             - if @listing.author != @current_user
+/ /               .listing-author-contact
+/ /                 %a#listing-contact{href: contact_to_listing_path(:listing_id => @listing.id.to_s), :class => "listing-author-contact-button"}
+/ /                   .content
+/ /                     = t(".contact")
+
+/ /     - if @current_community.testimonials_in_use && received_testimonials.size > 0
+/ /       .row-with-divider.listing-author-activity
+/ /         .col-12
+/ /           %i.listing-author-activity-icon{:class => icon_class("testimonial")}
+/ /           .listing-author-activity-item
+/ /             .listing-author-activity-value
+/ /               - if received_testimonials.size > 0
+/ /                 = feedback_positive_percentage.to_s + "%"
+/ /                 = t("people.show.positive")
+/ /                 = "(#{received_positive_testimonials.size}/#{received_testimonials.size})"
+/ /               - else
+/ /                 = t(".no_reviews")
+/ /             .listing-author-activity-description
+/ /               = t(".feedback")
+
+/ /     - if @listing.origin_loc && @listing.origin_loc.address != ""
+/ /       .row
+/ /         .col-12
+/ /           #googlemap
+/ /             = render :partial => "googlemap", :locals => { :listing => @listing}
+/ /             = render :partial => "origin", :locals => { :origin_loc => @listing.origin_loc }
+
+
+
+//////////////////////////////////////////// listing_actions ///////////////////////////////////////////////
+
+/ - is_author = current_user?(@listing.author)
+/ - is_marketplace_admin = Maybe(@current_user).has_admin_rights?(@current_community).or_else(false)
+/ - is_authorized = is_author || is_marketplace_admin
+/ - show_manage_availability = is_authorized && availability_enabled
+
+/ - if @listing.closed?
+/   .listing-view-admin-links
+/     .listing-view-admin-link
+/       .icon-with-text-container
+/         = icon_tag("lock", ["icon-part"])
+/         .text-part= t("listings.reply_link.listing_closed")
+/     - if is_authorized
+/       .listing-view-admin-link
+/         %a.action-link{href: edit_listing_path(@listing)}
+/           .icon-with-text-container
+/             = icon_tag("unlock", ["icon-part"])
+/             .text-part= t("listings.edit_links.reopen_listing")
+/ - else
+
+/   - if is_author
+/     = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
+/   - else
+
+/     = form_tag form_path, :method => :get, :id => "booking-dates" do
+
+/ <<<<<<< HEAD
+/       - # Currently we show the selectors only for preauth process.
+/       - # However, there has been a plan to introduce these in other
+/       - # Processes (free) as well - rap1ds, 2.6.2015
+/       / - if process != :postpay
+/       /   - if @listing.unit_type == :day
+/       /     - days = [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+/       /     - months = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
+/       /     - translated_days = days.map { |day_symbol| t("datepicker.days.#{day_symbol}") }.to_json
+/       /     - translated_days_short = days.map { |day_symbol| t("datepicker.days_short.#{day_symbol}") }.to_json
+/       /     - translated_days_min = days.map { |day_symbol| t("datepicker.days_min.#{day_symbol}") }.to_json
+/       /     - translated_months = months.map { |day_symbol| t("datepicker.months.#{day_symbol}") }.to_json
+/       /     - translated_months_short = months.map { |day_symbol| t("datepicker.months_short.#{day_symbol}") }.to_json
+
+/       /     - content_for :extra_javascript do
+/       /       :javascript
+/       /         $.fn.datepicker.dates['#{I18n.locale}'] = {
+/       /           days: #{translated_days},
+/       /           daysShort: #{translated_days_short},
+/       /           daysMin: #{translated_days_min},
+/       /           months: #{translated_months},
+/       /           monthsShort: #{translated_months_short},
+/       /           today: "#{t("datepicker.today")}",
+/       /           weekStart: #{t("datepicker.week_start", default: 0)},
+/       /           clear: "#{t("datepicker.clear")}",
+/       /           format: "#{t("datepicker.format")}"
+/       /         }
+
+/       /         $("#booking-dates").validate({
+/       /           submitHandler: function(form) {
+/       /             var $form = $(form);
+/       /             $form.find("#start-on").attr("name", "");
+/       /             $form.find("#end-on").attr("name", "");
+
+/       /             form.submit();
+/       /           }
+/       /         });
+
+/       /         window.ST.initializeFromToDatePicker('datepicker');
+/       /     .input-daterange.input-group.clearfix#datepicker{:data => {:locale => I18n.locale, :dateformat => t("datepicker.format")}}
+/       /       .datepicker-start-wrapper
+/       /         = label_tag t(".booking_from")
+/       /         %input.input-sm.form-control.required#start-on{:type => 'text', :name => "start_on", :placeholder => t("datepicker.format"), :data => { :output => "booking-start-output" } }
+/       /         %input#booking-start-output{:type => 'hidden', :name => 'start_on'}
+
+/       /       .datepicker-end-wrapper
+/       /         = label_tag t(".booking_to")
+/       /         %input.input-sm.form-control.required#end-on{:type => 'text', :name => "end_on", :placeholder => t("datepicker.format"), :data => { :output => "booking-end-output" }}
+/       /         %input#booking-end-output{:type => 'hidden', :name => 'end_on'}
+/       /   - elsif listing_unit_type.present?
+/       /     - delivery_type = delivery_opts.length > 0 ? delivery_opts.first[:name].to_s : ""
+/       /     - shipping_price_additional = delivery_opts.length > 0 ? delivery_opts.first[:shipping_price_additional] : nil
+/       /     - content_for :extra_javascript do
+/       /       :javascript
+/       /         $("#booking-dates").validate({
+/       /           errorPlacement: function(error, element) {
+/       /             if (element.is("#quantity")) {
+/       /               error.insertAfter(".quantity-wrapper");
+/       /             } else {
+/       /               error.insertAfter(element);
+/       /             }
+/       /           }
+/       /         });
+/       /         window.ST.initializeQuantityValidation({validate: "positiveIntegers", input: "quantity", errorMessage: "#{t("errors.messages.positive_number")}" });
+/       /         if ("#{delivery_type}" == "shipping" && #{shipping_price_additional != nil}) {
+/       /           window.ST.initializeShippingPriceTotal('#quantity', '.delivery-price-value', '#{Maybe(delivery_opts)[0][:price].currency.decimal_mark.or_else(".")}');
+/       /         }
+
+/       /     .quantity-wrapper.input-group.clearfix
+/       /       .quantity-label-wrapper
+/       /         %label.quantity-label{for: 'quantity'}
+/       /           = ListingViewUtils.translate_quantity(@listing.unit_type, @listing.unit_selector_tr_key)
+/       /       .quantity-input.input-sm.required
+/       /         %input#quantity{type: 'number', placeholder: t("listings.quantity_placeholder"), name: 'quantity', value: 1, min: 1, step: 1}
+/ =======
+/       - if [:day, :night].include?(@listing.quantity_selector&.to_sym)
+/         - blocked_dates_result.on_success do |blocked_dates|
+/           - days = [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]
+/           - months = [:january, :february, :march, :april, :may, :june, :july, :august, :september, :october, :november, :december]
+/           - translated_days = days.map { |day_symbol| t("datepicker.days.#{day_symbol}") }.to_json
+/           - translated_days_short = days.map { |day_symbol| t("datepicker.days_short.#{day_symbol}") }.to_json
+/           - translated_days_min = days.map { |day_symbol| t("datepicker.days_min.#{day_symbol}") }.to_json
+/           - translated_months = months.map { |day_symbol| t("datepicker.months.#{day_symbol}") }.to_json
+/           - translated_months_short = months.map { |day_symbol| t("datepicker.months_short.#{day_symbol}") }.to_json
+
+/           - content_for :extra_javascript do
+/             :javascript
+
+/               var disabledDates = [
+/                 #{blocked_dates.map { |d| "new Date(#{d.to_i * 1000})" }.join(",")}
+/               ];
+
+/               $.fn.datepicker.dates['#{I18n.locale}'] = {
+/                 days: #{raw translated_days},
+/                 daysShort: #{raw translated_days_short},
+/                 daysMin: #{raw translated_days_min},
+/                 months: #{raw translated_months},
+/                 monthsShort: #{raw translated_months_short},
+/                 today: "#{t("datepicker.today")}",
+/                 weekStart: #{t("datepicker.week_start", default: 0)},
+/                 clear: "#{t("datepicker.clear")}",
+/                 format: "#{t("datepicker.format")}"
+/               }
+/               $.validator.addMethod("night_selected",
+/                 function(value, element, params) {
+/                   var startVal = $(params.startOnSelector).val()
+/                   if (!!startVal == false) {
+/                     return true;
+/                   } else {
+/                     return startVal !== value
+/                   }
+/                 });
+/               $.validator.addMethod("availability_range",
+/                 function(value, element, params) {
+/                   var startVal = $(params.startOnSelector).datepicker('getDates');
+/                   var endVal = $(element).datepicker('getDates');
+
+/                   if (!startVal || startVal.length !== 1 || !endVal || endVal.length !== 1) {
+/                     return false;
+/                   }
+
+/                   var startDate = startVal[0].getTime();
+/                   var endDate = endVal[0].getTime();
+
+/                   // Validate that all booked dates are outside the selected range
+/                   return disabledDates.every(function(d) {
+/                     var date = d.getTime();
+/                     if (startDate === endDate) {
+/                       return date !== startDate;
+/                     }
+/                     return date < startDate || date >= endDate;
+/                   });
+/                 });
+/               var rules = #{@listing.quantity_selector&.to_sym == :night} ? {
+/                 "end_on": {
+/                   night_selected: {startOnSelector: "#start-on"},
+/                   availability_range: {startOnSelector: "#start-on"}
+/                 }
+/               } : {
+/                 "end_on": {
+/                   availability_range: {startOnSelector: "#start-on"}
+/                 }
+/               };
+/               $("#booking-dates").validate({
+/                 rules: rules,
+/                 submitHandler: function(form) {
+/                   var $form = $(form);
+/                   $form.find("#start-on").attr("name", "");
+/                   $form.find("#end-on").attr("name", "");
+
+/                   form.submit();
+/                 }
+/               });
+
+/               var endDate = new Date(#{blocked_dates_end_on.to_i * 1000});
+/               var nightPicker = #{@listing.quantity_selector.to_sym == :night};
+
+/               window.ST.initializeFromToDatePicker('datepicker', {disabledDates: disabledDates, endDate: endDate, nightPicker: nightPicker });
+/           .input-daterange.input-group.clearfix#datepicker{:data => {:locale => I18n.locale, :dateformat => t("datepicker.format")}}
+/             .datepicker-start-wrapper
+/               = label_tag t(".booking_from")
+/               %input.input-sm.form-control.required#start-on{:type => 'text', :name => "start_on", :placeholder => t("datepicker.format"), :data => { :output => "booking-start-output" } }
+/               %input#booking-start-output{:type => 'hidden', :name => 'start_on'}
+
+/             .datepicker-end-wrapper
+/               = label_tag t(".booking_to")
+/               %input.input-sm.form-control.required#end-on{:type => 'text', :name => "end_on", :placeholder => t("datepicker.format"), :data => { :output => "booking-end-output" }}
+/               %input#booking-end-output{:type => 'hidden', :name => 'end_on'}
+
+/         - blocked_dates_result.on_error do
+/           = t("listings.listing_actions.unable_load_availability")
+
+/       - elsif listing_unit_type.present?
+/         - delivery_type = delivery_opts.length > 0 ? delivery_opts.first[:name].to_s : ""
+/         - shipping_price_additional = delivery_opts.length > 0 ? delivery_opts.first[:shipping_price_additional] : nil
+/         - content_for :extra_javascript do
+/           :javascript
+/             $("#booking-dates").validate({
+/               errorPlacement: function(error, element) {
+/                 if (element.is("#quantity")) {
+/                   error.insertAfter(".quantity-wrapper");
+/                 } else {
+/                   error.insertAfter(element);
+/                 }
+/               }
+/             });
+/             window.ST.initializeQuantityValidation({validate: "positiveIntegers", input: "quantity", errorMessage: "#{t("errors.messages.positive_number")}" });
+/             if ("#{delivery_type}" == "shipping" && #{shipping_price_additional != nil}) {
+/               window.ST.initializeShippingPriceTotal(#{raw currency_opts.to_json}, '#quantity', '.delivery-price-value');
+/             }
+
+/         .quantity-wrapper.input-group.clearfix
+/           .quantity-label-wrapper
+/             %label.quantity-label{for: 'quantity'}
+/               = ListingViewUtils.translate_quantity(@listing.unit_type, @listing.unit_selector_tr_key)
+/           .quantity-input.input-sm.required
+/             %input#quantity{type: 'number', placeholder: t("listings.quantity_placeholder"), name: 'quantity', value: 1, min: 1, step: 1}
+
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+/       = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
+
+/       = hidden_field_tag(:listing_id, @listing.id)
+
+/ <<<<<<< HEAD
+/ =======
+/       - blocked_dates_result.on_success do
+/         %button.enabled-book-button
+/           .content
+/             = action_button_label(@listing)
+
+/       - blocked_dates_result.on_error do
+/         %button.disabled-book-button{disabled: true}
+/           .content
+/             = action_button_label(@listing)
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+
+
+/     / - if payment_gateway == :paypal && process != :none
+/     /   .row
+/     /     .col-12
+/     /       = render :partial => "listing_conversations/paypal_payment_methods", locals: { country_code: country_code }
+
+/   - if is_authorized
+/     .listing-view-admin-link
+/       %a.icon-with-text-container{href: edit_listing_path(@listing)}
+/         .col-md-1.col-sm-1.col-xs-1
+/           = icon_tag("edit", ["icon-part"])
+/ <<<<<<< HEAD
+/         .col-md-11.col-sm-11.col-xs-11.padding-0
+/           .text-part{:style => "padding-left:14px"}= t("listings.edit_links.edit_listing")
+/     .listing-view-admin-link
+/       %a.icon-with-text-container{href: close_person_listing_path(@current_user, @listing), data: { method: "put", remote: "true"}}
+/         .col-md-1.col-sm-1.col-xs-1
+/ =======
+/           .text-part= t("listings.edit_links.edit_listing")
+/       - if show_manage_availability
+/         - availability_link_id = "edit-listing-availability-#{SecureRandom.urlsafe_base64(5)}"
+/         .listing-view-admin-link
+/           %a.icon-with-text-container{id: availability_link_id, href: "#manage-availability"}
+/             = icon_tag("calendar", ["icon-part"])
+/             .text-part= t("web.listings.edit_listing_availability")
+/           = react_component("ManageAvailabilityApp", props: manage_availability_props.merge({ availability_link_id: availability_link_id }), prerender: false)
+/       .listing-view-admin-link
+/         %a.icon-with-text-container{href: close_person_listing_path(@current_user, @listing), data: { method: "put", remote: "true"}}
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+/           = icon_tag("lock", ["icon-part"])
+/         .col-md-11.col-sm-11.col-xs-11.padding-0
+/           .text-part{:style => "padding-left:14px"}= t("listings.edit_links.close_listing")
+
+/     - if is_marketplace_admin
+/       .listing-view-admin-link
+/         = link_to move_to_top_person_listing_path(@current_user, @listing), data: { method: "put" } do
+/           .col-md-1.col-sm-1.col-xs-1
+/             = icon_tag("star", ["icon-part"])
+/           .col-md-11.col-sm-11.col-xs-11
+/             .text-part= t("listings.edit_links.move_to_top")
+
+/       .listing-view-admin-link
+/         = link_to show_in_updates_email_person_listing_path(@current_user, @listing), data: { method: "put", remote: "true" }, :id => "add-to-updates-email"  do
+/           .col-md-1.col-sm-1.col-xs-1
+/             = icon_tag("mail", ["icon-part"])
+/           .col-md-11.col-sm-11.col-xs-11
+/             .text-part#add-to-updates-email-text{data: {:"action-loading" => t("listings.edit_links.show_in_updates_email_loading"), :"action-error" => t("listings.edit_links.show_in_updates_email_error"), :"action-success"=> t("listings.edit_links.show_in_updates_email_success")}}= t("listings.edit_links.show_in_updates_email")
+
+
+
+/     / .listing-view-admin-links
+/     /   .listing-view-admin-link
+/     /     %a.icon-with-text-container.row{href: edit_listing_path(@listing)}
+/     /       .col-md-1.col-sm-1.col-xs-1
+/     /         = icon_tag("edit", ["icon-part"])
+/     /       .col-md-11.col-sm-11.col-xs-11
+/     /         .text-part= t("listings.edit_links.edit_listing")
+/     /   .listing-view-admin-link
+/     /     %a.icon-with-text-container.row{href: close_person_listing_path(@current_user, @listing), data: { method: "put", remote: "true"}}
+/     /       .col-md-1.col-sm-1.col-xs-1
+/     /         = icon_tag("lock", ["icon-part"])
+/     /       .col-md-11.col-sm-11.col-xs-11
+/     /         .text-part= t("listings.edit_links.close_listing")
+
+/     /   - if is_marketplace_admin
+/     /     .listing-view-admin-link
+/     /       = link_to move_to_top_person_listing_path(@current_user, @listing), data: { method: "put" } do
+/     /         .icon-with-text-container.row
+/     /           .col-md-1.col-sm-1.col-xs-1
+/     /             = icon_tag("star", ["icon-part"])
+/     /           .col-md-11.col-sm-11.col-xs-11
+/     /             .text-part= t("listings.edit_links.move_to_top")
+
+/     /     .listing-view-admin-link
+/     /       = link_to show_in_updates_email_person_listing_path(@current_user, @listing), data: { method: "put", remote: "true" }, :id => "add-to-updates-email"  do
+/     /         .icon-with-text-container.row
+/     /           .col-md-1.col-sm-1.col-xs-1
+/     /             = icon_tag("mail", ["icon-part"])
+/     /           .col-md-11.col-sm-11.col-xs-11
+/     /             .text-part#add-to-updates-email-text{data: {:"action-loading" => t("listings.edit_links.show_in_updates_email_loading"), :"action-error" => t("listings.edit_links.show_in_updates_email_error"), :"action-success"=> t("listings.edit_links.show_in_updates_email_success")}}= t("listings.edit_links.show_in_updates_email")
+
+
+
+
+//////////////////////////////////////////////// _delivery_opts /////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////new
+/ - if delivery_opts.present?
+/   - if is_author
+/     .row.icon-with-text-container.row
+/       .col-md-1.col-sm-1.col-xs-1.padding-right-0
+/         %i.icon-shopping-cart
+/       .col-md-3.col-sm-3.col-xs-3.padding-0
+/         .text-title-de= t("listings.show.delivery")
+/       .col-md-6.col-sm-6.col-xs-6
+/         %ul.delivery_opts-list
+/           - delivery_opts.each do |opts|
+/             %li=opts[:price_info]
+
+/   - else
+/ <<<<<<< HEAD
+/     .col-md-1.col-sm-1.col-xs-1.padding-right-0
+/       %i.fa.fa-shopping-cart{"aria-hidden" => "true"}
+/     .col-md-3.col-sm-3.col-xs-3.padding-0
+/       .delivery-title= t("listings.show.delivery")
+/     .col-md-4.col-sm-4.col-xs-4.padding-right-0
+/       - if delivery_opts.count == 1
+/         %span.shipping-options-label
+/           = t("listings.show.#{delivery_opts.first[:name]}_no_price")
+/           - if (delivery_opts.first[:name] == :shipping)
+/             - price_tag = "<span class=\"delivery-price-value\" data-shipping-price=\"#{delivery_opts.first[:price].cents}\" data-per-additional=\"#{Maybe(delivery_opts).first[:shipping_price_additional].cents.or_else(0)}\">#{humanized_money(delivery_opts.first[:price])}</span>"
+/             - symbol = delivery_opts.first[:price].currency.symbol
+/             - price_tag_with_currency = delivery_opts.first[:price].currency.symbol_first ? "(+#{symbol}#{price_tag})" : "(+#{price_tag} #{symbol})"
+/             = price_tag_with_currency.html_safe
+/       - else
+/         - delivery_opts.each do |opts|
+/           .row
+/ =======
+/     .row
+/       .col-12
+/         .delivery-title= t("listings.show.delivery")
+/     - if delivery_opts.count == 1
+/       .row
+/         .col-12
+/           %span.shipping-options-label
+/             = t("listings.show.#{delivery_opts.first[:name]}_no_price")
+/             - if (delivery_opts.first[:name] == :shipping)
+/               = price_tag = "(+<span class=\"delivery-price-value\" data-shipping-price=\"#{delivery_opts.first[:price].cents}\" data-per-additional=\"#{Maybe(delivery_opts).first[:shipping_price_additional].cents.or_else(0)}\">#{MoneyViewUtils.to_humanized(delivery_opts.first[:price])}</span>)".html_safe
+/     - else
+/       - delivery_opts.each do |opts|
+/         .row
+/           .col-12
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+/             = radio_button_tag(:delivery, opts[:name], opts[:default])
+/             = label_tag("delivery_#{opts[:name]}", class: "delivery-label shipping-options-label") do
+/               = t("listings.show.#{opts[:name]}_no_price")
+/               - if (opts[:name] == :shipping)
+/ <<<<<<< HEAD
+/                 - price_tag = "<span class=\"delivery-price-value\" data-shipping-price=\"#{opts[:price].cents}\" data-per-additional=\"#{Maybe(opts)[:shipping_price_additional].cents.or_else(0)}\">#{humanized_money(opts[:price])}</span>"
+/                 - symbol = opts[:price].currency.symbol
+/                 - price_tag_with_currency = opts[:price].currency.symbol_first ? "(+#{symbol}#{price_tag})" : "(+#{price_tag} #{symbol})"
+/                 = price_tag_with_currency.html_safe
+/     .col-md-4.col-sm-4.col-xs-4.padding-0
+/       %button.book-button.btn
+/         = action_button_label(@listing)
+/       %span
+/         %i.icon-question
+/           %a{:href => "#{new_person_person_message_path(@listing.author)}"}Ask a Question
+
+
+// --------------------------------------------------------old---------------
+
+
+/ - if delivery_opts.present?
+/   - if is_author
+/     .row.icon-with-text-container.row
+/       .col-md-1.col-sm-1.col-xs-1
+/         %i.fa.fa-shopping-cart{"aria-hidden" => "true"}
+/       .col-md-4
+/         .text-title-de= t("listings.show.delivery")
+/       .col-md-7
+/         %ul.delivery_opts-list
+/           - delivery_opts.each do |opts|
+/             %li=opts[:price_info]
+
+/   - else
+/     .row
+/       .col-md-7
+/         .delivery-title= t("listings.show.delivery")
+/     - if delivery_opts.count == 1
+/       .row
+/         .col-12
+/           %span.shipping-options-label
+/             = t("listings.show.#{delivery_opts.first[:name]}_no_price")
+/             - if (delivery_opts.first[:name] == :shipping)
+/               - price_tag = "<span class=\"delivery-price-value\" data-shipping-price=\"#{delivery_opts.first[:price].cents}\" data-per-additional=\"#{Maybe(delivery_opts).first[:shipping_price_additional].cents.or_else(0)}\">#{humanized_money(delivery_opts.first[:price])}</span>"
+/               - symbol = delivery_opts.first[:price].currency.symbol
+/               - price_tag_with_currency = delivery_opts.first[:price].currency.symbol_first ? "(+#{symbol}#{price_tag})" : "(+#{price_tag} #{symbol})"
+/               = price_tag_with_currency.html_safe
+/     - else
+/       - delivery_opts.each do |opts|
+/         .row
+/           .col-12
+/             = radio_button_tag(:delivery, opts[:name], opts[:default])
+/             = label_tag("delivery_#{opts[:name]}", class: "delivery-label shipping-options-label") do
+/               = t("listings.show.#{opts[:name]}_no_price")
+/               - if (opts[:name] == :shipping)
+/                 - price_tag = "<span class=\"delivery-price-value\" data-shipping-price=\"#{opts[:price].cents}\" data-per-additional=\"#{Maybe(opts)[:shipping_price_additional].cents.or_else(0)}\">#{humanized_money(opts[:price])}</span>"
+/                 - symbol = opts[:price].currency.symbol
+/                 - price_tag_with_currency = opts[:price].currency.symbol_first ? "(+#{symbol}#{price_tag})" : "(+#{price_tag} #{symbol})"
+/                 = price_tag_with_currency.html_safe
+
+
+
+
+
+
+//////////////////////////////////////////////////// 6.4.0 //////////////////////////////////////////////
+/ =======
+/                 = price_tag = "(+<span class=\"delivery-price-value\" data-shipping-price=\"#{opts[:price].cents}\" data-per-additional=\"#{Maybe(opts)[:shipping_price_additional].cents.or_else(0)}\">#{MoneyViewUtils.to_humanized(opts[:price])}</span>)".html_safe
+/ >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
+>>>>>>> fb992705d30fcfef1d95275e0f318c70f99cbc4a
