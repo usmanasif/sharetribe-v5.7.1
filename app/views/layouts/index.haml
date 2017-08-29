@@ -14,93 +14,105 @@
         .container
           .row
             .col-md-12.col-sm-12.col-xs-12
-              %nav.cart-area.admin-menu-panel
-                %ul
-                  -if @current_user
-                    - conversations = @current_community.conversations.for_person(@current_user)
-                    - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
-                    - Maybe(@current_user).each do |user|
+              .cart-area.admin-menu-panel.penal-wrap
+                .row
+                  .col-md-6.col-sm-6.col-xs-6
+                    %ul
+                      -if @current_user
+                        - conversations = @current_community.conversations.for_person(@current_user)
+                        - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
+                        - Maybe(@current_user).each do |user|
+                          %li
+                            = link_to new_listing_path do
+                              %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                                Post a new listing
+                          %li
+                            = link_to person_path(user, :show_closed => true) do
+                              %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                                Manage Listings
+                  .col-md-6.col-sm-6.col-xs-6
+                    %ul.pull-right
                       %li
-                        = link_to new_listing_path do
-                          %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
-                            Post New Listing
+                        = link_to person_inbox_path(@current_user) do
+                          = icon_tag("mail", ["icon-with-text"])
+                          - if unread_count > 0
+                            .mobile-badge{:class => get_badge_class(unread_count)}
+                              = unread_count
                       %li
+                        .dropdown.login-admin-profile
+                          %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                            %span.admin-text
+                              = @current_user.name(@current_community)
+                              %i.icon-caret-down.icon-dropdown
+                          %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                            - if @current_user
+                              - Maybe(@current_user).each do |user|
+                                - conversations = @current_community.conversations.for_person(user)
+                                - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
+                                %li
+                                  = link_to person_inbox_path(@current_user) do
+                                    = icon_tag("mail", ["icon-with-text"])
+                                    = t("layouts.conversations.messages")
+                                    - if unread_count > 0
+                                      .mobile-badge{:class => get_badge_class(unread_count)}
+                                      = unread_count
+                                %li
+                                  = link_to person_path(user) do
+                                    = icon_tag("user", ["icon-with-text"])
+                                    = t("header.profile")
+                                %li
+                                  = link_to person_settings_path(user) do
+                                    = icon_tag("settings", ["icon-with-text"])
+                                    = t("layouts.logged_in.settings")
+                                / %li
+                                /   = link_to logout_path do
+                                /     = icon_tag("logout", ["icon-with-text"])
+                                /     = t("layouts.logged_in.logout")
+                      %li
+<<<<<<< HEAD
+                        .dropdown.login-menu
+                          %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
+                            Menu
+                          %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
+                            %li
+                              = link_to "/" do
+                                = icon_tag("home", ["icon-with-text"])
+                                = t("header.home")
+                            %li
+                              = link_to about_infos_path do
+                                = icon_tag("information", ["icon-with-text"])
+                                = t("header.about")
+                            %li
+                              = link_to new_user_feedback_path do
+                                = icon_tag("feedback", ["icon-with-text"])
+                                = t("header.contact_us")
+                            %li
+                              - with_invite_link do
+                                = link_to new_invitation_path do
+                                  = icon_tag("invite", ["icon-with-text"])
+                                  = t("header.invite")
+                            %li
+                              - Maybe(@current_community).menu_links.each do |menu_links|
+                                - menu_links.each do |menu_link|
+                                  = link_to menu_link.url(I18n.locale), :target => "_blank" do
+                                    = icon_tag("redirect", ["icon-with-text"])
+                                    = menu_link.title(I18n.locale)
+                            %li
+                              -if @current_user && @current_community && @current_user.has_admin_rights?(@current_community)
+                                = link_to edit_details_admin_community_path(@current_community) do
+                                  = icon_tag("admin", ["icon-with-text"])
+                                  = t("layouts.logged_in.admin")
+
+=======
                         = link_to person_path(user, :show_closed => true) do
-                          %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
                             Manage Listings
-                    %li{:style => "margin-left: 400px;"}
-                      = link_to person_inbox_path(@current_user) do
-                        = icon_tag("mail", ["icon-with-text"])
-                        - if unread_count > 0
-                          .mobile-badge{:class => get_badge_class(unread_count)}
-                            = unread_count
-                    %li
-                      .dropdown.login-admin-profile
-                        %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                          %span.admin-text
-                            = @current_user.name(@current_community)
-                            %i.icon-caret-down.icon-dropdown
-                        %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                          - if @current_user
-                            - Maybe(@current_user).each do |user|
-                              - conversations = @current_community.conversations.for_person(user)
-                              - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
-                              %li
-                                = link_to person_inbox_path(@current_user) do
-                                  = icon_tag("mail", ["icon-with-text"])
-                                  = t("layouts.conversations.messages")
-                                  - if unread_count > 0
-                                    .mobile-badge{:class => get_badge_class(unread_count)}
-                                    = unread_count
-                              %li
-                                = link_to person_path(user) do
-                                  = icon_tag("user", ["icon-with-text"])
-                                  = t("header.profile")
-                              %li
-                                = link_to person_settings_path(user) do
-                                  = icon_tag("settings", ["icon-with-text"])
-                                  = t("layouts.logged_in.settings")
-                              / %li
-                              /   = link_to logout_path do
-                              /     = icon_tag("logout", ["icon-with-text"])
-                              /     = t("layouts.logged_in.logout")
 
-
-                    %li
-                      .dropdown.login-menu
-                        %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                          Menu
-                        %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
-                          %li
-                            = link_to "/" do
-                              = icon_tag("home", ["icon-with-text"])
-                              = t("header.home")
-                          %li
-                            = link_to about_infos_path do
-                              = icon_tag("information", ["icon-with-text"])
-                              = t("header.about")
-                          %li
-                            = link_to new_user_feedback_path do
-                              = icon_tag("feedback", ["icon-with-text"])
-                              = t("header.contact_us")
-                          %li
-                            - with_invite_link do
-                              = link_to new_invitation_path do
-                                = icon_tag("invite", ["icon-with-text"])
-                                = t("header.invite")
-                          %li
-                            - Maybe(@current_community).menu_links.each do |menu_links|
-                              - menu_links.each do |menu_link|
-                                = link_to menu_link.url(I18n.locale), :target => "_blank" do
-                                  = icon_tag("redirect", ["icon-with-text"])
-                                  = menu_link.title(I18n.locale)
-                          %li
-                            -if @current_user && @current_community && @current_user.has_admin_rights?(@current_community)
-                              = link_to edit_details_admin_community_path(@current_community) do
-                                = icon_tag("admin", ["icon-with-text"])
-                                = t("layouts.logged_in.admin")
-
-
+                      %li{:style => "margin-right: 20px;"}
+                        = link_to new_listing_path do
+                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
+                            Post New Listing
+>>>>>>> master
 
 
     .container
@@ -129,7 +141,11 @@
                 .input-group-btn.select-drop-head
                   .search-form-input.categorices-select.btn.btn-default.dropdown-toggle
                     %span.caret.caret-icon
+<<<<<<< HEAD
                     = select_tag(:category,  options_from_collection_for_select(@main_categories, :url, "category_name" ) , class: 'categor-dropdown' , include_blank: "All Categories")
+=======
+                    = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories")
+>>>>>>> master
                   / /btn-group
             %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
         .col-md-1.col-sm-1.col-xs-1.header-p-0

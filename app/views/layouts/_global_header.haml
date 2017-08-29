@@ -5,18 +5,19 @@
       - if logged_in
         = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
         = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
-
+    .header-right
       - if logged_in
-        .no_margin_va{:style => "margin-left: 400px;"}
+        = render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, inbox_path: inbox_path, icons: icons}
+        .no_margin_va
           = render :partial => "layouts/header_user_menu", locals: {unread_count: unread_count, inbox_path: inbox_path, profile_path: profile_path, manage_listings_path: manage_listings_path, settings_path: settings_path, logout_path: logout_path, icons: icons}
           = render :partial => "layouts/header_anchors", locals: {avatar_url: avatar_url, current_user_name: current_user_name, icons: icons}
 
-        = render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, inbox_path: inbox_path, icons: icons}
+
 
       - if available_locales.size > 1
         .visible-desktop
           #header-locales-menu.toggle.header-hover{data: {toggle: '#header-locales-toggle-menu', 'toggle-position' => 'absolute'}}
-            %span.header-text-link.abc
+            %span.header-text-link
               = current_locale_name
               = icon_map_tag(icons, "dropdown", ["icon-dropdown"])
           #header-locales-toggle-menu.toggle-menu.header-toggle-menu-language.hidden
@@ -46,7 +47,6 @@
               = t("header.menu")
 
       = render :partial => "layouts/header_menu", locals: { locale_change_links: locale_change_links, icons: icons}
-      .header-right
       #header-menu-desktop-anchor.header-menu-container.toggle.hidden{data: {toggle: '#header-menu-toggle-menu', 'toggle-position' => 'absolute'}}
       / -#
       /   If necessary, the buttons will overlap with the logo. Buttons should be on top, that's
@@ -76,6 +76,7 @@
   .header.header-text-link {
     height: auto;
     line-height: 27px;
+
   }
   .va_h_image{
     height: 31px;
@@ -88,6 +89,7 @@
   .header-text-link {
     height: auto;
     line-height: 31px !important;
+    padding: 0 !important;
   }
 
 / -# Hide header in map view if mobile
@@ -156,8 +158,11 @@
   .email-link {
     line-height: 26px !important
   }
+  .header-right {
+    margin-right: 17px;
+  }
   .panel-wrap{
-    background-color: none;
+    background: none;
     border-bottom: 1px solid #ccc;
     width: 100%;
     overflow: hidden;
@@ -169,7 +174,7 @@
     -webkit-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
     box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
-    margin: 0 0 2px;
+    margin: 0 0 3px;
   }
   .header-panel {
     width: 1170px;
@@ -218,20 +223,44 @@
     color: #000;
   }
   .new-listing-link {
-    color: #000;
-    padding: 3px 12px;
-    margin: 0 5px 0 0;
-    border: 1px solid #000;
-    color: #000;
-    line-height: 1.42857143;
-    border-radius: 4px;
-    height: auto;
+    /
+    / padding: 3px 12px;
+    / margin: 0 5px 0 0;
+    / border: 1px solid #000;
+    / color: #000;
+    / line-height: 1.42857143;
+    / border-radius: 4px;
+    / height: auto;
+    / display: inline-block;
+    / vertical-align: middle;
+    / background: #eee;
+    / border: 1px solid black !important;
+    / font-size: 16px;
+    / height: 29px;
     display: inline-block;
+    padding: 6px 10.3px;
+    margin: 0 3px 0 0;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 15px;
+    text-align: center;
+    white-space: nowrap;
     vertical-align: middle;
-    background: #eee;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+     background: #eee;
     border: 1px solid black !important;
-    font-size: 16px;
     height: 29px;
+    color: #000;
+    font-family: 'Helvetica';
   }
   .header{
     height: 37px; important

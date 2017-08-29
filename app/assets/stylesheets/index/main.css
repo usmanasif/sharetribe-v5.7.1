@@ -37,7 +37,7 @@ body {
     top: 0;
     left: 0;
     padding: 6px 0 0;
-    height: 37px;
+    height: 39px;
     background: #eee;
     -webkit-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 8px -1px rgba(0, 0, 0, 0.75);
@@ -124,6 +124,10 @@ body {
     font-family: 'Helvetica';
     font-size: 12px;
     padding: 0 87px;
+}
+.cart-area.penal-wrap {
+    width: 100%;
+    padding-right: 15px;
 }
 .login-menu:focus {
     outline: none !important;
@@ -1419,6 +1423,7 @@ form .checkbox-container label {
     padding-left: 0;
 }
 .rating-details .people-image-mobile {
+    width: 100%;
     padding-top: 15px;
 }
 .rating-details .followblock {
@@ -1878,4 +1883,5 @@ box-shadow: none;
 }
 }
 
-/* Rating Detail Page end
+/* Rating Detail Page end */
+
