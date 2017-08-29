@@ -89,7 +89,7 @@ module ApplicationHelper
 
     image_url = person.image.present? ? person.image.url(:medium) : missing_avatar(:medium)
 
-    image_tag image_url, { :alt => PersonViewUtils.person_display_name(person, @current_community) }.merge(options)
+    image_tag image_url, { :alt => PersonViewUtils.person_display_name(person, @current_community), class: "img-responsive" }.merge(options)
   end
 
   def missing_avatar(size = :medium)
@@ -692,7 +692,7 @@ module ApplicationHelper
     end
     return quantity
   end
-  
+
   def available
     quantity = ""
     self.custom_field_values.where(:type => 'NumericFieldValue').all.each do |c_f_v|

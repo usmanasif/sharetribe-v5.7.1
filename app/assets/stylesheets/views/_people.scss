@@ -8,7 +8,7 @@ $profile-pic-gutter-mobile: lines(0.5);
   display: none;
   > img {
     @include border-radius($default-border-radius);
-    width: 100%;
+    width: 100% !important;
   }
 
   @include media(tablet) {
@@ -53,11 +53,12 @@ $profile-pic-gutter-mobile: lines(0.5);
 
 .profile-edit-link, .profile-contact-link {
   @include grey-button;
+  margin-top: 2px;
   width: 100%;
 }
 
 .people-image-mobile {
-  width: $profile-pic-size-mobile;
+  width: 100% !important;
   position: absolute;
   top: 0;
   left: 0;

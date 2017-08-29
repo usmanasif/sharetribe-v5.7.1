@@ -168,12 +168,12 @@ class PeopleController < Devise::RegistrationsController
     end
     puts "*"*500 , 'HTTParty'
     email = Email.find_by(:person_id => @person.id).address
-    HTTParty.post("http://still-ridge-7153.herokuapp.com/api/v1/user_services/signup", 
+    HTTParty.post("http://still-ridge-7153.herokuapp.com/api/v1/user_services/signup",
       body: json_for_vendor_advisor(params, email)
     )
   end
 
-  def json_for_vendor_advisor params , email 
+  def json_for_vendor_advisor params , email
     return {
       :username => params["person"]["username"] ,
       :email => email ,
@@ -294,7 +294,7 @@ class PeopleController < Devise::RegistrationsController
       flash[:error] = t("layouts.notifications.update_error")
     end
 
-    redirect_back(fallback_location: homepage_url)
+    redirect_to person_path(@current_user)
   end
 
   def destroy

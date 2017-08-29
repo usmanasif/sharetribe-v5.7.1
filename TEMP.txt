@@ -18,7 +18,7 @@
                 %li{:style => "margin-right: 262px;"}
                   .dropdown.login-admin-profile
                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-                      %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+                      %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"}
                       %span.admin-text
                         = "Ali Ahmad Saleem"
                         /= @current_user.name(@current_community)
@@ -38,7 +38,7 @@
                           %li
                             = link_to person_path(user) do
                               / = icon_tag"user", ["icon-with-text"])
-                              = t("header.profile")                        
+                              = t("header.profile")
                           %li
                             = link_to person_settings_path(user) do
                               / = icon_tag"settings", ["icon-with-text"])
@@ -49,7 +49,7 @@
                           /     = t("layouts.logged_in.logout")
 
               %li
-                .dropdown.login-menu 
+                .dropdown.login-menu
                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                     Menu
                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -85,8 +85,8 @@
                 %li
                   = link_to person_path(user, :show_closed => true) do
                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                      Manage Listings                      
-              
+                      Manage Listings
+
                 %li{:style => "margin-right: 20px;"}
                   = link_to new_listing_path do
                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
@@ -111,7 +111,7 @@
                 -if i == 0
                   .item.active
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
+                -else
                   .item
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
             -else
@@ -140,7 +140,7 @@
                 -if i == 0
                   .item.active
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-                -else  
+                -else
                   .item
                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
             -if !@second_slider_images.present?
@@ -182,7 +182,7 @@
                       - if list.fourth
                         %li
                           %a{:href => listing_path(set_path(listing.id))}
-                            %img.img-responsive{:alt => "", :src => list.fourth}/    
+                            %img.img-responsive{:alt => "", :src => list.fourth}/
               .col-md-12.col-sm-12.col-xs-12
                 .row
                   .padding-left-0.col-md-9.col-sm-9.col-xs-9
@@ -192,13 +192,13 @@
 
                   .padding-right-0.col-md-3.col-sm-3.col-xs-3
                     %ul.details
-                      %li 
+                      %li
                         - if listing.author
                           %a{:href => person_path(listing.author.username)} #{listing.author.username}
                       %li US #{listing.price}$
                       %li
                         %a{:href => listing_path(set_path(listing.id)) } Show now
-                        
+
 / - @listings.each do |listing|
 /   = render :partial => "layouts/grid_item_listing_image", :locals => {:listing => listing, :modifier_class => ""}
 /   = listing.inspect
@@ -216,7 +216,7 @@
     /         .col-md-12.col-sm-12.col-xs-12
     /           %nav.cart-area.admin-menu-panel
     /             %ul
-    /               - if @current_user  
+    /               - if @current_user
     /                 - conversations = @current_community.conversations.for_person(@current_user)
     /                 - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
     /                 %li
@@ -228,7 +228,7 @@
     /                 %li{:style => "margin-right: 262px;"}
     /                   .dropdown.login-admin-profile
     /                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-    /                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+    /                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"}
     /                       %span.admin-text
     /                         = "Ali Ahmad Saleem"
     /                         /= @current_user.name(@current_community)
@@ -248,7 +248,7 @@
     /                           %li
     /                             = link_to person_path(user) do
     /                               = icon_tag("user", ["icon-with-text"])
-    /                               = t("header.profile")                        
+    /                               = t("header.profile")
     /                           %li
     /                             = link_to person_settings_path(user) do
     /                               = icon_tag("settings", ["icon-with-text"])
@@ -259,7 +259,7 @@
     /                           /     = t("layouts.logged_in.logout")
 
     /               %li
-    /                 .dropdown.login-menu 
+    /                 .dropdown.login-menu
     /                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
     /                     Menu
     /                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -295,13 +295,13 @@
     /                 %li
     /                   = link_to person_path(user, :show_closed => true) do
     /                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-    /                       Manage Listings                      
-                  
+    /                       Manage Listings
+
     /                 %li{:style => "margin-right: 20px;"}
     /                   / = link_to new_listing_path do
     /                   /   %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
     /                   /     Post a new listing
-                  
+
     / .container
     /   .header-content
     /     / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -326,9 +326,9 @@
     /         .input-group.col-sm-10
     /           %input.form-control{:name => "q", :placeholder => "Search", :type => "text", :value => ""}
     /             .input-group-btn.select-drop-head
-    /               .search-form-input.categorices-select.btn.btn-default.dropdown-toggle 
+    /               .search-form-input.categorices-select.btn.btn-default.dropdown-toggle
     /                 %span.caret.caret-icon
-    /                 = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories") 
+    /                 = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories")
     /               / /btn-group
     /         %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
     /     .col-md-1.col-sm-1.col-xs-1.header-p-0
@@ -366,7 +366,7 @@
     /         / /.navbar-collapse
     /       / /.container-fluid
     /     / Banner
-  
+
     / = yield
 
 /////////////////////////////////////////////////////////people#show///////////////////////////////////////
@@ -396,22 +396,22 @@
               %a.title{:href => "#"} #{@person}
               ( #{listings.count} )
               %span.feed-back-text
-                
+
             .col-md-3.col-sm-3.col-xs-3.pull-right.text-right
               -if !current_user?(@person)
                 %a.fa.fa-envelope-o{:href => new_person_person_message_path(@person)}
                 %a{:href => new_person_person_message_path(@person)}
                   %span Contact me
           .row
-            .col-md-4.col-sm-4.col-xs-4      
+            .col-md-4.col-sm-4.col-xs-4
               - if @current_community.follow_in_use? && @current_user && !current_user?(@person)
                 - if @current_user.follows?(@person)
                   = link_to person_follower_path(@person, @current_user), :method => "delete", :remote => true, :id => "followButton" , :class => "following_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       Following
                 - else
                   = link_to [ @person, :followers ], :method => "post", :remote => true, :id => "followButton" , :class => "follow_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       %i.fa.fa-plus
                         Follow
             .col-md-8.col-sm-8.col-xs-8.follow_caption
@@ -423,7 +423,7 @@
                   .icon-with-text-container
                     .ss-chat.icon-part
                     .ss.text-part= t(".add_description")
-                          
+
   .col-md-12.col-sm-12.col-xs-12.see-all-feeback-block
     .row
       .col-md-6.col-sm-6.col-xs-6
@@ -474,7 +474,7 @@
 / >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
     .row
       .col-md-4.col-sm-4.col-xs-4.feedback-border-right
-       
+
         %ul.ratinglist-detail.row
           %li
             .col-md-4.col-sm-4.col-xs-4
@@ -485,7 +485,7 @@
             .col-md-5.col-sm-5.col-xs-5
               %span
                 Item as described
-      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right                                                 
+      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right
         .col-md-4.col-sm-4.col-xs-4
           %p
             %span
@@ -512,7 +512,7 @@
             Negative
       .col-md-4.col-sm-4.col-xs-4
         #rating-carousel
-          -received_testimonials.each do |testimonial| 
+          -received_testimonials.each do |testimonial|
             - listing = testimonial.tx.listing
             .item
               .row
@@ -521,48 +521,48 @@
                   -if testimonial.grade <= 0.25
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade == 0.5
                     %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star-half-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade >= 0.5
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
+                    %i.fa.fa-star{"aria-hidden" => "true"}
+                    %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star{"aria-hidden" => "true"}
                 .col-md-8.col-sm-8.col-xs-8
                   .item-caption
                     - text_with_line_breaks do
-                      #{testimonial.text} 
-                  %span        
+                      #{testimonial.text}
+                  %span
                     .testimonial-author
                       = link_to_unless testimonial.author.deleted?, PersonViewUtils.person_display_name(testimonial.author, @current_community), testimonial.author
                       = t("testimonials.testimonial.about_listing")
                       = link_to listing.title, listing
-                  %span    
+                  %span
                     = time_ago(testimonial.created_at) + "."
                 / .testimonial-icon{:class => testimonial.grade > 0.25 ? 'positive' : 'negative'}
                 /   - if testimonial.grade > 0.25
                 /     = icon_tag("like", ["positive"])
                 /   - else
                 /     = icon_tag("dislike", ["negative"])
-              
 
- 
+
+
 .container.collections-slider
   %h1
     Collections by #{@person.username} (#{listings.count})
   #collections-carousel
     -if listings.count > 0
       -listings.each do |listing|
-        .item 
+        .item
           .collections-items
             .collections-items-head
-              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}          
+              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}
             .colletions-img-slider
               %a.items-title{:href => listing_path(set_path(listing.id))}
                 = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
-            %ul.collections-img-list 
+            %ul.collections-img-list
               %li
                 %a.items-title{:href => listing_path(set_path(listing.id))}
                   = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
@@ -581,7 +581,7 @@
   %ul.following-members-list
     %li.row
       .col-md-3.col-sm-3.col-xs-3
-        
+
       .col-md-9.col-sm-9.col-xs-9
         %a.following-members{:href => "#"} Members
         %span #{listings.count} collections.
@@ -598,11 +598,11 @@
           %p #{person.followers.count} Followers
 
   %ul.following-images-list
-    - grade = 0 
+    - grade = 0
     -if received_testimonials.size > 0
       -received_testimonials.each do |r_t|
         -grade = grade + r_t.grade
-      - grade = ( grade / received_testimonials.size ) * 5 
+      - grade = ( grade / received_testimonials.size ) * 5
 
 
 - content_for :extra_javascript do
@@ -652,9 +652,9 @@
       var c = parseFloat(( a / b ) * 100).toFixed(2)
       $(".feed-back-text").text(c+"% positive feedback")
    }
-   $(function() { 
-      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); }); 
-      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); }); 
+   $(function() {
+      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); });
+      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); });
     });
   });
 
@@ -764,9 +764,6 @@
 / - content_for :extra_javascript do
 /   :javascript
 /     window.ST.initializeFollowButtons();
-
-
-
 //////////////////////////////////////////////////listing show///////////////////////////////////////////////////
 
 / <<<<<<< HEAD
@@ -792,7 +789,7 @@
 /                     %a{:href => "#"}
 /                       %img{:alt => "item image", :src => asset_path(ls_img.image.url(:thumb)) }
 /       .qty-block.col-md-7.col-sm-7.col-xs-7
-/         .single_head      
+/         .single_head
 /           %h1
 /             %span#listing-title.listing-title= @listing.title
 /         .row
@@ -809,7 +806,6 @@
 /                     /         / =question_type
 /                     /         = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
 /                     %span Item Condition:
-                    
 /                   .col-md-9.col-sm-9.col-xs-9
 /                     %span #{@listing.item_condition}
 /                 %li
@@ -820,9 +816,9 @@
 /                       %input.form-control{:id => "qty" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
 /                       %lable.min-order
 /                         Min Order: #{@listing.min_order}
-/                   .col-md-6.col-sm-6.col-xs-6 
-/                     .available     
-/                       #{@listing.available} available /  0 sold  
+/                   .col-md-6.col-sm-6.col-xs-6
+/                     .available
+/                       #{@listing.available} available /  0 sold
 /                 %li
 /                   .price-area
 /                     .col-md-1.col-sm-1.col-xs-1.padding-right-0
@@ -853,7 +849,7 @@
 /                     %span Shipping info:
 /                   .col-md-9.col-sm-9.col-xs-9
 /                     %p
-/                       May not ship to USA - Read item description or contact seller for shipping options. 
+/                       May not ship to USA - Read item description or contact seller for shipping options.
 /                 %li
 /                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
 /                     %span Delivery:
@@ -872,7 +868,7 @@
 /                         = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
 /                         %ul.author_details-list
 /                           %li
-/                             %span Total listings 
+/                             %span Total listings
 /                             = count_active_listings_for(@listing.author)
 /                           %li
 /                             %span Ships items quickly
@@ -1112,7 +1108,6 @@
 /       $("#qty").val(#{@listing.available});
 /     }
 /   }
-  
 /   $(document).ready(function(){
 /     cal_price()
 /   })
@@ -1352,7 +1347,6 @@
 /             = icon_tag("unlock", ["icon-part"])
 /             .text-part= t("listings.edit_links.reopen_listing")
 / - else
-  
 /   - if is_author
 /     = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
 /   - else
@@ -1362,7 +1356,7 @@
 / <<<<<<< HEAD
 /       - # Currently we show the selectors only for preauth process.
 /       - # However, there has been a plan to introduce these in other
-/       - # Processes (free) as well - rap1ds, 2.6.2015 
+/       - # Processes (free) as well - rap1ds, 2.6.2015
 /       / - if process != :postpay
 /       /   - if @listing.unit_type == :day
 /       /     - days = [:sunday, :monday, :tuesday, :wednesday, :thursday, :friday, :saturday, :sunday]

@@ -23,22 +23,22 @@
               %a.title{:href => "#"} #{@person.full_name}
               ( #{listings.count} )
               %span.feed-back-text
-                
+
             .col-md-3.col-sm-3.col-xs-3.pull-right.text-right
               -if !current_user?(@person)
                 %a.fa.fa-envelope-o{:href => new_person_person_message_path(@person)}
                 %a{:href => new_person_person_message_path(@person)}
                   %span Contact me
           .row
-            .col-md-4.col-sm-4.col-xs-4      
+            .col-md-4.col-sm-4.col-xs-4
               - if @current_community.follow_in_use? && @current_user && !current_user?(@person)
                 - if @current_user.follows?(@person)
                   = link_to person_follower_path(@person, @current_user), :method => "delete", :remote => true, :id => "followButton" , :class => "following_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       Following
                 - else
                   = link_to [ @person, :followers ], :method => "post", :remote => true, :id => "followButton" , :class => "follow_button" do
-                    %button.btn-follow{:type => "button"} 
+                    %button.btn-follow{:type => "button"}
                       %i.fa.fa-plus
                         Follow
             .col-md-8.col-sm-8.col-xs-8.follow_caption
@@ -50,7 +50,7 @@
                   .icon-with-text-container
                     .ss-chat.icon-part
                     .ss.text-part= t(".add_description")
-                          
+
   .col-md-12.col-sm-12.col-xs-12.see-all-feeback-block
     .row
       .col-md-6.col-sm-6.col-xs-6
@@ -61,7 +61,7 @@
           %a{:href => "#"} see all feeback
     .row
       .col-md-4.col-sm-4.col-xs-4.feedback-border-right
-       
+
         %ul.ratinglist-detail.row
           %li
             .col-md-4.col-sm-4.col-xs-4
@@ -72,7 +72,7 @@
             .col-md-5.col-sm-5.col-xs-5
               %span
                 Item as described
-      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right                                                 
+      .col-md-4.col-sm-4.col-xs-4.feedbak-result.feedback-border-right
         .col-md-4.col-sm-4.col-xs-4
           %p
             %span
@@ -99,7 +99,7 @@
             Negative
       .col-md-4.col-sm-4.col-xs-4
         #rating-carousel
-          -received_testimonials.each do |testimonial| 
+          -received_testimonials.each do |testimonial|
             - listing = testimonial.tx.listing
             .item
               .row
@@ -108,48 +108,48 @@
                   -if testimonial.grade <= 0.25
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
                     %i.fa.fa-star-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade == 0.5
                     %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star-half-o{"aria-hidden" => "true"}
-                    %i.fa.fa-star-o{"aria-hidden" => "true"}                    
+                    %i.fa.fa-star-o{"aria-hidden" => "true"}
                   -elsif testimonial.grade >= 0.5
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
-                    %i.fa.fa-star{"aria-hidden" => "true"} 
+                    %i.fa.fa-star{"aria-hidden" => "true"}
+                    %i.fa.fa-star{"aria-hidden" => "true"}
                     %i.fa.fa-star{"aria-hidden" => "true"}
                 .col-md-8.col-sm-8.col-xs-8
                   .item-caption
                     - text_with_line_breaks do
-                      #{testimonial.text} 
-                  %span        
+                      #{testimonial.text}
+                  %span
                     .testimonial-author
                       = link_to_unless testimonial.author.deleted?, PersonViewUtils.person_display_name(testimonial.author, @current_community), testimonial.author
                       = t("testimonials.testimonial.about_listing")
                       = link_to listing.title, listing
-                  %span    
+                  %span
                     = time_ago(testimonial.created_at) + "."
                 / .testimonial-icon{:class => testimonial.grade > 0.25 ? 'positive' : 'negative'}
                 /   - if testimonial.grade > 0.25
                 /     = icon_tag("like", ["positive"])
                 /   - else
                 /     = icon_tag("dislike", ["negative"])
-              
 
- 
+
+
 .container.collections-slider
   %h1
     Collections by #{@person.username} (#{listings.count})
   #collections-carousel
     -if listings.count > 0
       -listings.each do |listing|
-        .item 
+        .item
           .collections-items
             .collections-items-head
-              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}          
+              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}
             .colletions-img-slider
               %a.items-title{:href => listing_path(set_path(listing.id))}
                 = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
-            %ul.collections-img-list 
+            %ul.collections-img-list
               %li
                 %a.items-title{:href => listing_path(set_path(listing.id))}
                   = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
@@ -168,7 +168,7 @@
   %ul.following-members-list
     %li.row
       .col-md-3.col-sm-3.col-xs-3
-        
+
       .col-md-9.col-sm-9.col-xs-9
         %a.following-members{:href => "#"} Members
         %span #{listings.count} collections.
@@ -185,11 +185,11 @@
           %p #{person.followers.count} Followers
 
   %ul.following-images-list
-    - grade = 0 
+    - grade = 0
     -if received_testimonials.size > 0
       -received_testimonials.each do |r_t|
         -grade = grade + r_t.grade
-      - grade = ( grade / received_testimonials.size ) * 5 
+      - grade = ( grade / received_testimonials.size ) * 5
 
 
 - content_for :extra_javascript do
@@ -239,8 +239,8 @@
       var c = parseFloat(( a / b ) * 100).toFixed(2)
       $(".feed-back-text").text(c+"% positive feedback")
    }
-   $(function() { 
-      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); }); 
-      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); }); 
+   $(function() {
+      $("#followButton").on('ajax:error', function(xhr, status, error) { console.log("success"); location.reload(true); });
+      $("#followButton").on('ajax:success', function(event, data, status, xhr) { console.log("error"); location.reload(true); });
     });
   });

@@ -1,5 +1,5 @@
-.header-right.visible-tablet.no_margin_va
-  = link_to inbox_path, title: t("layouts.conversations.messages"), :id => "inbox-link", :class => "header-text-link header-hover header-inbox-link" do
+.visible-tablet.no_margin_va
+  = link_to inbox_path, title: t("layouts.conversations.messages"), :id => "inbox-link", :class => "header-text-link header-hover header-inbox-link email-link" do
     = icon_map_tag(icons, "mail", ["header-inbox"])
     - if unread_count > 0
       .badge.unreadC{:class => get_badge_class(unread_count)}
