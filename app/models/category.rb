@@ -153,6 +153,6 @@ class Category < ApplicationRecord
   end
 
   def category_name
-    url.humanize
+    url.humanize.gsub("-"," ")
   end
 end

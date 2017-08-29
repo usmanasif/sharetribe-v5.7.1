@@ -69,7 +69,6 @@
                                 /     = icon_tag("logout", ["icon-with-text"])
                                 /     = t("layouts.logged_in.logout")
                       %li
-<<<<<<< HEAD
                         .dropdown.login-menu
                           %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
                             Menu
@@ -102,19 +101,6 @@
                                 = link_to edit_details_admin_community_path(@current_community) do
                                   = icon_tag("admin", ["icon-with-text"])
                                   = t("layouts.logged_in.admin")
-
-=======
-                        = link_to person_path(user, :show_closed => true) do
-                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                            Manage Listings
-
-                      %li{:style => "margin-right: 20px;"}
-                        = link_to new_listing_path do
-                          %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-                            Post New Listing
->>>>>>> master
-
-
     .container
       .header-content
         / .col-md-2.col-sm-2.col-xs-12.header-p-5
@@ -141,11 +127,7 @@
                 .input-group-btn.select-drop-head
                   .search-form-input.categorices-select.btn.btn-default.dropdown-toggle
                     %span.caret.caret-icon
-<<<<<<< HEAD
                     = select_tag(:category,  options_from_collection_for_select(@main_categories, :url, "category_name" ) , class: 'categor-dropdown' , include_blank: "All Categories")
-=======
-                    = select_tag(:category,  options_from_collection_for_select(@main_categories, :url,:url) , class: 'categor-dropdown' , include_blank: "All Categories")
->>>>>>> master
                   / /btn-group
             %button.input-group.btn.btn-primary.col-sm-2{:type => "submit"} Search
         .col-md-1.col-sm-1.col-xs-1.header-p-0
