@@ -806,7 +806,6 @@
 /                     /         / =question_type
 /                     /         = render :partial => "listings/custom_field_partials/#{question_type}", :locals => { :custom_field_value => custom_field_value }
 /                     %span Item Condition:
-
 /                   .col-md-9.col-sm-9.col-xs-9
 /                     %span #{@listing.item_condition}
 /                 %li
@@ -831,7 +830,7 @@
 /                         %span.listing-price-amount
 /                           %span#price_span
 /                             = humanized_money_with_symbol(@listing.price).upcase
-/                     .col-md-4.col-sm-4.col-xs-4
+/                     .col-md-4.col-sm-4.col-xs-4                      
 /                     .col-md-12.col-sm-12.col-xs-12.row.delivery-method
 /                       #listing-message-links
 /                         = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
@@ -1109,7 +1108,6 @@
 /       $("#qty").val(#{@listing.available});
 /     }
 /   }
-
 /   $(document).ready(function(){
 /     cal_price()
 /   })
@@ -1349,7 +1347,6 @@
 /             = icon_tag("unlock", ["icon-part"])
 /             .text-part= t("listings.edit_links.reopen_listing")
 / - else
-
 /   - if is_author
 /     = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
 /   - else
@@ -1775,4 +1772,3 @@
 / =======
 /                 = price_tag = "(+<span class=\"delivery-price-value\" data-shipping-price=\"#{opts[:price].cents}\" data-per-additional=\"#{Maybe(opts)[:shipping_price_additional].cents.or_else(0)}\">#{MoneyViewUtils.to_humanized(opts[:price])}</span>)".html_safe
 / >>>>>>> c88dd8996af7e2a1f41b6194e9e289cf4aba0020
->>>>>>> fb992705d30fcfef1d95275e0f318c70f99cbc4a
