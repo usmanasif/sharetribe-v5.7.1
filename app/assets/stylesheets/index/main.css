@@ -370,6 +370,11 @@ select {
     font-size: 19px;
     line-height: 21px;
 }
+.nav.navbar-nav{
+    float: left;
+    margin: 0;
+    width: 100%;
+}
 .nav-area .navbar-default .navbar-collapse,
 .nav-area .navbar {
     margin-bottom: 0;
@@ -623,6 +628,8 @@ select {
 .navarea .navbar-nav>li {
     padding-left: 15px;
     padding-right: 15px;
+    width: 20%;
+    text-align: center;
 }
 .navarea .navbar {
     min-height: 19px !important;
