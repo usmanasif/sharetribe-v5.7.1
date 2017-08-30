@@ -93,6 +93,3 @@
 //= require radio_buttons
 //= require new_layout
 //= require_self
-
-
-
