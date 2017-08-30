@@ -7,8 +7,7 @@
       = stylesheet_link_tag "index/app-index"
       %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
       = javascript_include_tag 'index/app-index'
-
-  %body
+  %body{onload: "iframe_resize()"}
     %header#header
       .header-top
         .container

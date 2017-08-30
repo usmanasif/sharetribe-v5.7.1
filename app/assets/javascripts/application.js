@@ -19,6 +19,7 @@
 // It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
 // the compiled file.
 //
+//= require frameResize
 //= require jquery
 //= require jquery-ui-1.9.2.custom
 //= require jquery-ui-1.9.2.sortable
@@ -92,3 +93,6 @@
 //= require radio_buttons
 //= require new_layout
 //= require_self
+
+
+
