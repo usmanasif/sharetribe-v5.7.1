@@ -3,7 +3,7 @@
 /     .container
 /       .row
 /         .col-md-12.col-sm-12.col-xs-12
-/           %nav.cart-area.admin-menu-panel
+/           %nav.cart-area.admin-menu-panel.panel-wrap
 /             %ul
 /               - if @current_user
 /                 - conversations = @current_community.conversations.for_person(@current_user)
@@ -17,7 +17,7 @@
 /                 %li{:style => "margin-right: 262px;"}
 /                   .dropdown.login-admin-profile
 /                     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
-/                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"} 
+/                       %img.va_h_image{:alt => "", :src => "http://www.free-icons-download.net/images/user-icon-27998.png", :style => "width: 20px;height: 20px;"}
 /                       %span.admin-text
 /                         = "Ali Ahmad Saleem"
 /                         /= @current_user.name(@current_community)
@@ -37,7 +37,7 @@
 /                           %li
 /                             = link_to person_path(user) do
 /                               / = icon_tag"user", ["icon-with-text"])
-/                               = t("header.profile")                        
+/                               = t("header.profile")
 /                           %li
 /                             = link_to person_settings_path(user) do
 /                               / = icon_tag"settings", ["icon-with-text"])
@@ -48,7 +48,7 @@
 /                           /     = t("layouts.logged_in.logout")
 
 /               %li
-/                 .dropdown.login-menu 
+/                 .dropdown.login-menu
 /                   %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}
 /                     Menu
 /                   %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1"}
@@ -84,8 +84,8 @@
 /                 %li
 /                   = link_to person_path(user, :show_closed => true) do
 /                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
-/                       Manage Listings                      
-              
+/                       Manage Listings
+
 /                 %li{:style => "margin-right: 20px;"}
 /                   = link_to new_listing_path do
 /                     %button.btn.btn-md.pull-right.menu_btn_amzonLyout{:type => "button"}
@@ -110,7 +110,7 @@
 /                 -if i == 0
 /                   .item.active
 /                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-/                 -else  
+/                 -else
 /                   .item
 /                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
 /             -else
@@ -139,7 +139,7 @@
 /                 -if i == 0
 /                   .item.active
 /                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
-/                 -else  
+/                 -else
 /                   .item
 /                     %img.img-responsive{:alt => "...", :src => asset_path(image.image.url(:original))}
 /             -if !@second_slider_images.present?
@@ -181,7 +181,7 @@
 /                       - if list.fourth
 /                         %li
 /                           %a{:href => listing_path(set_path(listing.id))}
-/                             %img.img-responsive{:alt => "", :src => list.fourth}/    
+/                             %img.img-responsive{:alt => "", :src => list.fourth}/
 /               .col-md-12.col-sm-12.col-xs-12
 /                 .row
 /                   .padding-left-0.col-md-9.col-sm-9.col-xs-9
@@ -191,13 +191,13 @@
 
 /                   .padding-right-0.col-md-3.col-sm-3.col-xs-3
 /                     %ul.details
-/                       %li 
+/                       %li
 /                         - if listing.author
 /                           %a{:href => person_path(listing.author.username)} #{listing.author.username}
 /                       %li US #{listing.price}$
 /                       %li
 /                         %a{:href => listing_path(set_path(listing.id)) } Show now
-                        
+
 / / - @listings.each do |listing|
 / /   = render :partial => "layouts/grid_item_listing_image", :locals => {:listing => listing, :modifier_class => ""}
 / /   = listing.inspect

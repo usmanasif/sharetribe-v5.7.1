@@ -13,7 +13,7 @@
         .container
           .row
             .col-md-12.col-sm-12.col-xs-12
-              .cart-area.penal-wrap.admin-menu-panel
+              .cart-area.admin-menu-panel.penal-wrap
                 .row
                   .col-md-6.col-sm-6.col-xs-6
                     %ul
@@ -48,13 +48,6 @@
                               - Maybe(@current_user).each do |user|
                                 - conversations = @current_community.conversations.for_person(user)
                                 - unread_count = MarketplaceService::Inbox::Query.notification_count(user.id, @current_community.id)
-                                %li
-                                  = link_to person_inbox_path(@current_user) do
-                                    = icon_tag("mail", ["icon-with-text"])
-                                    = t("layouts.conversations.messages")
-                                    - if unread_count > 0
-                                      .mobile-badge{:class => get_badge_class(unread_count)}
-                                      = unread_count
                                 %li
                                   = link_to person_path(user) do
                                     = icon_tag("user", ["icon-with-text"])
@@ -184,6 +177,17 @@
     border-radius: 10px;
     text-align: center;
   }
+  .cart-area {
+  float: left;
+  font-family: 'Helvetica';
+  font-size: 12px;
+  padding: 0 0 0 0;
+  text-align: right;
+  }
+  .cart-area.penal-wrap {
+    width: 100%;
+    padding-right: 15px;
+  }
   .login-admin-profile {
     display: table !Important;
     width: 96%;
@@ -266,4 +270,15 @@
   .admin-menu-panel .dropdown-menu > li > a:hover  {
     background: #a64c5d;
     color: white;
+  }
+  .nav.navbar-nav {
+    float: left;
+    margin: 0;
+    width: 100%;
+  }
+  .navarea .navbar-nav>li {
+    padding-left: 15px;
+    padding-right: 15px;
+    width: 20%;
+    text-align: center;
   }
