@@ -359,10 +359,10 @@ class ListingsController < ApplicationController
             []
           end
 
-=begin        
+=begin
         ListingImage.where(id: listing_image_ids, author_id: @current_user.id).update_all(listing_id: @listing.id)
         puts "*"*50 , json = Listing.json_for_notification(@listing) , "*"*50
-        puts "*"*50 , Listing.notify_to_VA(json) , "*"*50 
+        puts "*"*50 , Listing.notify_to_VA(json) , "*"*50
 =end
 
         if params[:listing_ordered_images].present?
@@ -592,7 +592,7 @@ class ListingsController < ApplicationController
     else
       puts "*"*50 , 'off' , params
       l=Listing.find(params[:id]).update_attribute(:featured, false)
-    end        
+    end
     redirect_to :back
   end
   private

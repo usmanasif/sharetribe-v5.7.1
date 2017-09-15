@@ -1,4 +1,5 @@
 class PaypalAccountsController < ApplicationController
+before_action :allow_iframe_requests
   before_action do |controller|
     controller.ensure_logged_in t("layouts.notifications.you_must_log_in_to_view_your_settings")
   end
@@ -71,13 +72,26 @@ class PaypalAccountsController < ApplicationController
   end
 
   def ask_billing_agreement
+    puts '*='* 100
     return redirect_to action: :index unless PaypalHelper.community_ready_for_payments?(@current_community)
+    puts ' after redirect'
+    puts '*='* 100
 
     account_response = accounts_api.get(
       community_id: @current_community.id,
       person_id: @current_user.id
     )
+    puts '*='* 100
+    puts 'account_response'
+    puts account_response.inspect
+
+    puts '*='* 100
     m_account = account_response.maybe
+
+    puts '*='* 100
+    puts 'm_account'
+    puts m_account
+    puts '*='* 100
 
     case m_account[:order_permission_state]
     when Some(:verified)
@@ -92,13 +106,23 @@ class PaypalAccountsController < ApplicationController
             cancel_url:   billing_agreement_cancel_person_paypal_account_url
           }
         ))
+      puts '*='* 100
+      puts 'response ;dfksa;lfkad;lfkasd;lfkasd;lfkas;lfkas;k;lak;lfkads;f'
+
+      puts response
+      puts '*='* 100
 
       billing_agreement_url = response.data[:redirect_url]
+      puts '*+'* 100
+      puts billing_agreement_url.inspect
+      puts '*+' *100
 
       if billing_agreement_url.blank?
+
         flash[:error] = t("paypal_accounts.new.could_not_fetch_redirect_url")
         return redirect_to action: :index
       else
+        puts billing_agreement_url.inspect
         render json: {redirect_url: billing_agreement_url}
       end
 
@@ -106,7 +130,6 @@ class PaypalAccountsController < ApplicationController
       redirect_to action: ask_order_permission
     end
   end
-
   def permissions_verified
 
     unless params[:verification_code].present?
@@ -124,13 +147,20 @@ class PaypalAccountsController < ApplicationController
       ),
       flow: :old)
 
+    puts '==='* 50
+    puts 'permission verified response'
+    puts response.inspect
+    puts '==='* 50
+
+
     if response[:success]
-      redirect_to paypal_account_settings_payment_path(@current_user.username)
+      firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+      firebase.push("paypal_beep",{:community_id => @current_community.id, :user_id => @current_user.id })
+      render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: "Paypal account connected successfully!!" , paypal_status: true}
     else
-      flash_error_and_redirect_to_settings(error_response: response) unless response[:success]
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: "There was an error in connecting the Paypal Account... Please try again" , paypal_status: false}
     end
   end
-
   def billing_agreement_success
     response = accounts_api.billing_agreement_create(
       community_id: @current_community.id,
@@ -139,15 +169,19 @@ class PaypalAccountsController < ApplicationController
     )
 
     if response[:success]
-      redirect_to paypal_account_settings_payment_path(@current_user.username)
+      render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: "Billing Agreement is successful" , paypal_status: true}
+      # redirect_to paypal_account_settings_payment_path(@current_user.username)
     else
       case response.error_msg
       when :billing_agreement_not_accepted
-        flash_error_and_redirect_to_settings(error_msg: t("paypal_accounts.new.billing_agreement_not_accepted"))
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: t("paypal_accounts.new.billing_agreement_not_accepted") , paypal_status: false}
+        # flash_error_and_redirect_to_settings(error_msg: t("paypal_accounts.new.billing_agreement_not_accepted"))
       when :wrong_account
-        flash_error_and_redirect_to_settings(error_msg: t("paypal_accounts.new.billing_agreement_wrong_account"))
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: t("paypal_accounts.new.billing_agreement_wrong_account") , paypal_status: false}
+        # flash_error_and_redirect_to_settings(error_msg: t("paypal_accounts.new.billing_agreement_wrong_account"))
       else
-        flash_error_and_redirect_to_settings(error_response: response)
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: "There was an error in Billing agreement success" , paypal_status: false}
+        # flash_error_and_redirect_to_settings(error_response: response)
       end
     end
   end
@@ -159,7 +193,8 @@ class PaypalAccountsController < ApplicationController
     )
 
     flash[:error] = t("paypal_accounts.new.billing_agreement_canceled")
-    redirect_to paypal_account_settings_payment_path(@current_user.username)
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: t("paypal_accounts.new.billing_agreement_canceled") , paypal_status: false}
+    # redirect_to paypal_account_settings_payment_path(@current_user.username)
   end
 
 
@@ -179,7 +214,8 @@ class PaypalAccountsController < ApplicationController
   def ensure_paypal_enabled
     unless PaypalHelper.paypal_active?(@current_community.id)
       flash[:error] = t("paypal_accounts.new.paypal_not_enabled")
-      redirect_to person_settings_path(@current_user)
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: t("paypal_accounts.new.paypal_not_enabled") , paypal_status: false}
+      #redirect_to person_settings_path(@current_user)
     end
   end
 
@@ -225,6 +261,10 @@ class PaypalAccountsController < ApplicationController
 
   def accounts_api
     PaypalService::API::Api.accounts
+  end
+
+  def allow_iframe_requests
+  response.headers.delete('X-Frame-Options')
   end
 
 end
