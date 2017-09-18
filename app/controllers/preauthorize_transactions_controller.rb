@@ -347,6 +347,11 @@ class PreauthorizeTransactionsController < ApplicationController
           start_on: tx_params[:start_on],
           end_on: tx_params[:end_on]
         })
+      puts "========= ========="* 10
+      puts "in initiated method of preauthorize controller======== tx-respons"
+      puts tx_response.inspect
+      puts "=================="* 10
+
 
       handle_tx_response(tx_response)
     }
@@ -368,7 +373,7 @@ class PreauthorizeTransactionsController < ApplicationController
           raise NotImplementedError.new("No error handler for: #{msg}, #{data.inspect}")
         end
 
-      render_error_response(request.xhr?, error_msg, path)
+      render_error_response(request.xhrpaypal.generic_error?, error_msg, path)
     }
   end
 
@@ -419,6 +424,15 @@ class PreauthorizeTransactionsController < ApplicationController
 
   def handle_tx_response(tx_response)
     if !tx_response[:success]
+      puts "========"
+      puts
+      puts
+      puts "tx responseeeeeeeeeeeeeeeeeeeeeeeeeee"
+      puts tx_response.inspect
+      puts
+      puts
+      puts
+
       render_error_response(request.xhr?, t("error_messages.paypal.generic_error"), action: :initiate)
     elsif (tx_response[:data][:gateway_fields][:redirect_url])
       if request.xhr?
