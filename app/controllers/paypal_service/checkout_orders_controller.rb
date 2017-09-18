@@ -14,13 +14,25 @@ class PaypalService::CheckoutOrdersController < ApplicationController
     token = paypal_payments_service.get_request_token(@current_community.id, params[:token])
     return redirect_to error_not_found_path if !token[:success]
 
+    puts "====================="
+    puts "Tokennnnnnnnnnnnnnnnnn"
+    puts token.inspect
+    puts "=========end token========"
+
     transaction = transaction_service.query(token[:data][:transaction_id])
+     puts "====================="
+    puts "Transaction========================="
+    puts transaction.inspect
+    puts "=========end transaction========"
 
     proc_status = paypal_payments_service.create(
       @current_community.id,
       token[:data][:token],
       force_sync: false)
-
+    puts "====================="
+    puts "proc_status"
+    puts proc_status.inspect
+    puts "=========end proc_status========"
 
     if !proc_status[:success]
       flash[:error] = t("error_messages.paypal.generic_error")

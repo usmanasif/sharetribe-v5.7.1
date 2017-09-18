@@ -90,7 +90,7 @@ before_action :allow_iframe_requests
 
     puts '*='* 100
     puts 'm_account'
-    puts m_account
+    puts m_account.inspect
     puts '*='* 100
 
     case m_account[:order_permission_state]
