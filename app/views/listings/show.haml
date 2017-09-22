@@ -97,7 +97,7 @@
                       = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
                     .listing-author-details
                       .listing-author-name
-                        = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+                        = link_to(PersonViewUtils.person_display_name_for_type(@listing.author,""), @listing.author).html_safe
                         %ul.author_details-list
                           %li
                             %span Total listings
