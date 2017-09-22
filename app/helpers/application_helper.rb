@@ -696,7 +696,7 @@ module ApplicationHelper
   def available
     quantity = ""
     self.custom_field_values.where(:type => 'NumericFieldValue').all.each do |c_f_v|
-      if c_f_v.question.name == 'Items available'
+      if c_f_v.question.name == 'Available'
         quantity = quantity + c_f_v.display_value.to_s
       end
     end

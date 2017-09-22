@@ -2,6 +2,8 @@
 %header.panel-wrap
   .header-panel
     .header-left
+      = link_to "/" do
+        = icon_map_tag(icons, "home", ["icon-with-text"])
       - if logged_in
         = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
         = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
@@ -84,6 +86,13 @@
     height: auto;
     line-height: 31px !important;
     padding: 0 !important;
+  }
+  .icon-with-text{
+    color: black;
+    font-size: 21px;
+    display: inline-block;
+    width: 1.25em;
+    text-align: center;
   }
 
 / -# Hide header in map view if mobile

@@ -22,7 +22,7 @@ var newwindow=null;
           $redirectLink.attr('href', response.redirect_url);
           $(redirectMessageSelector).removeClass('hidden');
           // window.location = response.redirect_url;
-          PopupCenter(response.redirect_url, 953.555);
+          PopupCenter(response.redirect_url, 953,555);
         }
       });
 

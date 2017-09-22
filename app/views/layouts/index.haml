@@ -20,6 +20,9 @@
                       -if @current_user
                         - conversations = @current_community.conversations.for_person(@current_user)
                         - unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
+                        %li
+                          = link_to "/" do
+                            = icon_tag("home", ["icon-with-text"])
                         - Maybe(@current_user).each do |user|
                           %li
                             = link_to new_listing_path do

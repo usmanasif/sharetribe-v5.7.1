@@ -25,16 +25,18 @@
           = l end_on, format: :long_with_abbr_day_name
           = "(#{pluralize(duration, t("listing_conversations.preauthorize.night"), t("listing_conversations.preauthorize.nights"))})"
 
-  - elsif quantity.present? && localized_unit_type.present?
+  - elsif quantity.present?
     .initiate-transaction-per-unit-wrapper
       %span.initiate-transaction-per-unit-label
-        = t("transactions.price_per_quantity", unit_type: localized_unit_type)
+        Price per Unit
+        / = t("transactions.price_per_quantity", unit_type: localized_unit_type)
       %span.initiate-transaction-per-unit-value
         = MoneyViewUtils.to_humanized(listing_price)
     - if quantity > 1
       .initiate-transaction-quantity-wrapper
         %span.initiate-transaction-quantity-label
-          = localized_selector_label || t("transactions.initiate.quantity")
+          Quantity
+        /   = localized_selector_label || t("transactions.initiate.quantity")
         %span.initiate-transaction-quantity-value
           = quantity
 

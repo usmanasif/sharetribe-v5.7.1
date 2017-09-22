@@ -20,7 +20,6 @@
   - if is_author
     = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
   - else
-
     = form_tag form_path, :method => :get, :id => "booking-dates" do
 
       - if [:day, :night].include?(@listing.quantity_selector&.to_sym)
@@ -120,7 +119,7 @@
         - blocked_dates_result.on_error do
           = t("listings.listing_actions.unable_load_availability")
 
-      - elsif listing_unit_type.present?
+      - elsif !is_author
         - delivery_type = delivery_opts.length > 0 ? delivery_opts.first[:name].to_s : ""
         - shipping_price_additional = delivery_opts.length > 0 ? delivery_opts.first[:shipping_price_additional] : nil
         - content_for :extra_javascript do
@@ -138,23 +137,26 @@
             if ("#{delivery_type}" == "shipping" && #{shipping_price_additional != nil}) {
               window.ST.initializeShippingPriceTotal(#{raw currency_opts.to_json}, '#quantity', '.delivery-price-value');
             }
-
-        .quantity-wrapper.input-group.clearfix
-          .quantity-label-wrapper
+        .row
+          .col-md-1-col-sm-1.col-xs-1
+          .col-md-3-col-sm-3.col-xs-3
             %label.quantity-label{for: 'quantity'}
-              = ListingViewUtils.translate_quantity(@listing.unit_type, @listing.unit_selector_tr_key)
-          .quantity-input.input-sm.required
-            %input#quantity{type: 'number', placeholder: t("listings.quantity_placeholder"), name: 'quantity', value: 1, min: 1, step: 1}
+              Quantity
+          .col-md-3-col-sm-3.col-xs-3
+            / = ListingViewUtils.translate_quantity(@listing.unit_type, @listing.unit_selector_tr_key)
+            .quantity-input.input-sm.required
+              %input#quantity{type: 'number',id: "quantity", placeholder: t("listings.quantity_placeholder"), name: 'quantity', value: "#{@listing.min_order}", min: "#{@listing.min_order}", step: 1, max: "#{@listing.available}" }
+              %lable.min-order
+                Min Order: #{@listing.min_order}
+          .col-md-5-col-sm-5.col-xs-5
+          #{@listing.available} available /  0 sold
 
       = render partial: "delivery_opts", locals: { delivery_opts: delivery_opts, is_author: is_author }
 
       = hidden_field_tag(:listing_id, @listing.id)
       .row
-        .col-md-1.col-sm-1.col-xs-1.padding-right-0
-
-        .col-md-3.col-sm-3.col-xs-3.padding-0
-
-        .col-md-8.col-sm-8.col-xs-8
+        .col-md-1.col-sm-1.col-xs-1.padding-0
+        .col-md-5.col-sm-5.col-xs-5
           - blocked_dates_result.on_success do
             %button.enabled-book-button.btn-success
               .content
@@ -164,7 +166,12 @@
             %button.disabled-book-button{disabled: true}
               .content
                 = action_button_label(@listing)
-
+        -if !is_author
+          .col-md-5.col-sm-5.col-xs-5
+            %button.btn-info{:type => "button"}
+              %a.ask{href: contact_to_listing_path(@listing) }
+                Ask a Question
+          .col-md-1.col-sm-1.col-xs-1.padding-0
     - if payment_gateway == :paypal && process != :none
       .row
         .col-md-1.col-sm-1.col-xs-1.padding-right-0
@@ -203,6 +210,91 @@
 
 
 :css
-  .btn-success{
-    margin-top: 8px;
+   .btn-success{
+  /   margin-top: 8px;
+    border-radius: 0.3125em;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    margin: 0.75em 0;
+    padding: 0 1.5em;
+    padding-bottom: 4px;
+    height: 2.625em;
+    border: 0;
+    display: table;
+    line-height: 1.5em;
+    padding-top: 0.5625em;
+    padding-bottom: 0.5625em;
+    height: auto;
+    width: -webkit-fill-available;
+    font-size: 1.10em;
+   }
+  .btn-info{
+    font-size: 1.10em;
+    width: -webkit-fill-available;
+    border-radius: 0.3125em;
+    color: white;
+    background: #4a90e2;
+    text-align: center;
+    cursor: pointer;
+    margin: 0.75em 0;
+    padding: 0 1.5em;
+    padding-bottom: 4px;
+    height: 2.625em;
+    border: 0;
+    display: table;
+    line-height: 1.5em;
+    padding-top: 0.5625em;
+    padding-bottom: 0.5625em;
+    height: auto;
+    margin-bottom: 3px;
   }
+  .ask{
+    color: white;
+  }
+  .quantity-input.input-sm{
+    padding: 0;
+    margin-bottom: 10px;
+  }
+:javascript
+  $("#quantity").on('keyup paste', function () {
+    ApplyFilter();
+  });
+  function ApplyFilter() {
+    console.log('in function apply filter');
+    var value = $("#quantity").val();
+    console.log(value);
+    if( value < #{@listing.min_order} ){
+      $("#quantity").val(#{@listing.min_order});
+    }
+    if( value > #{@listing.available} ){
+      $("#quantity").val(#{@listing.available});
+    }
+
+  }
+  $(document).ready(function(){
+    cal_price();
+  })
+
+  $("#quantity").change(function(){
+   cal_price();
+  })
+
+  function cal_price(){
+    var q = parseFloat($("#quantity").val());
+    console.log(#{humanized_money(@listing.price)})
+    var p = (#{(@listing.price)});
+    console.log(p);
+    $("#price_span").text("$" + q * p );
+  }
+
+
+/ :javascript
+/   $('#booking-dates').on('submit', function() {
+/     console.log("bott0n clicked");
+/     var q = $('#quantity').val();
+/     var formAction = $('#booking-dates').attr('action');
+/     $('#booking-dates').attr('action', formAction + "?quantity="+ q);
+/     var formActionnew = $('#booking-dates').attr('action');
+/     console.log($('#booking-dates').attr('action'));
+/   });

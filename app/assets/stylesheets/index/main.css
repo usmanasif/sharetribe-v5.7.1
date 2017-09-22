@@ -1489,14 +1489,10 @@ form .checkbox-container label {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    height: 39px;
-    -webkit-line-clamp: 2;
+    height: auto;
     margin-bottom: 8px;
     -webkit-box-orient: vertical;
 }
-
-
-
 #rating-carousel .item img {
     width: 100%;
 }
