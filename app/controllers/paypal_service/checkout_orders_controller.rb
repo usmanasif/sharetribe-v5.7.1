@@ -90,18 +90,25 @@ class PaypalService::CheckoutOrdersController < ApplicationController
       elsif response_data[:paypal_error_code] == "10417"
         # https://www.paypal.com/us/selfhelp/article/What-is-API-error-code-10417-FAQ3308
 
-        flash[:error] = t("error_messages.paypal.transaction_cannot_complete")
-        redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+        # flash[:error] = t("error_messages.paypal.transaction_cannot_complete")
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.paypal.transaction_cannot_complete") , paypal_status: false}
+        # redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
       elsif response_data[:paypal_error_code] == "10425"
-        flash[:error] = t("error_messages.paypal.seller_express_checkout_disabled")
-        redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+        # flash[:error] = t("error_messages.paypal.seller_express_checkout_disabled")
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.paypal.seller_express_checkout_disabled") , paypal_status: false}
+
+        # redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
       elsif response_data[:error_code] == :"payment-review"
-        flash[:warning] = t("error_messages.paypal.pending_review_error")
-        redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+        # flash[:warning] = t("error_messages.paypal.pending_review_error")
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.paypal.pending_review_error") , paypal_status: false}
+
+        # redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
       else
-        flash[:error] = t("error_messages.paypal.generic_error")
-        warn("Unhandled PayPal error response. Showing generic error to user.", :paypal_unhandled_error, response_data)
-        redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+        # flash[:error] = t("error_messages.paypal.generic_error")
+        # warn("Unhandled PayPal error response. Showing generic error to user.", :paypal_unhandled_error, response_data)
+         render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.paypal.generic_error") , paypal_status: false}
+        # redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+
       end
     end
   end

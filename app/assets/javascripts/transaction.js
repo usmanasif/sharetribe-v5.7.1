@@ -2,6 +2,44 @@ window.ST = window.ST || {};
 
 window.ST.transaction = window.ST.transaction || {};
 
+
+function FindLeftWindowBoundry()
+{
+  // In Internet Explorer window.screenLeft is the window's left boundry
+  if (window.screenLeft)
+  {
+    return window.screenLeft;
+  }
+
+  // In Firefox window.screenX is the window's left boundry
+  if (window.screenX)
+    return window.screenX;
+
+  return 0;
+}
+// Find Left Boundry of current Window
+function FindTopWindowBoundry()
+{
+  // In Internet Explorer window.screenLeft is the window's left boundry
+  if (window.screenTop)
+  {
+    return window.screenTop;
+  }
+
+  // In Firefox window.screenY is the window's left boundry
+  if (window.screenY)
+    return window.screenY;
+
+  return 0;
+}
+function PopupCenter(url, width, height) {
+  console.log(FindLeftWindowBoundry(), FindTopWindowBoundry());
+  var x = screen.width/2 - width/2 + FindLeftWindowBoundry();
+  var y = screen.height/2 - height/2 + FindTopWindowBoundry();
+  newwindow=window.open(url, '_blank','height=555,width=953,left='+x+',top='+y);
+
+}
+
 (function(module, _) {
 
   function toOpResult(submitResponse) {
@@ -52,7 +90,10 @@ window.ST.transaction = window.ST.transaction || {};
 
 
   function redirectFromOpResult(opResult) {
-    window.location = opResult.data.redirect_url;
+    console.log(opResult.data.redirect_url);
+    var url= opResult.data.redirect_url;
+    PopupCenter(url, 953,555);
+    // window.location = opResult.data.redirect_url;
   }
 
   function showErrorFromOpResult(opResult) {
@@ -99,6 +140,7 @@ window.ST.transaction = window.ST.transaction || {};
   }
 
   function initializeCreatePaymentPoller(opStatusUrl, redirectUrl) {
+    console.log(redirectUrl);
     ST.utils.baconStreamFromAjaxPolling(
       { url: opStatusUrl },
       function(pollingResult) {

@@ -424,14 +424,6 @@ class PreauthorizeTransactionsController < ApplicationController
 
   def handle_tx_response(tx_response)
     if !tx_response[:success]
-      puts "========"
-      puts
-      puts
-      puts "tx responseeeeeeeeeeeeeeeeeeeeeeeeeee"
-      puts tx_response.inspect
-      puts
-      puts
-      puts
 
       render_error_response(request.xhr?, t("error_messages.paypal.generic_error"), action: :initiate)
     elsif (tx_response[:data][:gateway_fields][:redirect_url])
@@ -443,6 +435,15 @@ class PreauthorizeTransactionsController < ApplicationController
         redirect_to tx_response[:data][:gateway_fields][:redirect_url]
       end
     else
+      puts "========"
+        puts
+        puts
+        puts "tx responseeeeeeeeeeeeeeeeeeeeeeeeeee"
+        puts tx_response.inspect
+        puts
+        puts "url is"
+        puts tx_response[:data][:gateway_fields][:process_token]
+        puts "end url"
       render json: {
                op_status_url: transaction_op_status_path(tx_response[:data][:gateway_fields][:process_token]),
                op_error_msg: t("error_messages.paypal.generic_error")

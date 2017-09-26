@@ -5,6 +5,7 @@
 - content_for :extra_javascript do
   :javascript
     $('#transaction-agreement-read-more').click(function() { $('#transaction-agreement-content').lightbox_me({centered: true, zIndex: 1000000}); });
+= javascript_include_tag "https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"
 
 - content_for :title_header do
   %h1
@@ -27,7 +28,7 @@
       %li
         = render partial: "transactions/price_break_down", locals: price_break_down_locals
 
-  = form_tag form_action, method: :post, id: "transaction-form" do
+  = form_tag form_action, method: :post,:target => "_blank" ,id: "transaction-form" do
 
     = hidden_field_tag(:start_on, start_on&.iso8601 )
     = hidden_field_tag(:end_on, end_on&.iso8601 )
@@ -62,5 +63,59 @@
           %p
             = t("listing_conversations.preauthorize.you_will_be_charged", author: author_link, expiration_period: expiration_period).html_safe
 
+
   %noscript
     = "For security reasons JavaScript has to be enabled"
+
+
+
+
+
+
+%script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
+:javascript
+
+  // Initialize Firebase
+  var current_user = "#{@current_user.id}"
+  var current_community= "#{@current_community.id}";
+
+  //var a = document.getElementById("message_conversation_id").value;
+  var config = {
+    apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
+    authDomain: "vendoradvisor-4df3f.firebaseapp.com",
+    databaseURL: "https://vendoradvisor-4df3f.firebaseio.com",
+    storageBucket: "vendoradvisor-4df3f.appspot.com",
+    messagingSenderId: "795403313668"
+  };
+  firebase.initializeApp(config);
+  var dbrefSB = firebase.database().ref().child('transaction_beep');
+  dbrefSB.on('value' , function(snap){
+    // var c = 0;
+    console.log("this is firebase snap",snap)
+    obj = snap.val();
+    $.each(obj , function( key , element ){
+      var p_id= element.person_id;
+      if(element.person_id == current_user && element.community_id == current_community && element.transaction_id){
+        console.log("window location");
+        console.log(window.location);
+        console.log("window origin");
+        console.log(window.location.origin);
+        console.log("transaction id");
+        console.log(element.transaction_id);
+        window.location=window.location.origin+"/en/transactions/"+element.transaction_id;
+      }
+      else{
+        console.log("transaction id");
+        console.log(element.transaction_id);
+        console.log("transaction id is null");
+        location.reload();
+      }
+      // get_messages_update(element.current_username);
+      dbrefSB.child( key ).remove();
+    });
+
+  });
+
+  // function update_unreadC(){
+  // $.get( "<%= person_messages_get_message_count_path %>",function(data, status){ if(status == 'success'){console.log(data); if(data // > 0){
+  // $(".unreadC").html(data);} } }); }

@@ -192,12 +192,23 @@ class TransactionsController < ApplicationController
     tx_fields = proc_status.dig(:data, :transaction_service_fields) || {}
     process_token = tx_fields[:process_token]
     process_completed = tx_fields[:completed]
+    puts "------------------------------"
+    puts "transaction ID"
+    puts params[:transaction_id]
+    puts "------------------------------"
 
     if process_token.present?
       redirect_url = transaction_finalize_processed_path(process_token)
 
       if process_completed
-        redirect_to redirect_url
+        puts "======" * 10
+        puts "in process completed check of created function of transaction controller "
+        puts "======" * 10
+         firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+         firebase.push("transaction_beep",{transaction_id: params[:transaction_id], person_id: @current_user.id ,community_id: @current_community.id})
+         render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: "Transaction created successfully" , paypal_status: true}
+
+        # redirect_to redirect_url
       else
         # Operation was performed asynchronously
 
@@ -215,8 +226,10 @@ class TransactionsController < ApplicationController
 
   def finalize_processed
     process_token = params[:process_token]
-
     proc_status = transaction_process_tokens.get_status(UUIDTools::UUID.parse(process_token))
+    puts "proc status of finalize_processed of transactions controller"
+    puts proc_status.inspect
+    puts "end proc_status of finalize_processed of transactions controller"
     unless (proc_status[:success] && proc_status[:data][:completed])
       return redirect_to error_not_found_path
     end
@@ -290,22 +303,31 @@ class TransactionsController < ApplicationController
           listing_uuid: tx[:listing_uuid].to_s,
           transaction_id: tx[:id],
           payment_process: tx[:payment_process] })
-
-      redirect_to person_transaction_path(person_id: @current_user.id, id: tx[:id])
+      firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+      firebase.push("transaction_beep",{transaction_id: tx[:id], person_id: @current_user.id ,community_id: @current_community.id})
+      render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: "Transaction created successfully" , paypal_status: true}
+      # redirect_to person_transaction_path(person_id: @current_user.id, id: tx[:id])
     else
       listing_id = response_data[:listing_id]
+      case response_data[:reason]
+      when :connection_issue
+        firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+        firebase.push("transaction_beep",{transaction_id: tx[:id], person_id: @current_user.id ,community_id: @current_community.id})
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.booking.booking_failed_payment_voided") , paypal_status: false}
+        # t("error_messages.booking.booking_failed_payment_voided")
+      when :double_booking
+        firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+        firebase.push("transaction_beep",{transaction_id: tx[:id], person_id: @current_user.id ,community_id: @current_community.id})
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: t("error_messages.booking.double_booking_payment_voided") , paypal_status: false}
 
-      flash[:error] =
-        case response_data[:reason]
-        when :connection_issue
-          t("error_messages.booking.booking_failed_payment_voided")
-        when :double_booking
-          t("error_messages.booking.double_booking_payment_voided")
-        else
-          t("error_messages.booking.booking_failed_payment_voided")
-        end
-
-      redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
+        # t("error_messages.booking.double_booking_payment_voided")
+      else
+        firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+        firebase.push("transaction_beep",{transaction_id: tx[:id], person_id: @current_user.id ,community_id: @current_community.id})
+        render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response:  t("error_messages.booking.booking_failed_payment_voided") , paypal_status: false}
+        # t("error_messages.booking.booking_failed_payment_voided")
+      end
+      # redirect_to person_listing_path(person_id: @current_user.id, id: listing_id)
     end
   end
 
