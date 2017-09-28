@@ -1,3 +1,4 @@
+=javascript_include_tag "application"
 - content_for :extra_javascript do
   :javascript
     ST.initializePayPalPreferencesForm(
@@ -123,3 +124,35 @@
               .paypal-redirect-message
                 - paypal_redirect_link = "<a href='#' id='ask_paypal_permissions_redirect'>#{t("paypal_accounts.redirect_link_text")}</a>"
                 = t("paypal_accounts.redirect_message", redirect_link: paypal_redirect_link).html_safe
+
+
+
+
+%script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
+:javascript
+  // Initialize Firebase
+  var current_user = "#{@current_user.id}"
+  //var a = document.getElementById("message_conversation_id").value;
+  var config = {
+    apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
+    authDomain: "vendoradvisor-4df3f.firebaseapp.com",
+    databaseURL: "https://vendoradvisor-4df3f.firebaseio.com",
+    storageBucket: "vendoradvisor-4df3f.appspot.com",
+    messagingSenderId: "795403313668"
+  };
+  firebase.initializeApp(config);
+  var dbrefSB = firebase.database().ref().child('paypal_beep');
+  dbrefSB.on('value' , function(snap){
+    // var c = 0;
+    console.log("this is firebase snap",snap)
+    obj = snap.val();
+    $.each(obj , function( key , element ){
+      if(element.user_id == current_user){
+        //apply refresh page partially or completely
+        location.reload();
+      }
+      // get_messages_update(element.current_username);
+      dbrefSB.child( key ).remove();
+    });
+
+  });

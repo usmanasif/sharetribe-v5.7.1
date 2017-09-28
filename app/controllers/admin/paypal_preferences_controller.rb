@@ -85,13 +85,22 @@ class Admin::PaypalPreferencesController < Admin::AdminBaseController
   end
 
   def preferences_update
+    puts '*'* 100
     currency = params[:paypal_preferences_form]["marketplace_currency"]
+    puts currency
+    puts '*'* 100
     minimum_commission = paypal_minimum_commissions_api.get(currency)
+    puts minimum_commission
+    puts '*'* 100
 
     paypal_prefs_form = PaypalPreferencesForm.new(
       parse_preferences(params[:paypal_preferences_form], currency).merge(minimum_commission: minimum_commission))
 
     if paypal_prefs_form.valid?
+      puts '*'* 100
+      puts '*'* 100
+      puts '*'* 100
+      puts '*'* 100
       ActiveRecord::Base.transaction do
         @current_community.currency = currency
         @current_community.save!
@@ -125,6 +134,11 @@ class Admin::PaypalPreferencesController < Admin::AdminBaseController
 
   def account_create
     community_country_code = LocalizationUtils.valid_country_code(@current_community.country)
+    # community_country_code = LocalizationUtils.valid_country_code('US')
+    puts '='*100
+    puts 'community_country_code'
+    puts community_country_code
+    puts '='*100
     response = accounts_api.request(
       body: PaypalService::API::DataTypes.create_create_account_request(
       {
@@ -132,7 +146,17 @@ class Admin::PaypalPreferencesController < Admin::AdminBaseController
         callback_url: admin_paypal_preferences_permissions_verified_url,
         country: community_country_code
       }))
+    puts '='*100
+    puts 'response'
+    puts response
+    puts '='*100
     permissions_url = response.data[:redirect_url]
+
+    puts '='*100
+    puts 'permissions_url'
+    permissions_url = response.data[:redirect_url]
+    puts permissions_url
+    puts '='*100
 
     if permissions_url.blank?
       flash[:error] = t("paypal_accounts.new.could_not_fetch_redirect_url")
@@ -158,9 +182,13 @@ class Admin::PaypalPreferencesController < Admin::AdminBaseController
           }))
 
     if response[:success]
-      redirect_to action: :index
+      firebase = Firebase::Client.new('https://vendoradvisor-4df3f.firebaseio.com/')
+      firebase.push("paypal_beep",{:community_id => @current_community.id, :user_id => @current_user.id })
+      render "layouts/paypal_acknowledgements" , layout: false , locals: { paypal_response: "Paypal account connected successfully!!" , paypal_status: true}
+      # redirect_to action: :index
     else
-      flash_error_and_redirect_to_settings(error_response: response)
+      render "layouts/paypal_acknowledgements", layout: false , locals: { paypal_response: "There was an error in connecting the Paypal Account... Please try again" , paypal_status: false}
+      # flash_error_and_redirect_to_settings(error_response: response)
     end
   end
 

@@ -174,6 +174,11 @@ module PaypalService::API
               billing_agreement_paypal_username_to: billing_agreement_request[:username_to],
               billing_agreement_request_token: billing_agreement_request[:token]
             })
+        puts ''''''''''''''''''''''''''''''''''''''''''''''''''''''''* 50
+        puts 'account'
+        puts account.inspect
+        puts ''''''''''''''''''''''''''''''''''''''''''''''''''''''''* 50
+
 
         Result::Success.new(
           DataTypes.create_billing_agreement_request(

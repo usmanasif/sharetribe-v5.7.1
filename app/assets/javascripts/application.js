@@ -93,3 +93,17 @@
 //= require radio_buttons
 //= require new_layout
 //= require_self
+
+$(document).ready(function() {
+  console.log('In Application .js for disabling the new tab open');
+  var links = document.getElementsByTagName("a");
+  console.log(links);
+  for(var i=0; i<links.length; i++){
+    links[i].setAttribute("data-href", links[i].getAttribute("href"));
+    links[i].removeAttribute("href");
+    links[i].onclick = function(){
+        window.location = this.getAttribute("data-href");
+    };
+  }
+});
+

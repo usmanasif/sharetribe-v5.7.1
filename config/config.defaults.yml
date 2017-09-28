@@ -5,9 +5,9 @@ default: &default_settings
   # The community subdomains will be added to this top domain.
   # NOTE: Do not include http(s) here, or subdomains, just the top level domain, like "sharetribe.com" for example
   domain: "codingstack.com:3000"
-  
+
   va_url: http://still-ridge-7153.herokuapp.com
-  
+
   # If you want to make logins work across different subdomains you should put here the domain where you are running Sharetribe.
   # practically in most cases the same value as in "domain:"
   # The session cookies will apply for the whole domain. If this is not needed you can leave this empty.
@@ -103,10 +103,11 @@ default: &default_settings
   aws_ses_sns_topic:
 
   # Paypal credentials for the platform owner.
-  paypal_username: xxxxxxxxxxxxx
-  paypal_password: xxxxxxxxxxxxx
-  paypal_signature: xxxxxxxxxxxxx
-  paypal_partner_id: xxxxxxxxxxxxx # payerID for paypal platform owner account
+
+  paypal_username: email.usmanasif-facilitator_api1.gmail.com
+  paypal_password: Y3X48VXFGLKYZU2A
+  paypal_signature: AFcWxV21C7fd0v3bYYYRCpSSRl31AAG2ZlC7gLF4.9CeCsaUIXrqb7z2
+  paypal_partner_id: VT5K5C3N5KVDQ
   paypal_app_id: APP-80W284485P519543T # Global test id
   paypal_button_source: # Unique value given to you by your PayPal contact
 
@@ -142,7 +143,7 @@ default: &default_settings
   # If you want to use Facebook connect, enter the credentials here
   fb_connect_id: "1013209578795884"
   fb_connect_secret: "2f6a763eb7bd21ff5074cc2686548e97"
-  
+
   # You can use Airbrake to track errors if you want.
   # You need to register an account and get an API key from airbrake.io
   use_airbrake: false
@@ -338,7 +339,7 @@ default: &default_settings
 
   # Default Google Maps API key for communities that don't specify one
   # Default is not to use Google Maps API key
-  google_maps_key:
+  google_maps_key: "AIzaSyBRhjgDtKt6RHpqhGrjtDMgCrf_Oebgs1k"
 
   # Path or URL for landing page assets.
   #

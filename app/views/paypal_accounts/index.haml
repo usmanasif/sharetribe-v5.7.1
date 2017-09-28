@@ -1,9 +1,10 @@
+=javascript_include_tag "application"
 - content_for :title_header do
   %h1= t("layouts.no_tribe.settings")
 
 = render :partial => "layouts/left_hand_navigation", :locals => { :links => left_hand_navigation_links }
 
-.left-navi-section.settings-section.payment-settings
+.left-navi-section.settings-section.payment-settings#payment_setting_view
   %h2= t("paypal_accounts.payout_info_title")
 
   - if community_ready_for_payments
@@ -39,7 +40,7 @@
                 =t("paypal_accounts.new.connect_paypal_account_instructions")
             .row.send-button-wrapper.without-margin
               .col-12
-                %button#ask_paypal_permissions
+                %button#ask_paypal_permissions.abc
                   = t("paypal_accounts.new.connect_paypal_account")
             .row.js-paypal-redirect-order-permission.hidden
               .col-12
@@ -137,3 +138,50 @@
     = t("paypal_accounts.admin_account_not_connected",
         contact_admin_link: link_to(t("paypal_accounts.contact_admin_link_text"),
                                     new_user_feedback_path)).html_safe
+
+
+/ :javascript
+/   $(document).ready(function () {
+/     $(".abc").on('click', function () {
+/       openWindow();
+/     });
+/     function openWindow() {
+/       window.open ("http://www.google.com", "Janela", "status=no, width=960, height=700")
+/     }
+/   });
+
+
+
+%script{:src => "https://www.gstatic.com/firebasejs/3.6.1/firebase.js"}
+:javascript
+  // Initialize Firebase
+  var current_user = "#{@current_user.id}"
+  //var a = document.getElementById("message_conversation_id").value;
+  var config = {
+    apiKey: "AIzaSyAmzQbCOTI58tmUqsuia3uUfUClvRzu6zM",
+    authDomain: "vendoradvisor-4df3f.firebaseapp.com",
+    databaseURL: "https://vendoradvisor-4df3f.firebaseio.com",
+    storageBucket: "vendoradvisor-4df3f.appspot.com",
+    messagingSenderId: "795403313668"
+  };
+  firebase.initializeApp(config);
+  var dbrefSB = firebase.database().ref().child('paypal_beep');
+  dbrefSB.on('value' , function(snap){
+    // var c = 0;
+    console.log("this is firebase snap",snap)
+    obj = snap.val();
+    $.each(obj , function( key , element ){
+      if(element.user_id == current_user){
+        //apply refresh page partially or completely
+        location.reload();
+      }
+      // get_messages_update(element.current_username);
+      dbrefSB.child( key ).remove();
+    });
+
+  });
+
+  // function update_unreadC(){
+  // $.get( "<%= person_messages_get_message_count_path %>",function(data, status){ if(status == 'success'){console.log(data); if(data // > 0){
+  // $(".unreadC").html(data);} } }); }
+

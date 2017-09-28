@@ -4,7 +4,30 @@
 - content_for :title_header do
   %h1
     %span.profile-title= PersonViewUtils.person_display_name(@person, @current_community)
-
+.container.collections-slider
+  %h1
+    Collections by #{@person.full_name} (#{listings.count})
+  #collections-carousel
+    -if listings.count > 0
+      -listings.each do |listing|
+        .item
+          .collections-items
+            .collections-items-head
+              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}
+            .colletions-img-slider
+              %a.items-title{:href => listing_path(set_path(listing.id))}
+                = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
+            %ul.collections-img-list
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,2), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+              %li
+                %a.items-title{:href => listing_path(set_path(listing.id))}
+                  = image_tag listing_image_url(listing,3), {:alt => listed_listing_title(listing), :class => "img-responsive"}
+            %p USD$ #{listing.price}
 .rating-details
   .col-md-12.col-sm-12.col-xs-12
     .row
@@ -136,30 +159,7 @@
 
 
 
-.container.collections-slider
-  %h1
-    Collections by #{@person.username} (#{listings.count})
-  #collections-carousel
-    -if listings.count > 0
-      -listings.each do |listing|
-        .item
-          .collections-items
-            .collections-items-head
-              %a.items-title{:href => listing_path(set_path(listing.id))} #{listing.title}
-            .colletions-img-slider
-              %a.items-title{:href => listing_path(set_path(listing.id))}
-                = image_tag listing_image_url(listing,0), {:alt => listed_listing_title(listing), :class => "img-responsive img-slider"}
-            %ul.collections-img-list
-              %li
-                %a.items-title{:href => listing_path(set_path(listing.id))}
-                  = image_tag listing_image_url(listing,1), {:alt => listed_listing_title(listing), :class => "img-responsive"}
-              %li
-                %a.items-title{:href => listing_path(set_path(listing.id))}
-                  = image_tag listing_image_url(listing,2), {:alt => listed_listing_title(listing), :class => "img-responsive"}
-              %li
-                %a.items-title{:href => listing_path(set_path(listing.id))}
-                  = image_tag listing_image_url(listing,3), {:alt => listed_listing_title(listing), :class => "img-responsive"}
-            %p USD$ #{listing.price}
+
 
 .container.following-collections
   %h2

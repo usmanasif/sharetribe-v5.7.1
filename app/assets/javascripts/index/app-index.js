@@ -34,6 +34,19 @@
 //= require map_label
 
 
+$(document).ready(function() {
+  console.log('In App-index.js for disabling the new tab open');
+  var links = document.getElementsByTagName("a");
+  console.log(links);
+  for(var i=0; i<links.length; i++){
+    links[i].setAttribute("data-href", links[i].getAttribute("href"));
+    links[i].removeAttribute("href");
+    links[i].onclick = function(){
+        window.location = this.getAttribute("data-href");
+    };
+  }
+});
+
 
 
 

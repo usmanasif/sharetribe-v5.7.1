@@ -20,48 +20,80 @@
                     %a{:href => "#"}
                       %img{:alt => "item image", :src => asset_path(ls_img.image.url(:thumb)) }
       .qty-block.col-md-7.col-sm-7.col-xs-7
-        .single_head      
+        .single_head
           %h1
             %span#listing-title.listing-title= @listing.title
         .row
           .col-md-7.col-sm-7.col-xs-7
             .row
               %ul.product-info
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Item Condition:
-                    
-                  .col-md-9.col-sm-9.col-xs-9
-                    %span #{@listing.item_condition}
-                %li
-                  .col-md-3.col-sm-3.col-xs-3.p-0.text-right
-                    %span Qty:
-                  .col-md-3.col-sm-3.col-xs-3
-                    .qty
-                      %input.form-control{:id => "qty" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
-                      %lable.min-order
-                        Min Order: #{@listing.min_order}
-                  .col-md-6.col-sm-6.col-xs-6 
-                    .available     
-                      #{@listing.available} available /  0 sold  
+                / %li
+                /   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+                /     %span Item Condition:
+
+                /   .col-md-9.col-sm-9.col-xs-9
+                /     %span #{@listing.item_condition}
+                / %li
+                /   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
+                /     %span Qty:
+                /   .col-md-3.col-sm-3.col-xs-3
+                /     .qty
+                /       %input.form-control{:id => "quantity" ,:type => "number", :min => "#{@listing.min_order}" , :max => "#{@listing.available}" , :value => "#{@listing.min_order}" }
+                /       %lable.min-order
+                /         Min Order: #{@listing.min_order}
+                /   .col-md-6.col-sm-6.col-xs-6
+                /     .available
+                /       #{@listing.available} available /  0 sold
                 %li
                   .price-area
                     .col-md-1.col-sm-1.col-xs-1.padding-right-0
                       %i.fa.fa-money{"aria-hidden" => "true"}
                     .col-md-3.col-sm-3.col-xs-3.padding-0
-                      %span Price
+                      %span Unit Price
                     .col-md-4.col-sm-4.col-xs-4.padding-0
                       .listing-price
                         %span.listing-price-amount
                           %span#price_span
                             = humanized_money_with_symbol(@listing.price).upcase
-                    .col-md-4.col-sm-4.col-xs-4                      
+                    .col-md-4.col-sm-4.col-xs-4
+                      &nbsp&nbsp
+                    .col-md-1.col-sm-1.col-xs-1.padding-right-0
+                      %i.fa.fa-money{"aria-hidden" => "true"}
+                    .col-md-3.col-sm-3.col-xs-3.padding-0
+                      %span Item Condition
+                    .col-md-4.col-sm-4.col-xs-4.padding-0
+                      .listing-price
+                        %span.listing-price-amount
+                          %span #{@listing.item_condition.humanize}
+                    .col-md-4.col-sm-4.col-xs-4
+                      &nbsp&nbsp
+                    -if @listing.health.present?
+                      .col-md-1.col-sm-1.col-xs-1.padding-right-0
+                        %i.fa.fa-money{"aria-hidden" => "true"}
+                      .col-md-3.col-sm-3.col-xs-3.padding-0
+                        %span Health
+                      .col-md-4.col-sm-4.col-xs-4.padding-0
+                        .listing-price
+                          %span.listing-price-amount
+                            %span#price_span
+                              %span #{@listing.health.humanize}
+                      .col-md-4.col-sm-4.col-xs-4
+                        &nbsp&nbsp
+                    -if @listing.age.present?
+                      .col-md-1.col-sm-1.col-xs-1.padding-right-0
+                        %i.fa.fa-money{"aria-hidden" => "true"}
+                      .col-md-3.col-sm-3.col-xs-3.padding-0
+                        %span Used
+                      .col-md-4.col-sm-4.col-xs-4.padding-0
+                        .listing-price
+                          %span.listing-price-amount
+                            %span#price_span
+                              %span #{@listing.age.humanize}
+                      .col-md-4.col-sm-4.col-xs-4
+                        &nbsp&nbsp
                     .col-md-12.col-sm-12.col-xs-12.row.delivery-method
                       #listing-message-links
-                        = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code }
-
-                    .col-md-12.col-sm-12.col-xs-12.cards-image-holder
-                      %img{:alt => "Cards", :src => asset_path("braintree_cards.png") }
+                        = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code, blocked_dates_end_on: blocked_dates_end_on, blocked_dates_result: blocked_dates_result, manage_availability_props: manage_availability_props, availability_enabled: availability_enabled, currency_opts: currency_opts}
 
                 %li
                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
@@ -74,7 +106,7 @@
                     %span Shipping info:
                   .col-md-9.col-sm-9.col-xs-9
                     %p
-                      May not ship to USA - Read item description or contact seller for shipping options. 
+                      May not ship to USA - Read item description or contact seller for shipping options.
                 %li
                   .col-md-3.col-sm-3.col-xs-3.p-0.text-right
                     %span Delivery:
@@ -90,10 +122,10 @@
                       = medium_avatar_thumb(@listing.author, {:class => "listing-author-avatar-image"})
                     .listing-author-details
                       .listing-author-name
-                        = link_to @listing.author.name(@current_community), @listing.author, :id => "listing-author-link", :class => "listing-author-name-link", :title => "#{@listing.author.name(@current_community)}"
+                        = link_to(PersonViewUtils.person_display_name_for_type(@listing.author,""), @listing.author).html_safe
                         %ul.author_details-list
                           %li
-                            %span Total listings 
+                            %span Total listings
                             = count_active_listings_for(@listing.author)
                           %li
                             %span Ships items quickly
@@ -142,32 +174,25 @@
                         = render :partial => "comment_form"
 
 
-
 :javascript
-  $("#qty").on('keyup paste', function () {
-    ApplyFilter();
-  });
-
-  function ApplyFilter() {
-    var value = $("#qty").val();
-    if( value < #{@listing.min_order} ){
-      $("#qty").val(#{@listing.min_order});
-    }
-    if( value > #{@listing.available} ){
-      $("#qty").val(#{@listing.available});
-    }
-  }
-  
   $(document).ready(function(){
-    cal_price()
-  })
-
-  $("#qty").change(function(){
-   cal_price()
+    cal_price();
   })
 
   function cal_price(){
-    var q = parseFloat($("#qty").val())
-    var p = parseFloat(#{humanized_money(@listing.price)})
-    $("#price_span").text("$" + q * p );
+    console.log('in function cal_price' );
+    console.log(#{humanized_money(@listing.price)})
+    var p = (#{(@listing.price)});
+    console.log(p);
+    $("#price_span").text("$" +  p );
   }
+
+
+
+
+
+
+
+
+
+

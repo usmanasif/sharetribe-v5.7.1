@@ -2,6 +2,24 @@
   = link_to inbox_path, title: t("layouts.conversations.messages"), :id => "inbox-link", :class => "header-text-link header-hover header-inbox-link email-link" do
     = icon_map_tag(icons, "mail", ["header-inbox"])
     - if unread_count > 0
-      .badge.unreadC{:class => get_badge_class(unread_count)}
+      .badge.unreadC
         = unread_count
 
+:css
+  .badge{
+    position: relative;
+    top: -11px;
+    left: 12px;
+    background: #a64c5d;
+    color: white;
+    width: 19px;
+    height: 19px;
+    font-size: 12px;
+    line-height: 19px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+    text-align: center;
+  }
