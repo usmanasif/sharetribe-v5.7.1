@@ -1,6 +1,9 @@
 window.ST = window.ST || {};
 
 (function(module) {
+
+
+
   /* global report_analytics_event */
   /* global disable_submit_button */
   /* global set_textarea_maxlength */
@@ -537,5 +540,4 @@ window.ST = window.ST || {};
 
     $(form_id).addClass("js-listing-form-ready");
   };
-
 })(window.ST);

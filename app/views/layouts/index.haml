@@ -23,15 +23,15 @@
                         %li
                           = link_to "/" do
                             = icon_tag("home", ["icon-with-text"])
+                            = @current_community.name(I18n.locale)
+
+
                         - Maybe(@current_user).each do |user|
                           %li
                             = link_to new_listing_path do
                               %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
                                 Post a new listing
-                          %li
-                            = link_to person_path(user, :show_closed => true) do
-                              %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
-                                Manage Listings
+
                   .col-md-6.col-sm-6.col-xs-6
                     %ul.pull-right
                       %li
@@ -40,6 +40,12 @@
                           - if unread_count > 0
                             .mobile-badge{:class => get_badge_class(unread_count)}
                               = unread_count
+                      - Maybe(@current_user).each do |user|
+                        %li
+                          = link_to person_path(user, :show_closed => true) do
+                            %button.btn.btn-md.menu_btn_amzonLyout{:type => "button"}
+                              Manage Listings
+
                       / %li
                       /   .dropdown.login-admin-profile
                       /     %button#dropdownMenu1.btn.btn-default.login-btn.dropdown-toggle{"aria-expanded" => "true", "aria-haspopup" => "true", "data-toggle" => "dropdown", :type => "button"}

@@ -64,8 +64,33 @@
                     .col-md-4.col-sm-4.col-xs-4.padding-0
                       .listing-price
                         %span.listing-price-amount
-                          %span #{@listing.item_condition}
+                          %span #{@listing.item_condition.humanize}
                     .col-md-4.col-sm-4.col-xs-4
+                      &nbsp&nbsp
+                    -if @listing.health.present?
+                      .col-md-1.col-sm-1.col-xs-1.padding-right-0
+                        %i.fa.fa-money{"aria-hidden" => "true"}
+                      .col-md-3.col-sm-3.col-xs-3.padding-0
+                        %span Health
+                      .col-md-4.col-sm-4.col-xs-4.padding-0
+                        .listing-price
+                          %span.listing-price-amount
+                            %span#price_span
+                              %span #{@listing.health.humanize}
+                      .col-md-4.col-sm-4.col-xs-4
+                        &nbsp&nbsp
+                    -if @listing.age.present?
+                      .col-md-1.col-sm-1.col-xs-1.padding-right-0
+                        %i.fa.fa-money{"aria-hidden" => "true"}
+                      .col-md-3.col-sm-3.col-xs-3.padding-0
+                        %span Used
+                      .col-md-4.col-sm-4.col-xs-4.padding-0
+                        .listing-price
+                          %span.listing-price-amount
+                            %span#price_span
+                              %span #{@listing.age.humanize}
+                      .col-md-4.col-sm-4.col-xs-4
+                        &nbsp&nbsp
                     .col-md-12.col-sm-12.col-xs-12.row.delivery-method
                       #listing-message-links
                         = render :partial => "listing_actions", locals: { form_path: form_path, payment_gateway: payment_gateway, delivery_opts: delivery_opts, process: process, listing_unit_type: listing_unit_type, country_code: country_code, blocked_dates_end_on: blocked_dates_end_on, blocked_dates_result: blocked_dates_result, manage_availability_props: manage_availability_props, availability_enabled: availability_enabled, currency_opts: currency_opts}

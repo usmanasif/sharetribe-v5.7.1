@@ -1,15 +1,18 @@
 -# Hide header in map view if mobile
+- unread_count = MarketplaceService::Inbox::Query.notification_count(@current_user.id, @current_community.id)
 %header.panel-wrap
   .header-panel
     .header-left
-      = link_to "/" do
+      = link_to "/",class: "community_name" do
         = icon_map_tag(icons, "home", ["icon-with-text"])
+        = @current_community.name(I18n.locale)
       - if logged_in
         = link_to t("homepage.index.post_new_listing"), new_listing_path, :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
-        = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
+
     .header-right
       - if logged_in
         = render :partial => "layouts/header_right_visible_tablet", locals: {unread_count: unread_count, inbox_path: inbox_path, icons: icons}
+        = link_to "Manage Listings", person_path(@current_user) , :id => "new-listing-link" , :class => "new-listing-link vA_h_simulator"
       - if available_locales.size > 1
         .visible-desktop
           #header-locales-menu.toggle.header-hover{data: {toggle: '#header-locales-toggle-menu', 'toggle-position' => 'absolute'}}
@@ -94,6 +97,10 @@
     width: 1.25em;
     text-align: center;
   }
+  .community_name{
+    color: black;
+    font-size: small;
+  }
 
 / -# Hide header in map view if mobile
 / %header.header
@@ -168,7 +175,6 @@
     background: none;
     border-bottom: 1px solid #ccc;
     width: 100%;
-    overflow: hidden;
     top: 0;
     left: 0;
     padding: 6px 0 0;
@@ -181,7 +187,6 @@
   }
   .header-panel {
     width: 1170px;
-    overflow: hidden;
     background: none;
     padding: 0 15px;
     margin: 0 auto;

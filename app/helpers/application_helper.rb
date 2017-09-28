@@ -703,4 +703,26 @@ module ApplicationHelper
     return quantity
   end
 
+  def age
+    age= ""
+    self.custom_field_values.where(:type => 'DropdownFieldValue').all.each do |c_f_v|
+      if c_f_v.question.name == 'Age'
+        s_id = c_f_v.selected_options.first.id
+        age = c_f_v.question.options.find(s_id).title
+      end
+    end
+    return age
+  end
+
+  def health
+    health= ""
+    self.custom_field_values.where(:type => 'DropdownFieldValue').all.each do |c_f_v|
+      if c_f_v.question.name == 'Condition'
+        s_id = c_f_v.selected_options.first.id
+        health = c_f_v.question.options.find(s_id).title
+      end
+    end
+    return health
+    end
+
 end

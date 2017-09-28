@@ -1,6 +1,46 @@
+= javascript_include_tag "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"
 - if custom_fields && custom_fields.count > 0
   .new_listing_form_field_container
     - custom_fields.each do |custom_field|
       - custom_field.with_type do |field_type|
         = label "custom_fields", "#{custom_field.id}".to_sym, "#{custom_field.name(I18n.locale)}#{custom_field.required ? '*' : ''}"
         = render :partial => "listings/form/custom_field_partials/#{field_type}", :locals => { :custom_field => custom_field, :custom_field_value => listing.answer_for(custom_field) }
+
+:javascript
+
+  function hideDropdowns(){
+    $(document).ready(function() {
+      console.log("hiding the dropdowns");
+      $(".custom_dropdown").addClass('hidden');
+      $(".custom_dropdown").prev().addClass('hidden');
+    });
+  }
+  function showDropdowns(){
+    $(".custom_dropdown").removeClass('hidden');
+    $(".custom_dropdown").prev().removeClass('hidden');
+  }
+
+  $(document).ready(function() {
+    if ($(".type-checkbox:checked").next().text() == "Used") {
+      showDropdowns();
+    }
+    else{
+      hideDropdowns();
+    }
+    $(".type-checkbox").on('change',function(){
+      console.log("in click function of listing-form .js");
+      var checkbox_text=$(this).next().text();
+      if(checkbox_text=="New"){
+        $('.custom_dropdown').prop('selectedIndex',0);
+        hideDropdowns();
+      }
+      else if (checkbox_text=="Used") {
+        if(this.checked){
+          showDropdowns();
+        }
+        else{
+          hideDropdowns();
+        }
+      }
+    });
+  });
